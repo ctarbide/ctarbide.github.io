@@ -1,0 +1,69 @@
+
+Use 'git config' as a generic configuration tool.
+
+<<CONFIG_NAME>>=
+"${thisdir}/website.cfg"
+@
+
+<<NAMESPACE>>=
+website.
+@
+
+<<default values>>=
+configure configname "${configname}"
+configure kbdir "${thisdir%/*}/pages"
+@
+
+<<set stamp and year>>=
+stamp=`date --utc '+%Y-%m-%d_%Hh%Mm%S'`
+year=${stamp%%-*}
+@
+
+<<function configure>>=
+configname=<<CONFIG_NAME>>
+configure(){
+    if [ x"${1#*.}" = x"${1}" ] || ! git config -f "${configname}" "$@"; then
+        name="<<NAMESPACE>>${1}"; shift
+        git config -f "${configname}" "${name}" "$@"
+    fi
+}
+@
+
+<<create-config.sh>>=
+<<sh preamble>>
+<<thisdir>>
+<<function configure>>
+<<default values>>
+@
+
+usage example:
+
+    ./show-config.sh website.kbdir
+
+<<show-config.sh>>=
+<<sh preamble>>
+<<thisdir>>
+<<function configure>>
+[ -f "${configname}" ] || "${thisdir}/create-config.sh"
+if [ $# -eq 0 ]; then
+    git config -f "${configname}" --get-regexp '.*'
+else
+    configure "$@"
+fi
+@
+
+<<get kbdir>>=
+kbdir=`"${thisdir}/show-config.sh" kbdir`
+test -d "${kbdir}" || die 1 "Error, directory not found: ${kbdir}."
+@
+
+<<*>>=
+CHMOD='chmod 0555' nofake.sh -Rcreate-config.sh -ocreate-config.sh shell.nw create-config.nw
+CHMOD='chmod 0555' nofake.sh -Rshow-config.sh -oshow-config.sh shell.nw create-config.nw
+CHMOD='chmod 0555' nofake.sh -Rnew-item.sh -onew-item.sh shell.nw create-config.nw new-item.nw
+CHMOD='chmod 0555' nofake.sh -Rmake-index.sh -omake-index.sh shell.nw create-config.nw make-index.nw
+CHMOD='chmod 0555' nofake.sh -Rfind.sh -ofind.sh shell.nw create-config.nw temporary-files-shell.nw find.nw
+CHMOD='chmod 0555' nofake.sh -Rhead-README.sh -ohead-README.sh shell.nw create-config.nw temporary-files-shell.nw head-README.nw
+CHMOD='chmod 0555' nofake.sh -Rshow-README.sh -oshow-README.sh shell.nw create-config.nw temporary-files-shell.nw show-README.nw
+CHMOD='chmod 0555' nofake.sh -Rcat-README.sh -ocat-README.sh shell.nw create-config.nw temporary-files-shell.nw cat-README.nw
+@

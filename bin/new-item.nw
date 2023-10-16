@@ -1,0 +1,49 @@
+
+nofake create-config.nw
+
+<<new-item.sh>>=
+<<sh preamble>>
+<<function die>>
+<<thisdir>>
+<<function configure>>
+
+if [ "$#" -lt 1 ]; then
+    die 1 "usage: ${thispath##*/} id1 id2 ... idN"
+fi
+
+<<get kbdir>>
+
+<<set stamp and year>>
+
+item_id=$1
+shift
+for i in "$@"; do
+    item_id="${item_id}·${i}"
+done
+
+STAMP=${stamp}
+ITEM_ID=${item_id}
+DOC_ID=${stamp}_${item_id}
+DOCRELDIR=${year}/${DOC_ID}
+DOCABSDIR=${kbdir}/${DOCRELDIR}
+
+mkdir -p "${DOCABSDIR}"
+
+"${thisdir}/make-index.sh" "${DOCRELDIR}"
+
+cd "${DOCABSDIR}"
+
+cat @<<EOF>README.txt
+
+${DOC_ID}
+
+**************** references
+
+- 
+
+****************
+
+EOF
+
+echo 'echo '"${DOCABSDIR}"' | first-line-to-clipboard.sh'
+@
