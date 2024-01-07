@@ -1,3 +1,12 @@
+<<assets - favicon.ico for top level>>=
+favicon.ico
+@
 <<assets - favicon.ico for pages>>=
 ../../../favicon.ico
+@
+<<assets - md.pl for top level>>=
+pages/2023/2023-10-19_21h40m15_perl·markdown·daringfireball.net/md.pl
+@
+<<assets - md.pl for pages>>=
+../../2023/2023-10-19_21h40m15_perl·markdown·daringfireball.net/md.pl
 @

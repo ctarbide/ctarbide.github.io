@@ -1,0 +1,22 @@
+
+<<*>>=
+#!/bin/sh
+set -eu
+( find -mindepth 2 -name Makefile -type f | perl -le'
+    printf(qq{@<<make pages>>=\n});
+    while (<STDIN>) { chomp; s,^./|/Makefile$,,g;
+        print(qq{\t\$(MAKE) -C \047$_\047});
+    }
+    printf(qq{@\n});'
+) | CHMOD='chmod 0444' nofake.sh --error -RMakefile -oMakefile Makefile.nw -
+@
+
+<<Makefile>>=
+index.html: pages index.nw
+	rm -f index.html
+	nofake --error index.nw | sh | sh
+
+.PHONY: pages
+pages:
+<<make pages>>
+@

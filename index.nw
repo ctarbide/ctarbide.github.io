@@ -1,0 +1,97 @@
+
+<<body>>=
+
+<h1><<TITLE>></h1> 
+
+<p> Hi, you are very much welcome!
+
+<h2>About</h2>
+
+<p> The intent of this is to document some of the stuff I do.
+
+<p> <a href="pages/2024/2024-01-06_15h38m06_meta/index.html">More information</a>.
+
+@
+
+<<PRIMARY SOURCES>>=
+<<TOP>>/assets.nw index.nw
+@
+
+<<URL_PREFIX>>=
+https://ctarbide.github.io/
+@
+
+<<TOP>>=
+.
+@
+
+<<CANONICAL_URL>>=
+<<URL_PREFIX>>index.html
+@
+
+<<TITLE>>=
+ctarbi.de - Main Page
+@
+
+<<sh preamble>>=
+#!/bin/sh
+set -eu
+@
+
+<<print LAST MODIFIED>>=
+if git diff-index --quiet HEAD index.nw; then
+    FORMAT='format:%B %e, %Y at %T UTC' git-last-modified.sh index.nw | perl \
+        -lne'print(qq{@<<LAST MODIFIED@>>=\n${_}\n@\n})'
+else
+    last-modified.sh index.nw | perl -MPOSIX=strftime \
+        -lne'print(strftime(qq{@<<LAST MODIFIED@>>=\n%B %e, %Y (DRAFT)\n@\n}, gmtime($_)))'
+fi
+@
+
+<<generate>>=
+<<sh preamble>>
+<<print LAST MODIFIED>>
+cat <<PRIMARY SOURCES>>
+@
+
+<<render>>=
+<<sh preamble>>
+nofake -Rgenerate index.nw | sh | CHMOD='chmod 0444' nofake.sh --error -Rindex.html -oindex.html
+@
+
+<<index.html>>=
+<!DOCTYPE html>
+<html lang="en">
+<title><<TITLE>></title>
+<<metas and links>>
+<<style>>
+<<body>>
+<<footer>>
+@
+
+<<metas and links>>=
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=0.6">
+<link rel="canonical" href="<<CANONICAL_URL>>">
+<link rel="icon" href="<<assets - favicon.ico for top level>>" type="image/x-icon">
+@
+
+<<style>>=
+<style>
+body {
+    width: 90ch;
+    max-width: calc(100vw - 4em);
+    margin: 2em auto 0 auto;
+}
+</style>
+@
+
+<<footer>>=
+<p>
+    This <a href="index.nw">page</a> was
+    last modified on <<LAST MODIFIED>>.<br>
+@
+
+<<*>>=
+nofake --error -Rrender <<PRIMARY SOURCES>>
+@

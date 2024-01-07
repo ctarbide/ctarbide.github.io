@@ -917,6 +917,8 @@ sub _EncodeEmailAddress {
 
 	$addr = "mailto:" . $addr;
 
+	# disable encoding of email addresses, repeatable output is
+	# important here for automation
 	$addr =~ s{(.)}{
 		my $char = $1;
 		if ( $char eq '@' ) {
@@ -933,7 +935,7 @@ sub _EncodeEmailAddress {
 			);
 		}
 		$char;
-	}gex;
+	}gex if 0;
 
 	$addr = qq{<a href="$addr">$addr</a>};
 	$addr =~ s{">.+?:}{">}; # strip the mailto: from the visible part

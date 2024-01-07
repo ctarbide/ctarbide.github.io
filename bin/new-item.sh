@@ -41,8 +41,17 @@ cd "${DOCABSDIR}"
 
 cat <<EOF>README.txt
 
-<<*>>=
-nofake --error -Rrender README.txt
+<<references>>=
+-
+@
+
+<<body>>=
+<h1><<TITLE>></h1>
+<p> This is just a sample paragraph.
+@
+
+<<PRIMARY SOURCES>>=
+<<TOP>>/assets.nw README.txt
 @
 
 <<URL_PREFIX>>=
@@ -51,6 +60,10 @@ https://ctarbide.github.io/pages/${year}
 
 <<TOP>>=
 ../../..
+@
+
+<<PAGES>>=
+../..
 @
 
 <<STAMP>>=
@@ -65,22 +78,87 @@ ${ITEM_ID}
 <<URL_PREFIX>>/<<STAMP>>_<<ITEM_ID>>/index.html
 @
 
+<<TITLE>>=
+ctarbi.de - <<ITEM_ID>>
+@
+
+<<sh preamble>>=
+#!/bin/sh
+set -eu
+@
+
 <<print LAST MODIFIED>>=
-last-modified.sh README.txt | perl -MPOSIX=strftime \\
-    -lne'print(strftime(qq{@<<LAST MODIFIED@>>=\n%B %e, %Y\n@\n}, gmtime(\$_)))'
+if git diff-index --quiet HEAD README.txt; then
+    FORMAT='format:%B %e, %Y at %T UTC' git-last-modified.sh README.txt | perl \\
+        -lne'print(qq{@<<LAST MODIFIED@>>=\n\${_}\n@\n})'
+else
+    last-modified.sh README.txt | perl -MPOSIX=strftime \\
+        -lne'print(strftime(qq{@<<LAST MODIFIED@>>=\n%B %e, %Y (DRAFT)\n@\n}, gmtime(\$_)))'
+fi
+@
+
+<<set \$t0>>=
+t0=\`perl -MTime::HiRes=time -le'print(time)'\`
+@
+
+<<generated: \$t1 - \$t0>>=
+perl -MTime::HiRes=time -MPOSIX=strftime -le'
+    \$t1 = time;
+    \$t0 = \$ARGV[0];
+    printf(qq{\n<!-- Generated in %.3f seconds on %s. -->\n},
+        \$t1 - \$t0, strftime(q{%B %e, %Y at %T UTC}, gmtime))
+' -- "\${t0}"
+@
+
+<<standard data>>=
+<<print LAST MODIFIED>>
+cat <<PRIMARY SOURCES>>
+@
+
+<<aux data>>=
+: no-op
+@
+
+<<generate>>=
+<<sh preamble>>
+<<standard data>>
+<<aux data>>
+@
+
+<<create index.html from .index.html>>=
+cat .index.html > index.html
+<<generated: \$t1 - \$t0>> @>> index.html
+chmod 0444 index.html
+@
+
+<<update (or not) index.html from .index.html>>=
+if [ -f index.html ]; then
+    if [ .index.html -nt index.html ]; then
+        rm -fv index.html
+        <<create index.html from .index.html>>
+    else
+        echo "index.html is up to date."
+    fi
+else
+    <<create index.html from .index.html>>
+fi
+@
+
+<<update (or not) .index.html from primary sources>>=
+nofake -Rgenerate <<PRIMARY SOURCES>> | sh | CHMOD='chmod 0444' nofake.sh --error -Rindex.html -o.index.html
 @
 
 <<render>>=
-(
-    <<print LAST MODIFIED>>
-    cat <<TOP>>/assets.nw README.txt
-) | CHMOD='chmod 0444' nofake.sh --error -Rindex.html -oindex.html
+<<sh preamble>>
+<<set \$t0>>
+<<update (or not) .index.html from primary sources>>
+<<update (or not) index.html from .index.html>>
 @
 
 <<index.html>>=
 <!DOCTYPE html>
 <html lang="en">
-<title>ctarbi.de - <<STAMP>> - <<ITEM_ID>></title>
+<title><<TITLE>></title>
 <<metas and links>>
 <<style>>
 <<body>>
@@ -105,15 +183,11 @@ body {
 @
 
 <<footer>>=
-<p>
-    This <a href="README.txt">page</a> was
-    last modified on <<LAST MODIFIED>>.
+<p> This <a href="README.txt">page</a> was last modified on <<LAST MODIFIED>>.
 @
 
-<<body>>=
-<h1>Sample Document</h1>
-<p>
-    This is just a sample paragraph.
+<<*>>=
+nofake --error -Rrender <<PRIMARY SOURCES>>
 @
 EOF
 
