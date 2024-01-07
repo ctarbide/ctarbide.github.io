@@ -87,9 +87,7 @@ body {
 @
 
 <<footer>>=
-<p>
-    This <a href="index.nw">page</a> was
-    last modified on <<LAST MODIFIED>>.<br>
+<p> This <a href="index.nw">page</a> was last modified on <<LAST MODIFIED>>.<br>
 @
 
 <<*>>=
