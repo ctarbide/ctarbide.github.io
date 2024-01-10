@@ -24,7 +24,7 @@ use warnings FATAL => qw{uninitialized void inplace};
 use vars qw($VERSION);
 $VERSION = '1.0.1';
 use Digest::MD5 qw(md5_hex);
-my $g_empty_element_suffix = " />";     # Change to ">" for HTML output
+my $g_empty_element_suffix = ">";     # Change to " />" for XHTML output
 my $g_tab_width = 4;
 # Regex to match balanced [brackets]. See Friedl's
 # "Mastering Regular Expressions", 2nd Ed., pp. 328-331.
@@ -55,22 +55,6 @@ my %g_html_blocks;
 # Used to track when we're inside an ordered or unordered list
 # (see _ProcessListItems() for details):
 my $g_list_level = 0;
-sub Markdown ($) {
-	my $text = shift;
-	%g_urls = ();
-	%g_titles = ();
-	%g_html_blocks = ();
-	$text =~ s{\r\n}{\n}g; 	# DOS to Unix
-	$text =~ s{\r}{\n}g; 	# Mac to Unix
-	$text .= "\n\n";
-	$text = _Detab($text);
-	$text =~ s/^[ \t]+$//mg;
-	$text = _HashHTMLBlocks($text);
-	$text = _StripLinkDefinitions($text);
-	$text = _RunBlockGamut($text);
-	$text = _UnescapeSpecialChars($text);
-	return $text . "\n";
-}
 sub _StripLinkDefinitions {
 	my $text = shift;
 	my $less_than_tab = $g_tab_width - 1;
@@ -986,6 +970,22 @@ sub _Detab {
 
 	$text =~ s{(.*?)\t}{$1.(' ' x ($g_tab_width - length($1) % $g_tab_width))}ge;
 	return $text;
+}
+sub Markdown ($) {
+	my $text = shift;
+	%g_urls = ();
+	%g_titles = ();
+	%g_html_blocks = ();
+	$text =~ s{\r\n}{\n}g; 	# DOS to Unix
+	$text =~ s{\r}{\n}g; 	# Mac to Unix
+	$text .= "\n\n";
+	$text = _Detab($text);
+	$text =~ s/^[ \t]+$//mg;
+	$text = _HashHTMLBlocks($text);
+	$text = _StripLinkDefinitions($text);
+	$text = _RunBlockGamut($text);
+	$text = _UnescapeSpecialChars($text);
+	return $text . "\n";
 }
 my %cli_opts;
 use Getopt::Long;

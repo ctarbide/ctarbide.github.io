@@ -9,9 +9,14 @@ Use 'git config' as a generic configuration tool.
 website.
 @
 
+<<KBDIR>>=
+pages
+@
+
 <<default values>>=
 configure configname "${configname}"
-configure kbdir "${thisdir%/*}/pages"
+configure kbdir "${thisdir%/*}/<<KBDIR>>"
+configure kbdir-from-top-level "<<KBDIR>>"
 @
 
 <<set stamp and year>>=
@@ -60,6 +65,7 @@ test -d "${kbdir}" || die 1 "Error, directory not found: ${kbdir}."
 <<*>>=
 CHMOD='chmod 0555' nofake.sh -Rcreate-config.sh -ocreate-config.sh shell.nw create-config.nw
 CHMOD='chmod 0555' nofake.sh -Rshow-config.sh -oshow-config.sh shell.nw create-config.nw
+CHMOD='chmod 0555' nofake.sh -Rnew-item.sh -onew-item.sh shell.nw create-config.nw new-item.nw
 CHMOD='chmod 0555' nofake.sh -Rmake-index.sh -omake-index.sh shell.nw create-config.nw make-index.nw
 CHMOD='chmod 0555' nofake.sh -Rfind.sh -ofind.sh shell.nw create-config.nw temporary-files-shell.nw find.nw
 CHMOD='chmod 0555' nofake.sh -Rhead-README.sh -ohead-README.sh shell.nw create-config.nw temporary-files-shell.nw head-README.nw

@@ -1,13 +1,21 @@
 
+<<url>>=
+https://github.com/ctarbide
+@
+
 <<body>>=
 
 <h1><<TITLE>></h1> 
 
 <p> Hi, you are very much welcome!
 
+<h2>Pages</h2>
+
+<<pages listing>>
+
 <h2>About</h2>
 
-<p> The intent of this is to document some of the stuff I do.
+<p> The intent of this is to document some of the stuff I do at <a href="<<url>>"><<url>></a>.
 
 <p> <a href="pages/2024/2024-01-06_15h38m06_meta/index.html">More information</a>.
 
@@ -51,7 +59,7 @@ fi
 <<generate>>=
 <<sh preamble>>
 <<print LAST MODIFIED>>
-cat <<PRIMARY SOURCES>>
+cat <<PRIMARY SOURCES>> pages.nw
 @
 
 <<render>>=
@@ -76,20 +84,80 @@ nofake -Rgenerate index.nw | sh | CHMOD='chmod 0444' nofake.sh --error -Rindex.h
 <link rel="icon" href="<<assets - favicon.ico for top level>>" type="image/x-icon">
 @
 
-<<style>>=
-<style>
-body {
-    width: 90ch;
-    max-width: calc(100vw - 4em);
-    margin: 2em auto 0 auto;
-}
-</style>
-@
-
 <<footer>>=
 <p> This <a href="index.nw">page</a> was last modified on <<LAST MODIFIED>>.<br>
 @
 
 <<*>>=
-nofake --error -Rrender <<PRIMARY SOURCES>>
+<<sh preamble>>
+nofake -R'generate pages.nw' index.nw | sh
+nofake --error -Rrender <<PRIMARY SOURCES>> pages.nw | sh
+@
+
+<<find pages Makefile>>=
+find pages/ -mindepth 3 -maxdepth 3 -name Makefile -type f
+@
+
+<<generate pages listing>>=
+<<find pages Makefile>> | LC_ALL=C sort -r | perl -le'
+    printf(qq{@<<pages listing>>=\n});
+    printf(qq{<ul>\n});
+    while (<STDIN>) {
+        chomp;
+        s,^\./|/Makefile$,,g;
+        next if -f qq{${_}/.hidden};
+        next unless m{^( pages/ [12]\d{3} / ) (.*)$}xi;
+        my ($date, $item) = ($1, $2);
+        print(qq{<li><a href="${_}/">${item}</a></li>});
+    }
+    printf(qq{</ul>\n});
+    printf(qq{@\n});'
+@
+
+<<generate pages.nw>>=
+<<sh preamble>>
+rm -f pages.nw
+(
+    <<generate pages listing>>
+)>pages.nw
+chmod 0444 pages.nw
+@
+
+<<generate Makefile>>=
+<<sh preamble>>
+( <<find pages Makefile>> | LC_ALL=C sort | perl -le'
+    printf(qq{@<<make pages>>=\n});
+    while (<STDIN>) {
+        chomp;
+        s,^\./|/Makefile$,,g;
+        print(qq{\t\$(MAKE) -C \047${_}\047});
+    }
+    printf(qq{@\n});'
+) | CHMOD='chmod 0444' nofake.sh --error -RMakefile -oMakefile index.nw -
+@
+
+<<Makefile>>=
+index.html: update-Makefile pages index.nw
+	nofake --error index.nw | sh
+
+.PHONY: update-Makefile
+update-Makefile:
+	nofake -R'generate Makefile' index.nw | sh
+
+.PHONY: pages
+pages:
+<<make pages>>
+@
+
+nofake -R'git reset draft pages' index.nw | sh | sh
+
+<<git reset draft pages>>=
+<<sh preamble>>
+<<find pages Makefile>> | LC_ALL=C sort | perl -le'
+    while (<STDIN>) {
+        chomp;
+        s,^\./|/Makefile$,,g;
+        next unless -f qq{${_}/.draft};
+        print(qq{git reset --quiet \047${_}/index.html\047});
+    }'
 @

@@ -5,7 +5,7 @@ This is essentially a nowebified variant of v1.0.1 from Tue 14 Dec
 2004 with minor improvements.
 
 <<global default settings>>=
-my $g_empty_element_suffix = " />";     # Change to ">" for HTML output
+my $g_empty_element_suffix = ">";     # Change to " />" for XHTML output
 my $g_tab_width = 4;
 @
 
@@ -252,13 +252,17 @@ if ($cli_opts{'html4tags'}) {			# Use HTML tag style instead of XHTML
 }
 @
 
-<<md.pl>>=
-<<preamble>>
+<<md common>>=
 <<required uses>>
 <<global default settings>>
 <<globals>>
-<<sub Markdown>>
 <<other subs>>
+@
+
+<<md.pl>>=
+<<preamble>>
+<<md common>>
+<<sub Markdown>>
 <<process args>>
 print Markdown(do {local $/; <>});
 1;
@@ -267,11 +271,8 @@ __END__
 @
 
 <<md-inc.pl>>=
-<<required uses>>
-<<global default settings>>
-<<globals>>
+<<md common>>
 <<sub md>>
-<<other subs>>
 1;
 @
 
@@ -751,6 +752,8 @@ sub _EncodeEmailAddress {
 
 	$addr = "mailto:" . $addr;
 
+	# disable encoding of email addresses, repeatable output is
+	# important here for automation
 	$addr =~ s{(.)}{
 		my $char = $1;
 		if ( $char eq '@' ) {
@@ -767,7 +770,7 @@ sub _EncodeEmailAddress {
 			);
 		}
 		$char;
-	}gex;
+	}gex if 0;
 
 	$addr = qq{<a href="$addr">$addr</a>};
 	$addr =~ s{">.+?:}{">}; # strip the mailto: from the visible part

@@ -1,3 +1,7 @@
+This was generated from pages/2024/2024-01-06_15h38m06_meta/README.txt, do not change this file.
+<<assets - base url>>=
+https://ctarbide.github.io/
+@
 <<assets - favicon.ico for top level>>=
 favicon.ico
 @
@@ -9,4 +13,19 @@ pages/2023/2023-10-19_21h40m15_perl·markdown·daringfireball.net/md.pl
 @
 <<assets - md.pl for pages>>=
 ../../2023/2023-10-19_21h40m15_perl·markdown·daringfireball.net/md.pl
+@
+<<style>>=
+<style>
+pre {
+font-size: 12pt;
+font-family: "Lucida Console", Courier, monospace;
+}
+body {
+width: 90ch;
+max-width: calc(100vw - 4em);
+margin: 2em auto 0 auto;
+font-family: Georgia, "Bitstream Charter", serif;
+font-size: 14pt;
+}
+</style>
 @

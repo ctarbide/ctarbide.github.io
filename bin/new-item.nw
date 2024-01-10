@@ -1,8 +1,10 @@
-#!/bin/sh
-set -eu
-die(){ ev=$1; shift; for msg in "$@"; do echo "${msg}"; done; exit "${ev}"; }
-thispath=`perl -MCwd=realpath -le'print(realpath(\$ARGV[0]))' -- "${0}"`
-thisdir=${thispath%/*}
+
+nofake create-config.nw
+
+<<new-item.sh>>=
+<<sh preamble>>
+<<function die>>
+<<thisdir>>
 
 configname="${thisdir}/website.cfg"
 configure(){
@@ -53,46 +55,46 @@ cp -af "${META_DIR}/Makefile" .
 
 date '+%Y-%m-%d_%Hh%Mm%S' > .hidden
 
-cat - "${META_DIR}/template.nw" <<EOF >README.txt
+cat - "${META_DIR}/template.nw" @<<EOF >README.txt
 
-<<references>>=
+@<<references>>=
 - <http://www.literateprogramming.com/>
-@
+@@
 
-<<body>>=
-<h1><<TITLE>></h1>
+@<<body>>=
+<h1>@<<TITLE>></h1>
 <h2>References</h2>
-<<rendered references>>
+@<<rendered references>>
 <p> More details in the link below.
-@
+@@
 
-<<YEAR>>=
+@<<YEAR>>=
 ${year}
-@
+@@
 
-<<STAMP>>=
+@<<STAMP>>=
 ${STAMP}
-@
+@@
 
-<<ITEM_ID>>=
+@<<ITEM_ID>>=
 ${ITEM_ID}
-@
+@@
 
-<<PAGE DIR>>=
-${kbdir_ftl}/<<YEAR>>/<<STAMP>>_<<ITEM_ID>>
-@
+@<<PAGE DIR>>=
+${kbdir_ftl}/@<<YEAR>>/@<<STAMP>>_@<<ITEM_ID>>
+@@
 
-<<URL PREFIX>>=
-<<assets - base url>><<PAGE DIR>>
-@
+@<<URL PREFIX>>=
+@<<assets - base url>>@<<PAGE DIR>>
+@@
 
-<<CANONICAL URL>>=
-<<URL PREFIX>>/index.html
-@
+@<<CANONICAL URL>>=
+@<<URL PREFIX>>/index.html
+@@
 
-<<*>>=
-nofake --error -Rrender <<PRIMARY SOURCES>> | sh
-@
+@<<*>>=
+nofake --error -Rrender @<<PRIMARY SOURCES>> | sh
+@@
 EOF
 
 if [ "x${on_top_level}" = x1 ]; then
@@ -100,3 +102,4 @@ if [ "x${on_top_level}" = x1 ]; then
 else
     echo "tmux-new-window.sh '${DOCABSDIR}' '${ITEM_ID}'"
 fi
+@

@@ -1,3 +1,2 @@
-index.html: README.txt
-	rm -f index.html
-	nofake --error README.txt | sh | sh
+index.html: ../../../assets.nw README.txt
+	nofake --error README.txt | sh

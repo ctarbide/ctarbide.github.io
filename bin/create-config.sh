@@ -11,3 +11,4 @@ configure(){
 }
 configure configname "${configname}"
 configure kbdir "${thisdir%/*}/pages"
+configure kbdir-from-top-level "pages"

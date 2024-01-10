@@ -2,3 +2,5 @@
 *.stamp
 .index.html
 /pages/index.gz
+.draft
+.hidden

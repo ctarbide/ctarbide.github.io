@@ -1,42 +1,26 @@
 
-<<md url>>=
-https://daringfireball.net/projects/markdown/
-@
-
-<<md zip>>=
-https://daringfireball.net/projects/downloads/Markdown_1.0.1.zip
-@
-
 <<references>>=
-- <<<md url>>>
-
-    - <<<md zip>>>
-
-This uses a slightly modified version of [markdown v1.0.1](<<md zip>>)
+- <https://daringfireball.net/projects/markdown/basics>
 @
 
 <<body>>=
 <h1><<TITLE>></h1>
-<p> This page was automatically generated with these abstract recipes:
-<pre><code>
-<<htmlified snippets>>
-</code></pre>
+<<markdown basics>>
 <h2>References</h2>
 <<rendered references>>
-<p> See <a href="README.txt">README.txt</a> for more details.
-<<Markdown Readme.text.html>>
+<p> More details in the link below.
 @
 
 <<YEAR>>=
-2023
+2024
 @
 
 <<STAMP>>=
-2023-10-19_21h40m15
+2024-01-10_00h50m10
 @
 
 <<ITEM_ID>>=
-perl·markdown·daringfireball.net
+markdown·basics
 @
 
 <<PAGE DIR>>=
@@ -108,10 +92,9 @@ cat <<PRIMARY SOURCES>>
 printf '@<<rendered references>>=\n'
 nofake -Rreferences README.txt | <<assets - md.pl for pages>>
 printf '@\n'
-<<md Markdown Readme.text>>
-<<htmlify render chunk>>
-<<htmlify generate chunk>>
-<<htmlify 'aux data' chunk>>
+printf '@<<markdown basics>>=\n'
+<<assets - md.pl for pages>> basics.text
+printf '@\n'
 @
 
 <<generate>>=
@@ -175,39 +158,3 @@ nofake --error -Rgenerate <<PRIMARY SOURCES>> | sh | CHMOD='chmod 0444' nofake.s
 2023/2023-10-19_21h40m15_perl·markdown·daringfireball.net/
 @
 
-<<md Markdown Readme.text>>=
-printf '\n@<<Markdown Readme.text.html>>=\n'
-unzip -p Markdown_1.0.1.zip 'Markdown_1.0.1/Markdown Readme.text' |
-    perl -lpe's,\@daringfireball.net,\@redacted.net,' | ./md.pl
-printf '\n@\n'
-@
-
-<<htmlify render chunk>>=
-printf '@<<html snippet of '"'"'render'"'"'>>=\n'
-nofake-htmlify-chunk.sh render <<PRIMARY SOURCES>>
-printf '@\n'
-<<htmlified snippets>>=
-&lt;&lt;render&gt;&gt;=
-<<html snippet of 'render'>>
-@@
-@
-
-<<htmlify generate chunk>>=
-printf '@<<html snippet of '"'"'generate'"'"'>>=\n'
-nofake-htmlify-chunk.sh generate <<PRIMARY SOURCES>>
-printf '@\n'
-<<htmlified snippets>>=
-&lt;&lt;generate&gt;&gt;=
-<<html snippet of 'generate'>>
-@@
-@
-
-<<htmlify 'aux data' chunk>>=
-printf '@<<html snippet of '"'"'aux data'"'"'>>=\n'
-nofake-htmlify-chunk.sh 'aux data' <<PRIMARY SOURCES>>
-printf '@\n'
-<<htmlified snippets>>=
-&lt;&lt;aux data&gt;&gt;=
-<<html snippet of 'aux data'>>
-@@
-@

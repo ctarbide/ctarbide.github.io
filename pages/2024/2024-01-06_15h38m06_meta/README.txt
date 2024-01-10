@@ -1,6 +1,5 @@
 
 <<references>>=
-
 - [Markdown FTW](<<PAGES>>/<<md prefix>>index.html)
 
 - <https://github.com/ctarbide/coolscripts/blob/master/README.txt>
@@ -34,21 +33,14 @@
 @
 
 <<body>>=
-
 <h1><<TITLE>></h1>
-
+<h2>References</h2>
 <<rendered references>>
-
 <p> More details in the link below.
-
 @
 
 <<PRIMARY SOURCES>>=
 <<TOP>>/assets.nw README.txt
-@
-
-<<URL_PREFIX>>=
-https://ctarbide.github.io/pages/2024
 @
 
 <<TOP>>=
@@ -59,6 +51,10 @@ https://ctarbide.github.io/pages/2024
 ../..
 @
 
+<<YEAR>>=
+2024
+@
+
 <<STAMP>>=
 2024-01-06_15h38m06
 @
@@ -67,12 +63,20 @@ https://ctarbide.github.io/pages/2024
 meta
 @
 
-<<CANONICAL_URL>>=
-<<URL_PREFIX>>/<<STAMP>>_<<ITEM_ID>>/index.html
+<<PAGE DIR>>=
+pages/<<YEAR>>/<<STAMP>>_<<ITEM_ID>>
+@
+
+<<URL PREFIX>>=
+<<assets - base url>><<PAGE DIR>>
+@
+
+<<CANONICAL URL>>=
+<<URL PREFIX>>/index.html
 @
 
 <<TITLE>>=
-ctarbi.de - Meta
+ctarbi.de - <<ITEM_ID>>
 @
 
 <<sh preamble>>=
@@ -81,14 +85,16 @@ set -eu
 @
 
 <<print LAST MODIFIED>>=
-if git diff-index --quiet HEAD README.txt; then
+if git-file-is-pristine.sh README.txt; then
     FORMAT='format:%B %e, %Y at %T UTC' git-last-modified.sh README.txt | perl \
         -lne'print(qq{@<<LAST MODIFIED@>>=\n${_}\n@\n})'
 else
+    date '+%Y-%m-%d_%Hh%Mm%S' > .draft
     last-modified.sh README.txt | perl -MPOSIX=strftime \
         -lne'print(strftime(qq{@<<LAST MODIFIED@>>=\n%B %e, %Y (DRAFT)\n@\n}, gmtime($_)))'
 fi
 @
+
 <<set $t0>>=
 t0=`perl -MTime::HiRes=time -le'print(time)'`
 @
@@ -139,7 +145,7 @@ fi
 @
 
 <<update (or not) .index.html from primary sources>>=
-nofake -Rgenerate <<PRIMARY SOURCES>> | sh | CHMOD='chmod 0444' nofake.sh --error -Rindex.html -o.index.html
+nofake --error -Rgenerate <<PRIMARY SOURCES>> | sh | CHMOD='chmod 0444' nofake.sh --error -Rindex.html -o.index.html
 @
 
 <<render>>=
@@ -162,18 +168,8 @@ nofake -Rgenerate <<PRIMARY SOURCES>> | sh | CHMOD='chmod 0444' nofake.sh --erro
 <<metas and links>>=
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=0.6">
-<link rel="canonical" href="<<CANONICAL_URL>>">
+<link rel="canonical" href="<<CANONICAL URL>>">
 <link rel="icon" href="<<assets - favicon.ico for pages>>" type="image/x-icon">
-@
-
-<<style>>=
-<style>
-body {
-    width: 90ch;
-    max-width: calc(100vw - 4em);
-    margin: 2em auto 0 auto;
-}
-</style>
 @
 
 <<footer>>=
@@ -181,8 +177,10 @@ body {
 @
 
 <<*>>=
+<<sh preamble>>
 CHMOD='chmod 0444' nofake.sh --error -Rassets.nw -o'<<TOP>>/assets.nw' README.txt
-nofake --error -Rrender <<PRIMARY SOURCES>>
+nofake --error -R'create template' <<PRIMARY SOURCES>> | sh
+nofake --error -Rrender <<PRIMARY SOURCES>> | sh
 @
 
 <<https://www.imagemagick.org/Usage/thumbnails/#favicon snippet>>=
@@ -205,7 +203,10 @@ magick favicon.png \
 <<md prefix>>md.pl
 @
 
-<<assets.nw>>=
+<<assets.nw - misc>>=
+@<<assets - base url>>=
+https://ctarbide.github.io/
+@@
 @<<assets - favicon.ico for top level>>=
 favicon.ico
 @@
@@ -218,4 +219,56 @@ pages/<<md.pl from pages>>
 @<<assets - md.pl for pages>>=
 <<PAGES>>/<<md.pl from pages>>
 @@
+@
+
+<<assets.nw - style>>=
+@<<style>>=
+<style>
+pre {
+font-size: 12pt;
+font-family: "Lucida Console", Courier, monospace;
+}
+body {
+width: 90ch;
+max-width: calc(100vw - 4em);
+margin: 2em auto 0 auto;
+font-family: Georgia, "Bitstream Charter", serif;
+font-size: 14pt;
+}
+</style>
+@@
+@
+
+<<assets.nw>>=
+This was generated from <<PAGE DIR>>/README.txt, do not change this file.
+<<assets.nw - misc>>
+<<assets.nw - style>>
+@
+
+<<template exports 0>>=
+'PRIMARY SOURCES' TOP PAGES TITLE 'sh preamble' index.html footer
+<<template exports 1>>=
+'standard data' 'aux data' 'set $t0' 'generated: $t1 - $t0'
+<<template exports 2>>=
+'create index.html from .index.html' 'update (or not) index.html from .index.html'
+<<template exports 3>>=
+'update (or not) .index.html from primary sources' 'metas and links' 'md prefix'
+<<template exports 4>>=
+generate render 'print LAST MODIFIED'
+<<template exports 0 1 2>>=
+<<template exports 0>> <<template exports 1>> <<template exports 2>>
+<<template exports 3 4>>=
+<<template exports 3>> <<template exports 4>>
+<<template exports>>=
+<<template exports 0 1 2>> <<template exports 3 4>> 
+@
+
+This is used by new-item.sh as a partial document.
+
+<<create template>>=
+<<sh preamble>>
+rm -f template.nw; :>template.nw
+nofake-export-chunks.sh <<template exports>> <README.txt >>template.nw
+chmod 0444 template.nw
+echo 'Created "template.nw".'
 @

@@ -1,5 +1,5 @@
 use Digest::MD5 qw(md5_hex);
-my $g_empty_element_suffix = " />";     # Change to ">" for HTML output
+my $g_empty_element_suffix = ">";     # Change to " />" for XHTML output
 my $g_tab_width = 4;
 # Regex to match balanced [brackets]. See Friedl's
 # "Mastering Regular Expressions", 2nd Ed., pp. 328-331.
@@ -30,22 +30,6 @@ my %g_html_blocks;
 # Used to track when we're inside an ordered or unordered list
 # (see _ProcessListItems() for details):
 my $g_list_level = 0;
-sub md ($) {
-	my $text = shift;
-	%g_urls = ();
-	%g_titles = ();
-	%g_html_blocks = ();
-	$text =~ s{\r\n}{\n}g; 	# DOS to Unix
-	$text =~ s{\r}{\n}g; 	# Mac to Unix
-	die "Error, text does not end with new line." unless substr($text, -1) eq qq{\n};
-	$text = _Detab($text);
-	$text =~ s/^[ \t]+$//mg;
-	$text = _HashHTMLBlocks($text);
-	$text = _StripLinkDefinitions($text);
-	$text = _RunBlockGamut($text);
-	$text = _UnescapeSpecialChars($text);
-	return $text;
-}
 sub _StripLinkDefinitions {
 	my $text = shift;
 	my $less_than_tab = $g_tab_width - 1;
@@ -892,6 +876,8 @@ sub _EncodeEmailAddress {
 
 	$addr = "mailto:" . $addr;
 
+	# disable encoding of email addresses, repeatable output is
+	# important here for automation
 	$addr =~ s{(.)}{
 		my $char = $1;
 		if ( $char eq '@' ) {
@@ -908,7 +894,7 @@ sub _EncodeEmailAddress {
 			);
 		}
 		$char;
-	}gex;
+	}gex if 0;
 
 	$addr = qq{<a href="$addr">$addr</a>};
 	$addr =~ s{">.+?:}{">}; # strip the mailto: from the visible part
@@ -958,6 +944,22 @@ sub _Detab {
 	my $text = shift;
 
 	$text =~ s{(.*?)\t}{$1.(' ' x ($g_tab_width - length($1) % $g_tab_width))}ge;
+	return $text;
+}
+sub md ($) {
+	my $text = shift;
+	%g_urls = ();
+	%g_titles = ();
+	%g_html_blocks = ();
+	$text =~ s{\r\n}{\n}g; 	# DOS to Unix
+	$text =~ s{\r}{\n}g; 	# Mac to Unix
+	die "Error, text does not end with new line." unless substr($text, -1) eq qq{\n};
+	$text = _Detab($text);
+	$text =~ s/^[ \t]+$//mg;
+	$text = _HashHTMLBlocks($text);
+	$text = _StripLinkDefinitions($text);
+	$text = _RunBlockGamut($text);
+	$text = _UnescapeSpecialChars($text);
 	return $text;
 }
 1;
