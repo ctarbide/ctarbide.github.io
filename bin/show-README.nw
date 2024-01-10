@@ -1,5 +1,5 @@
 
-nofake create-config.nw
+nofake shell.nw create-config.nw
 
 <<show-README.sh>>=
 <<sh preamble>>

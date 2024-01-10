@@ -63,6 +63,7 @@ test -d "${kbdir}" || die 1 "Error, directory not found: ${kbdir}."
 @
 
 <<*>>=
+<<sh preamble>>
 CHMOD='chmod 0555' nofake.sh -Rcreate-config.sh -ocreate-config.sh shell.nw create-config.nw
 CHMOD='chmod 0555' nofake.sh -Rshow-config.sh -oshow-config.sh shell.nw create-config.nw
 CHMOD='chmod 0555' nofake.sh -Rnew-item.sh -onew-item.sh shell.nw create-config.nw new-item.nw

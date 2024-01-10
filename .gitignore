@@ -2,5 +2,6 @@
 *.stamp
 .index.html
 /pages/index.gz
+/.installation-ok
 .draft
 .hidden

@@ -47,12 +47,12 @@ set -eu
 @
 
 <<print LAST MODIFIED>>=
-if git diff-index --quiet HEAD index.nw; then
-    FORMAT='format:%B %e, %Y at %T UTC' git-last-modified.sh index.nw | perl \
-        -lne'print(qq{@<<LAST MODIFIED@>>=\n${_}\n@\n})'
-else
+if [ -f .draft ]; then
     last-modified.sh index.nw | perl -MPOSIX=strftime \
         -lne'print(strftime(qq{@<<LAST MODIFIED@>>=\n%B %e, %Y (DRAFT)\n@\n}, gmtime($_)))'
+else
+    FORMAT='format:%B %e, %Y at %T UTC' git-last-modified.sh index.nw | perl \
+        -lne'print(qq{@<<LAST MODIFIED@>>=\n${_}\n@\n})'
 fi
 @
 
@@ -90,21 +90,31 @@ nofake -Rgenerate index.nw | sh | CHMOD='chmod 0444' nofake.sh --error -Rindex.h
 
 <<*>>=
 <<sh preamble>>
+if git-file-is-pristine.sh index.nw; then
+    rm -f .draft
+else
+    date '+%Y-%m-%d_%Hh%Mm%S' > .draft
+    git reset --quiet -- index.html
+fi
 nofake -R'generate pages.nw' index.nw | sh
 nofake --error -Rrender <<PRIMARY SOURCES>> pages.nw | sh
 @
 
-<<find pages Makefile>>=
+<<find pages - Makefile>>=
 find pages/ -mindepth 3 -maxdepth 3 -name Makefile -type f
 @
 
+<<find pages - .draft>>=
+find pages/ -mindepth 3 -maxdepth 3 -name .draft -type f
+@
+
 <<generate pages listing>>=
-<<find pages Makefile>> | LC_ALL=C sort -r | perl -le'
+<<find pages - Makefile>> | LC_ALL=C sort -r | perl -le'
     printf(qq{@<<pages listing>>=\n});
     printf(qq{<ul>\n});
     while (<STDIN>) {
         chomp;
-        s,^\./|/Makefile$,,g;
+        s,/Makefile$,,g;
         next if -f qq{${_}/.hidden};
         next unless m{^( pages/ [12]\d{3} / ) (.*)$}xi;
         my ($date, $item) = ($1, $2);
@@ -118,6 +128,8 @@ find pages/ -mindepth 3 -maxdepth 3 -name Makefile -type f
 <<sh preamble>>
 rm -f pages.nw
 (
+    echo 'generated from index.nw'
+    echo
     <<generate pages listing>>
 )>pages.nw
 chmod 0444 pages.nw
@@ -125,11 +137,11 @@ chmod 0444 pages.nw
 
 <<generate Makefile>>=
 <<sh preamble>>
-( <<find pages Makefile>> | LC_ALL=C sort | perl -le'
+( <<find pages - Makefile>> | LC_ALL=C sort | perl -le'
     printf(qq{@<<make pages>>=\n});
     while (<STDIN>) {
         chomp;
-        s,^\./|/Makefile$,,g;
+        s,/Makefile$,,g;
         print(qq{\t\$(MAKE) -C \047${_}\047});
     }
     printf(qq{@\n});'
@@ -137,31 +149,32 @@ chmod 0444 pages.nw
 @
 
 <<Makefile>>=
-index.html: update-Makefile pages index.nw
-	nofake --error index.nw | sh
+# generated from index.nw
+
+index.html: .installation-ok update-Makefile pages index.nw
+	@nofake --error index.nw | sh
+
+.installation-ok: bin/check-installation.sh
+	@./bin/check-installation.sh
+	@date '+%Y-%m-%d_%Hh%Mm%S' > .installation-ok
 
 .PHONY: update-Makefile
 update-Makefile:
-	nofake -R'generate Makefile' index.nw | sh
+	@nofake -R'generate Makefile' index.nw | sh
 
 .PHONY: pages
 pages:
+	@nofake -R'touch draft pages' index.nw | sh
 <<make pages>>
 @
 
-nofake -R'git reset draft pages' index.nw | sh | sh -x
-
-<<git reset draft pages>>=
+<<touch draft pages>>=
 <<sh preamble>>
-<<find pages Makefile>> | LC_ALL=C sort | perl -le'
+<<find pages - .draft>> | LC_ALL=C sort | perl -le'
     $atime = $mtime = time;
     while (<STDIN>) {
         chomp;
-        s,^\./|/Makefile$,,g;
-        next unless -f qq{${_}/.draft};
-        print(qq{git reset --quiet \047${_}/index.html\047});
+        s,/.draft$,,g;
         utime $atime, $mtime, qq{${_}/README.txt};
-    }
-    print(qq{git reset --quiet \047index.html\047});
-    '
+    }'
 @

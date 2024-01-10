@@ -91,6 +91,13 @@ ${kbdir_ftl}/<<YEAR>>/<<STAMP>>_<<ITEM_ID>>
 @
 
 <<*>>=
+<<sh preamble>>
+if git-file-is-pristine.sh README.txt; then
+    rm -f .draft
+else
+    date '+%Y-%m-%d_%Hh%Mm%S' > .draft
+    git reset --quiet index.html
+fi
 nofake --error -Rrender <<PRIMARY SOURCES>> | sh
 @
 EOF

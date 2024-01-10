@@ -85,14 +85,12 @@ set -eu
 @
 
 <<print LAST MODIFIED>>=
-if git-file-is-pristine.sh README.txt; then
-    rm -f .draft
-    FORMAT='format:%B %e, %Y at %T UTC' git-last-modified.sh README.txt | perl \
-        -lne'print(qq{@<<LAST MODIFIED@>>=\n${_}\n@\n})'
-else
-    date '+%Y-%m-%d_%Hh%Mm%S' > .draft
+if [ -f .draft ]; then
     last-modified.sh README.txt | perl -MPOSIX=strftime \
         -lne'print(strftime(qq{@<<LAST MODIFIED@>>=\n%B %e, %Y (DRAFT)\n@\n}, gmtime($_)))'
+else
+    FORMAT='format:%B %e, %Y at %T UTC' git-last-modified.sh README.txt | perl \
+        -lne'print(qq{@<<LAST MODIFIED@>>=\n${_}\n@\n})'
 fi
 @
 
@@ -179,6 +177,12 @@ nofake --error -Rgenerate <<PRIMARY SOURCES>> | sh | CHMOD='chmod 0444' nofake.s
 
 <<*>>=
 <<sh preamble>>
+if git-file-is-pristine.sh README.txt; then
+    rm -f .draft
+else
+    date '+%Y-%m-%d_%Hh%Mm%S' > .draft
+    git reset --quiet -- index.html
+fi
 CHMOD='chmod 0444' nofake.sh --error -Rassets.nw -o'<<TOP>>/assets.nw' README.txt
 nofake --error -R'create template' <<PRIMARY SOURCES>> | sh
 nofake --error -Rrender <<PRIMARY SOURCES>> | sh

@@ -1,2 +1,2 @@
 index.html: ../../../assets.nw README.txt
-	nofake --error README.txt | sh | sh
+	@nofake --error README.txt | sh | sh
