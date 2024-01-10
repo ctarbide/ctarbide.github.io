@@ -6,10 +6,16 @@
 <link rel="canonical" href="https://ctarbide.github.io/pages/2023/2023-10-19_21h40m15_perl·markdown·daringfireball.net/index.html">
 <link rel="icon" href="../../../favicon.ico" type="image/x-icon">
 <style>
+pre {
+font-size: 12pt;
+font-family: "Lucida Console", Courier, monospace;
+}
 body {
-    width: 90ch;
-    max-width: calc(100vw - 4em);
-    margin: 2em auto 0 auto;
+width: 90ch;
+max-width: calc(100vw - 4em);
+margin: 2em auto 0 auto;
+font-family: Georgia, "Bitstream Charter", serif;
+font-size: 14pt;
 }
 </style>
 <h1>ctarbi.de - perl·markdown·daringfireball.net</h1>
@@ -18,7 +24,7 @@ body {
 &lt;&lt;render&gt;&gt;=
 &lt;&lt;sh preamble&gt;&gt;
 &lt;&lt;set $t0&gt;&gt;
-&lt;&lt;update (or not) .index.html from primary sources (uses 'generate')&gt;&gt;
+&lt;&lt;update (or not) .index.html from primary sources&gt;&gt;
 &lt;&lt;update (or not) index.html from .index.html&gt;&gt;
 @
 &lt;&lt;generate&gt;&gt;=
@@ -27,19 +33,31 @@ body {
 &lt;&lt;aux data&gt;&gt;
 @
 &lt;&lt;aux data&gt;&gt;=
+printf '@&lt;&lt;rendered references&gt;&gt;=\n'
+nofake -Rreferences README.txt | &lt;&lt;assets - md.pl for pages&gt;&gt;
+printf '@\n'
 &lt;&lt;md Markdown Readme.text&gt;&gt;
 &lt;&lt;htmlify render chunk&gt;&gt;
 &lt;&lt;htmlify generate chunk&gt;&gt;
 &lt;&lt;htmlify 'aux data' chunk&gt;&gt;
 @
 </code></pre>
-<p> This uses a slightly modified version of <a href="https://daringfireball.net/projects/markdown/">https://daringfireball.net/projects/markdown/</a>
+<h2>References</h2>
+<ul>
+<li><p><a href="https://daringfireball.net/projects/markdown/">https://daringfireball.net/projects/markdown/</a></p>
+
+<ul>
+<li><a href="https://daringfireball.net/projects/downloads/Markdown_1.0.1.zip">https://daringfireball.net/projects/downloads/Markdown_1.0.1.zip</a></li>
+</ul></li>
+</ul>
+
+<p>This uses a slightly modified version of <a href="https://daringfireball.net/projects/downloads/Markdown_1.0.1.zip">markdown v1.0.1</a></p>
 <p> See <a href="README.txt">README.txt</a> for more details.
 <h1>Markdown</h1>
 
 <p>Version 1.0.1 - Tue 14 Dec 2004</p>
 
-<p>by John Gruber <br />
+<p>by John Gruber <br>
 <a href="http://daringfireball.net/">http://daringfireball.net/</a></p>
 
 <h2>Introduction</h2>
@@ -325,8 +343,8 @@ How silly. Now fixed.</p></li>
 
 <h2>Copyright and License</h2>
 
-<p>Copyright (c) 2003-2004 John Gruber <br />
-<a href="http://daringfireball.net/">http://daringfireball.net/</a> <br />
+<p>Copyright (c) 2003-2004 John Gruber <br>
+<a href="http://daringfireball.net/">http://daringfireball.net/</a> <br>
 All rights reserved.</p>
 
 <p>Redistribution and use in source and binary forms, with or without
@@ -356,8 +374,6 @@ liability, whether in contract, strict liability, or tort (including
 negligence or otherwise) arising in any way out of the use of this
 software, even if advised of the possibility of such damage.</p>
 
-<p>
-    This <a href="README.txt">page</a> was
-    last modified on January  7, 2024 at 18:35:45 UTC.<br>
+<p> This <a href="README.txt">page</a> was last modified on January 10, 2024 at 16:39:11 UTC.
 
-<!-- Generated in 0.073 seconds on January  7, 2024 at 18:36:31 UTC. -->
+<!-- Generated in 0.087 seconds on January 10, 2024 at 16:39:16 UTC. -->
