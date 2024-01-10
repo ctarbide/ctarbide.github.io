@@ -149,7 +149,7 @@ pages:
 <<make pages>>
 @
 
-nofake -R'git reset draft pages' index.nw | sh | sh
+nofake -R'git reset draft pages' index.nw | sh | sh -x
 
 <<git reset draft pages>>=
 <<sh preamble>>
@@ -159,5 +159,7 @@ nofake -R'git reset draft pages' index.nw | sh | sh
         s,^\./|/Makefile$,,g;
         next unless -f qq{${_}/.draft};
         print(qq{git reset --quiet \047${_}/index.html\047});
-    }'
+    }
+    print(qq{git reset --quiet \047index.html\047});
+    '
 @

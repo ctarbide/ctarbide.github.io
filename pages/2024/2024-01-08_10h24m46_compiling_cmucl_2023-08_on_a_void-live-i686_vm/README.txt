@@ -185,6 +185,7 @@ set -eu
 
 <<print LAST MODIFIED>>=
 if git diff-index --quiet HEAD README.txt; then
+    rm -f .draft
     FORMAT='format:%B %e, %Y at %T UTC' git-last-modified.sh README.txt | perl \
         -lne'print(qq{@<<LAST MODIFIED@>>=\n${_}\n@\n})'
 else
