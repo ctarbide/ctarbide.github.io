@@ -154,11 +154,13 @@ nofake -R'git reset draft pages' index.nw | sh | sh -x
 <<git reset draft pages>>=
 <<sh preamble>>
 <<find pages Makefile>> | LC_ALL=C sort | perl -le'
+    $atime = $mtime = time;
     while (<STDIN>) {
         chomp;
         s,^\./|/Makefile$,,g;
         next unless -f qq{${_}/.draft};
         print(qq{git reset --quiet \047${_}/index.html\047});
+        utime $atime, $mtime, qq{${_}/README.txt};
     }
     print(qq{git reset --quiet \047index.html\047});
     '
