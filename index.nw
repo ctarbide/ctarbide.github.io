@@ -114,7 +114,7 @@ find pages/ -mindepth 3 -maxdepth 3 -name .draft -type f
     printf(qq{<ul>\n});
     while (<STDIN>) {
         chomp;
-        s,/Makefile$,,g;
+        s,/Makefile$,,;
         next if -f qq{${_}/.hidden};
         next unless m{^( pages/ [12]\d{3} / ) (.*)$}xi;
         my ($date, $item) = ($1, $2);
@@ -141,7 +141,7 @@ chmod 0444 pages.nw
     printf(qq{@<<make pages>>=\n});
     while (<STDIN>) {
         chomp;
-        s,/Makefile$,,g;
+        s,/Makefile$,,;
         print(qq{\t\$(MAKE) -C \047${_}\047});
     }
     printf(qq{@\n});'
@@ -151,7 +151,7 @@ chmod 0444 pages.nw
 <<Makefile>>=
 # generated from index.nw
 
-index.html: .installation-ok update-Makefile pages index.nw
+index.html: .installation-ok update-Makefile unlink-draft-pages pages index.nw
 	@nofake --error index.nw | sh
 
 .installation-ok: bin/check-installation.sh
@@ -162,19 +162,20 @@ index.html: .installation-ok update-Makefile pages index.nw
 update-Makefile:
 	@nofake -R'generate Makefile' index.nw | sh
 
+.PHONY: unlink-draft-pages
+unlink-draft-pages:
+	@nofake -R'unlink draft pages' index.nw | sh
+
 .PHONY: pages
-pages:
-	@nofake -R'touch draft pages' index.nw | sh
+pages: unlink-draft-pages
 <<make pages>>
 @
 
-<<touch draft pages>>=
+This is useful to force index.html regeneration if their primary sources have
+become pristine (committed in repository).
+
+<<unlink draft pages>>=
 <<sh preamble>>
-<<find pages - .draft>> | LC_ALL=C sort | perl -le'
-    $atime = $mtime = time;
-    while (<STDIN>) {
-        chomp;
-        s,/.draft$,,g;
-        utime $atime, $mtime, qq{${_}/README.txt};
-    }'
+<<find pages - .draft>> | LC_ALL=C sort |
+    perl -lne's,/.draft$,,; unlink qq{${_}/index.html}'
 @
