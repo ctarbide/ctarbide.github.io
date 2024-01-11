@@ -226,20 +226,28 @@ pages/<<md.pl from pages>>
 @@
 @
 
-<<assets.nw - style>>=
-@<<style>>=
-<style>
-pre {
-font-size: 12pt;
-font-family: "Lucida Console", Courier, monospace;
-}
-body {
+<<style - body>>=
 width: 90ch;
 max-width: calc(100vw - 4em);
 margin: 2em auto 0 auto;
 font-family: Georgia, "Bitstream Charter", serif;
 font-size: 14pt;
-}
+@
+
+<<style - monospace font>>=
+font-family: "Lucida Console", Courier, monospace;
+font-size: 14pt;
+@
+
+<<assets.nw - style>>=
+@<<style>>=
+<style>
+pre {
+<<style - monospace font>> }
+code {
+<<style - monospace font>> }
+body {
+<<style - body>> }
 </style>
 @@
 @
