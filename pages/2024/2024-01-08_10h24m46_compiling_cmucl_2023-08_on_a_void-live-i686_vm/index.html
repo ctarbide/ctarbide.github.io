@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<title>ctarbi.de - compiling_cmucl_2023-08_on_a_void-live-i686_vm</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=0.6">
+<link rel="canonical" href="https://ctarbide.github.io/pages/2024/2024-01-08_10h24m46_compiling_cmucl_2023-08_on_a_void-live-i686_vm/index.html">
+<link rel="icon" href="../../../favicon.ico" type="image/x-icon">
+<style>
+pre {
+font-family: "Lucida Console", Courier, monospace;
+font-size: 14pt; }
+code {
+font-family: "Lucida Console", Courier, monospace;
+font-size: 14pt; }
+body {
+width: 90ch;
+max-width: calc(100vw - 4em);
+margin: 2em auto 0 auto;
+font-family: Georgia, "Bitstream Charter", serif;
+font-size: 14pt; }
+</style>
+<h1>ctarbi.de - compiling_cmucl_2023-08_on_a_void-live-i686_vm</h1>
+
+<h2>Prepare VM</h2>
+
+<pre><code>qemu-img create -f qcow2 "void-live-i686--base.qcow2" 20G
+</code></pre>
+
+<h2>Install OS</h2>
+
+<p>Download Void Linux live ISO image:</p>
+
+<ul>
+<li><a href="https://repo-default.voidlinux.org/live/current/void-live-i686-20230628-base.iso">https://repo-default.voidlinux.org/live/current/void-live-i686-20230628-base.iso</a></li>
+</ul>
+
+<p>Start <code>qemu</code> to install from <code>ISO</code> image (tested with <code>QEMU emulator version 8.1.3</code>):</p>
+
+<pre><code>qemu-system-i386 -m 2048 -enable-kvm \
+    -monitor stdio \
+    -hda "void-live-i686--base.qcow2" \
+    -cdrom "void-live-i686-20230628-base.iso" \
+    -boot d
+</code></pre>
+
+<p><p>You should see the boot screen (choose the default/first option):</p>
+
+<p><img src="img-boot.png" alt="img boot" title="boot"></p>
+
+<p>followed by the login screen:</p>
+
+<p><img src="img-login.png" alt="img login" title="boot"></p>
+
+<p>Login as <code>root</code> with <code>voidlinux</code>, then start the installer program
+<code>void-installer</code>, then follow the installation instructions, this is the
+installer main menu:</p>
+
+<p><img src="img-installer.png" alt="img installer" title="installer"></p>
+
+<p>Options <strong>Keyboard</strong> and <strong>Network</strong> are straightforward.</p>
+
+<p>For <strong>Source</strong> I always choose <strong>Local</strong> and then update the system later
+using <code>xbps-install -Su</code></p>
+
+<p><img src="img-source.png" alt="img source" title="source"></p>
+
+<p>Set <strong>Mirror</strong> according to the VM geographical location or use a
+global mirror:</p>
+
+<p><img src="img-mirror-1.png" alt="img mirror 1" title="mirror-1"></p>
+
+<p><img src="img-mirror-2.png" alt="img mirror 2" title="mirror-2"></p>
+
+<p><img src="img-mirror-3.png" alt="img mirror 3" title="mirror-3"></p>
+
+<p><img src="img-mirror-4.png" alt="img mirror 4" title="mirror-4"></p>
+
+<p>To select another choice of mirror after installation, simply call <code>xmirror</code>
+on a terminal.</p>
+
+<p>For <strong>Hostname</strong>, <strong>Locale</strong> and <strong>Timezone</strong> I leave them untouched, these
+are the default installer settings:</p>
+
+<pre><code># cat /etc/hostname
+void
+
+# cat /etc/locale.conf
+LANG=C.UTF-8
+LC_COLLATE=C
+
+TODO: timezone
+</code></pre>
+
+<p>Options <strong>RootPassword</strong> and <strong>UserAccount</strong> are also straightforward.</p>
+
+<p>Option <strong>BootLoader</strong> is trivial, there is just one sensible option:</p>
+
+<p><img src="img-bootloader.png" alt="img bootloader" title="bootloader"></p>
+
+<p>Now start the most critical settings below, the <strong>Partition</strong> option:</p>
+
+<p><img src="img-partition-1.png" alt="img partition 1" title="partition 1"></p>
+
+<p>scroll...</p>
+
+<p><img src="img-partition-2.png" alt="img partition 2" title="partition 2"></p>
+
+<p>After following the instructions above for GPT and no UEFI, you should end up
+with a this configuration on <code>cfdisk</code>:</p>
+
+<p><img src="img-partition-3.png" alt="img partition 3" title="partition 3"></p>
+
+<p>Pay close attention to these steps:</p>
+
+<p><img src="img-partition-4.png" alt="img partition 4" title="partition 4"></p>
+
+<p><img src="img-partition-5.png" alt="img partition 5" title="partition 5"></p>
+
+<p><img src="img-partition-6.png" alt="img partition 6" title="partition 6"></p>
+
+<p>I normally do not use a <code>swap</code> partition, if the need arises, it is trivial to
+setup a swap file on the root partition:</p>
+
+<pre><code>swapon --show
+dd iflag=fullblock if=/dev/zero of=/swapfile bs=4096 count=524288 2&gt;/dev/null
+mkswap /swapfile
+chmod 0600 /swapfile
+swapon /swapfile
+# then add this to /etc/fstab: "/swapfile none swap sw 0 0"
+</code></pre>
+
+<p>Now comes the filesystem setup, <strong>XFS</strong> is a fine choice:</p>
+
+<p><img src="img-filesystem-1.png" alt="img filesystem 1" title="file system 1"></p>
+
+<p>Mount it to the root directory:</p>
+
+<p><img src="img-filesystem-2.png" alt="img filesystem 2" title="file system 2"></p>
+
+<p>Format and done:</p>
+
+<p><img src="img-filesystem-3.png" alt="img filesystem 3" title="file system 3"></p>
+
+<p>Now just <strong>Install</strong>:</p>
+
+<p><img src="img-install-1.png" alt="img install 1" title="install 1"></p>
+
+<p><img src="img-install-2.png" alt="img install 2" title="install 2"></p>
+
+<p>After installation is complete, choose to not restart, exit installer and
+shutdown the VM with <code>shutdown -h now</code>.</p>
+
+<h2>Start the system</h2>
+
+<pre><code>qemu-system-i386 -m 2048 -hda "void-live-i686--base.qcow2"
+</code></pre>
+
+<h2>Install Packages</h2>
+
+<p>After logging in with <code>root</code> and the choosen password from installation, it is
+advisable to change to a more friendly shell that is available, as shown below:</p>
+
+<p><img src="img-chsh.png" alt="img chsh" title="chsh"></p>
+
+<p>Then update the package manager and the system:</p>
+
+<pre><code>xbps-install -Suy xbps
+
+xbps-install -uy
+</code></pre>
+
+<p>After the last command you should end up with something similar to this:</p>
+
+<p><img src="img-system-update.png" alt="img system-update" title="system update"></p>
+
+<p>Then install these packages:</p>
+
+<pre><code>xbps-install xtools lsof wget curl lynx zip perl rsync unzip
+xbps-install zsh mg nano vim tmux rlwrap colordiff groff time
+xbps-install patch make git gcc gdb automake autoconf libtool
+xbps-install xorg-minimal xorg-input-drivers xorg-video-drivers
+xbps-install setxkbmap xauth font-misc-misc terminus-font
+xbps-install dejavu-fonts-ttf xterm xrandr xset jwm vtwm
+xbps-install firefox geany ncurses ncurses-devel libXt-devel
+xbps-install motif-devel motif-mwm motif-xmbind xlsfonts
+xbps-install font-adobe-100dpi font-adobe-75dpi
+</code></pre>
+
+<p>These packages are both very useful and some of them are prerequisite to build CMUCL.</p>
+
+<p>After installation of additional packages, you should end up with roughtly
+this disk usage:</p>
+
+<p><img src="img-disk-usage.png" alt="img disk usage" title="disk usage after initial packages install"></p>
+
+<p><code>gcc</code> version available at the time of this writting (January 11, 2024):</p>
+
+<p><img src="img-gcc-version.png" alt="img after install 2" title="after initial packages install 2"></p>
+
+<h2>Creating backing image</h2>
+
+<pre><code>chmod a-w "void-live-i686--base.qcow2"
+qemu-img create -f qcow2 -o backing_file="void-live-i686--base.qcow2" \
+    -F qcow2 "void-live-i686.qcow2"
+</code></pre>
+
+<h2>Start system with backed image</h2>
+
+<pre><code>qemu-system-i386 -m 2048 -enable-kvm \
+    -monitor stdio \
+    -hda "void-live-i686.qcow2" \
+    -boot c
+</code></pre>
+
+<h2>Connect to guest from host</h2>
+
+<p>In guest, connect to host and send local tcp port 22 as remote (-R) 2223:</p>
+
+<pre><code>ssh -R2223:127.0.0.1:22 hostuser@10.0.2.2 'while date; do sleep 30; done'
+</code></pre>
+
+<p>In host, connect to guest:</p>
+
+<pre><code>TERM=screen ssh -p2223 void@127.0.0.1
+</code></pre>
+
+<p><code>TERM</code> is important for <code>tmux</code> to properly work.</p>
+
+<h2>Configure environment</h2>
+
+<h3>Install coolscripts</h3>
+
+<p>Some instructions below only applies to <code>zsh</code>, adapt accordingly to your
+favorite shell.</p>
+
+<pre><code>mkdir -p ~/Downloads
+git clone https://github.com/ctarbide/coolscripts.git ~/Downloads/coolscripts
+PATH=${HOME}/Downloads/coolscripts/bin:${PATH}
+(set -eux; cd ~/Downloads/coolscripts/examples; nofake shell-tips.nw | sh)
+</code></pre>
+
+<h3>Other miscellaneous settings</h3>
+
+<pre><code>chsh -s /bin/zsh
+git config --global user.email "you@example.com"
+git config --global user.name "Your Name"
+git config --global init.defaultBranch master
+</code></pre>
+
+<h3>Setup a basic X11 graphical environment</h3>
+
+<p>Create a <code>~/.xinitrc</code> file with these contents:</p>
+
+<pre><code>setxkbmap us
+
+# faster keyboard repeat rate and smaller delay
+xset r rate 190 35
+
+xsetroot -solid '#0f2023'
+
+# exec vtwm
+exec jwm
+</code></pre>
+
+<p>After login:</p>
+
+<pre><code>exec startx
+</code></pre>
+
+<p>Hints:</p>
+
+<pre><code>$ xrandr --output Virtual-1 --mode 1440x900
+
+(qemu) sendkey ctrl-alt-f2
+</code></pre>
+
+<h2>Build CMUCL</h2>
+
+<h3>Extract CMUCL binary</h3>
+
+<pre><code>cd ~
+wget -cN https://common-lisp.net/project/cmucl/downloads/snapshots/2023/08/cmucl-2023-08-x86-linux.tar.bz2
+(set -eux; mkdir -pv ~/cmucl-2023-08-x86-linux; cd cmucl-2023-08-x86-linux; tar -xjf ../cmucl-2023-08-x86-linux.tar.bz2)
+</code></pre>
+
+<h3>Extract CMUCL sources</h3>
+
+<pre><code>cd ~
+wget -cN https://common-lisp.net/project/cmucl/downloads/snapshots/2023/08/cmucl-src-2023-08.tar.bz2
+(set -eux; mkdir -pv ~/cmucl-src-2023-08; cd cmucl-src-2023-08; tar -xjf ../cmucl-src-2023-08.tar.bz2)
+</code></pre>
+
+<h3>Build</h3>
+
+<pre><code>cd ~/cmucl-src-2023-08
+bin/build.sh -B boot-2021-07-2 -R -C x86_linux -o ~/cmucl-2023-08-x86-linux/bin/lisp
+bin/make-dist.sh -V 2023-08 -I dist linux-4
+</code></pre>
+
+<p>Build shouldn't take long:</p>
+
+<p><img src="img-build-finished.png" alt="img build finished" title="build finished"></p>
+
+<p>And should work fine:</p>
+
+<p><img src="img-it-works.png" alt="img it works" title="it works!"></p>
+
+<h2>References</h2>
+
+<ul>
+<li><p><a href="https://repo-default.voidlinux.org/live/current/void-live-i686-20230628-base.iso">https://repo-default.voidlinux.org/live/current/void-live-i686-20230628-base.iso</a></p></li>
+<li><p><a href="https://github.com/void-linux/void-mklive/blob/master/build-x86-images.sh">https://github.com/void-linux/void-mklive/blob/master/build-x86-images.sh</a></p></li>
+<li><p><a href="https://www.howtogeek.com/455981/how-to-create-a-swap-file-on-linux/">https://www.howtogeek.com/455981/how-to-create-a-swap-file-on-linux/</a></p></li>
+<li><p><a href="https://docs.voidlinux.org/xbps/repositories/mirrors/changing.html">https://docs.voidlinux.org/xbps/repositories/mirrors/changing.html</a></p></li>
+<li><p><a href="https://gitlab.common-lisp.net/cmucl/cmucl/-/wikis/Developer/BuildingCmucl">https://gitlab.common-lisp.net/cmucl/cmucl/-/wikis/Developer/BuildingCmucl</a></p></li>
+<li><p><a href="https://common-lisp.net/project/cmucl/downloads/snapshots/2023/08/">https://common-lisp.net/project/cmucl/downloads/snapshots/2023/08/</a></p></li>
+<li><p><a href="https://gitlab.common-lisp.net/cmucl/cmucl/-/blob/master/.gitlab-ci.yml">https://gitlab.common-lisp.net/cmucl/cmucl/-/blob/master/.gitlab-ci.yml</a></p></li>
+<li><p><a href="https://common-lisp.net/project/cmucl/downloads/snapshots/2023/08/cmucl-2023-08-x86-linux.tar.bz2">https://common-lisp.net/project/cmucl/downloads/snapshots/2023/08/cmucl-2023-08-x86-linux.tar.bz2</a></p></li>
+<li><p><a href="https://common-lisp.net/project/cmucl/downloads/snapshots/2023/08/cmucl-src-2023-08.tar.bz2">https://common-lisp.net/project/cmucl/downloads/snapshots/2023/08/cmucl-src-2023-08.tar.bz2</a></p></li>
+</ul>
+<p> This <a href="README.txt">page</a> was last modified on January 20, 2024 at 16:55:13 UTC.
+
+<!-- Generated in 0.060 seconds on January 20, 2024 at 16:55:22 UTC. -->
