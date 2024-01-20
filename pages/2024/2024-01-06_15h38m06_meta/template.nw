@@ -68,7 +68,7 @@ chmod 0444 index.html
 <<update (or not) index.html from .index.html>>=
 if [ -f index.html ]; then
     if [ .index.html -nt index.html ]; then
-        rm -fv index.html
+        rm -f index.html
         <<create index.html from .index.html>>
     else
         echo "index.html is up to date."

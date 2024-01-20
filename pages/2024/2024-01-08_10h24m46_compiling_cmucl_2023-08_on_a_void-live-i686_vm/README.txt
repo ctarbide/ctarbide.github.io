@@ -1,6 +1,6 @@
 
 <<references>>=
-- <https://gitlab.common-lisp.net/cmucl/cmucl/-/blob/master/.gitlab-ci.yml>
+- <<<void-live-i686-20230628-base.iso>>>
 
 - <https://github.com/void-linux/void-mklive/blob/master/build-x86-images.sh>
 
@@ -8,7 +8,15 @@
 
 - <https://docs.voidlinux.org/xbps/repositories/mirrors/changing.html>
 
+- <https://gitlab.common-lisp.net/cmucl/cmucl/-/wikis/Developer/BuildingCmucl>
+
 - <https://common-lisp.net/project/cmucl/downloads/snapshots/2023/08/>
+
+- <https://gitlab.common-lisp.net/cmucl/cmucl/-/blob/master/.gitlab-ci.yml>
+
+- <<<cmucl-2023-08-x86-linux.tar.bz2>>>
+
+- <<<cmucl-src-2023-08.tar.bz2>>>
 @
 
 <<void-live iso>>=
@@ -19,21 +27,34 @@ void-live-i686-20230628-base.iso
 void-live-i686--base.qcow2
 @
 
+<<backed image>>=
+void-live-i686.qcow2
+@
+
 <<create base image>>=
 qemu-img create -f qcow2 "<<base image>>" 20G
 @
 
-image will be backed by base image
-
-<<image>>=
-void-live-i686.qcow2
+<<create backed image>>=
+qemu-img create -f qcow2 -o backing_file="<<base image>>" \
+    -F qcow2 "<<backed image>>"
 @
 
+image will be backed by base image
+
 <<run qemu for installation>>=
-qemu-system-i386 -m 2048 \
+qemu-system-i386 -m 2048 -enable-kvm \
+    -monitor stdio \
     -hda "<<base image>>" \
     -cdrom "<<void-live iso>>" \
     -boot d
+@
+
+<<run qemu backed image>>=
+qemu-system-i386 -m 2048 -enable-kvm \
+    -monitor stdio \
+    -hda "<<backed image>>" \
+    -boot c
 @
 
 <<run qemu>>=
@@ -63,6 +84,10 @@ LC_COLLATE=C
 <<Install OS>>=
 
 <h2>Install OS</h2>
+
+Download Void Linux live ISO image:
+
+- <<<void-live-i686-20230628-base.iso>>>
 
 Start `qemu` to install from `ISO` image (tested with `QEMU emulator version 8.1.3`):
 
@@ -172,22 +197,56 @@ xbps-install zsh mg nano vim tmux rlwrap colordiff groff time
 xbps-install patch make git gcc gdb automake autoconf libtool
 xbps-install xorg-minimal xorg-input-drivers xorg-video-drivers
 xbps-install setxkbmap xauth font-misc-misc terminus-font
-xbps-install dejavu-fonts-ttf xterm xrandr xset jwm firefox
-xbps-install geany ncurses ncurses-devel libXt-devel
+xbps-install dejavu-fonts-ttf xterm xrandr xset jwm vtwm
+xbps-install firefox geany ncurses ncurses-devel libXt-devel
 xbps-install motif-devel motif-mwm motif-xmbind xlsfonts
 xbps-install font-adobe-100dpi font-adobe-75dpi
 @
 
+<<~/.xinitrc>>=
+setxkbmap us
+
+# faster keyboard repeat rate and smaller delay
+xset r rate 190 35
+
+xsetroot -solid '#0f2023'
+
+# exec vtwm
+exec jwm
+@
+
+<<void-live-i686-20230628-base.iso>>=
+https://repo-default.voidlinux.org/live/current/void-live-i686-20230628-base.iso
+@
+
+<<cmucl-2023-08-x86-linux.tar.bz2>>=
+https://common-lisp.net/project/cmucl/downloads/snapshots/2023/08/cmucl-2023-08-x86-linux.tar.bz2
+@
+
+<<cmucl-src-2023-08.tar.bz2>>=
+https://common-lisp.net/project/cmucl/downloads/snapshots/2023/08/cmucl-src-2023-08.tar.bz2
+@
+
+<<download and extract cmucl>>=
+cd ~
+wget -cN <<cmucl-2023-08-x86-linux.tar.bz2>>
+(set -eux; mkdir -pv ~/cmucl-2023-08-x86-linux; cd cmucl-2023-08-x86-linux; tar -xjf ../cmucl-2023-08-x86-linux.tar.bz2)
+@
+
+<<download and extract sources>>=
+cd ~
+wget -cN <<cmucl-src-2023-08.tar.bz2>>
+(set -eux; mkdir -pv ~/cmucl-src-2023-08; cd cmucl-src-2023-08; tar -xjf ../cmucl-src-2023-08.tar.bz2)
+@
+
+<<build cmucl>>=
+cd ~/cmucl-src-2023-08
+bin/build.sh -B boot-2021-07-2 -R -C x86_linux -o ~/cmucl-2023-08-x86-linux/bin/lisp
+bin/make-dist.sh -V 2023-08 -I dist linux-4
+@
+
 <<body in markdown>>=
 <h1><<TITLE>></h1>
-
-<h2>Download assets</h2>
-
-- <https://repo-default.voidlinux.org/live/current/void-live-i686-20230628-base.iso>
-
-- <https://common-lisp.net/project/cmucl/downloads/snapshots/2023/08/cmucl-2023-08-x86-linux.tar.bz2>
-
-- <https://common-lisp.net/project/cmucl/downloads/snapshots/2023/08/cmucl-src-2023-08.tar.bz2>
 
 <h2>Prepare VM</h2>
 
@@ -195,7 +254,7 @@ xbps-install font-adobe-100dpi font-adobe-75dpi
 
 <<Install OS>>
 
-<h2>Start the System</h2>
+<h2>Start the system</h2>
 
     <<run qemu>>
 
@@ -222,13 +281,92 @@ Then install these packages:
 
 These packages are both very useful and some of them are prerequisite to build CMUCL.
 
-<h2>Configure Environment</h2>
+After installation of additional packages, you should end up with roughtly
+this disk usage:
 
-<h2>Extract CMUCL</h2>
+![img disk usage](img-disk-usage.png "disk usage after initial packages install")
 
-Both binaries and sources.
+`gcc` version available at the time of this writting (January 11, 2024):
 
-<h2>Build</h2>
+![img after install 2](img-gcc-version.png "after initial packages install 2")
+
+<h2>Creating backing image</h2>
+
+    chmod a-w "<<base image>>"
+    <<create backed image>>
+
+<h2>Start system with backed image</h2>
+
+    <<run qemu backed image>>
+
+<h2>Connect to guest from host</h2>
+
+In guest, connect to host and send local tcp port 22 as remote (-R) 2223:
+
+    ssh -R2223:127.0.0.1:22 hostuser@10.0.2.2 'while date; do sleep 30; done'
+
+In host, connect to guest:
+
+    TERM=screen ssh -p2223 void@127.0.0.1
+
+`TERM` is important for `tmux` to properly work.
+
+<h2>Configure environment</h2>
+
+<h3>Install coolscripts</h3>
+
+Some instructions below only applies to `zsh`, adapt accordingly to your
+favorite shell.
+
+    mkdir -p ~/Downloads
+    git clone https://github.com/ctarbide/coolscripts.git ~/Downloads/coolscripts
+    PATH=${HOME}/Downloads/coolscripts/bin:${PATH}
+    (set -eux; cd ~/Downloads/coolscripts/examples; nofake shell-tips.nw | sh)
+
+<h3>Other miscellaneous settings</h3>
+
+    chsh -s /bin/zsh
+    git config --global user.email "you@example.com"
+    git config --global user.name "Your Name"
+    git config --global init.defaultBranch master
+
+<h3>Setup a basic X11 graphical environment</h3>
+
+Create a `~/.xinitrc` file with these contents:
+
+    <<~/.xinitrc>>
+
+After login:
+
+    exec startx
+
+Hints:
+
+    $ xrandr --output Virtual-1 --mode 1440x900
+
+    (qemu) sendkey ctrl-alt-f2
+
+<h2>Build CMUCL</h2>
+
+<h3>Extract CMUCL binary</h3>
+
+    <<download and extract cmucl>>
+
+<h3>Extract CMUCL sources</h3>
+
+    <<download and extract sources>>
+
+<h3>Build</h3>
+
+    <<build cmucl>>
+
+Build shouldn't take long:
+
+![img build finished](img-build-finished.png "build finished")
+
+And should work fine:
+
+![img it works](img-it-works.png "it works!")
 
 <h2>References</h2>
 <<references>>
@@ -264,7 +402,7 @@ if git-file-is-pristine.sh README.txt; then
     rm -f .draft
 else
     date '+%Y-%m-%d_%Hh%Mm%S' > .draft
-    git reset --quiet index.html
+    git reset --quiet -- index.html
 fi
 nofake --error -Rrender <<PRIMARY SOURCES>> | sh
 @
@@ -319,7 +457,7 @@ cat <<PRIMARY SOURCES>>
 
 <<aux data>>=
 printf '@<<body>>=\n'
-nofake --error -R'body in markdown' README.txt | <<assets - md.pl for pages>>
+nofake --error -R'body in markdown' <<PRIMARY SOURCES>> | <<assets - md.pl for pages>>
 printf '@\n'
 @
 
@@ -338,7 +476,7 @@ chmod 0444 index.html
 <<update (or not) index.html from .index.html>>=
 if [ -f index.html ]; then
     if [ .index.html -nt index.html ]; then
-        rm -fv index.html
+        rm -f index.html
         <<create index.html from .index.html>>
     else
         echo "index.html is up to date."
@@ -383,4 +521,3 @@ nofake --error -Rgenerate <<PRIMARY SOURCES>> | sh | CHMOD='chmod 0444' nofake.s
 <<md prefix>>=
 2023/2023-10-19_21h40m15_perl·markdown·daringfireball.net/
 @
-

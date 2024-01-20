@@ -133,7 +133,7 @@ chmod 0444 index.html
 <<update (or not) index.html from .index.html>>=
 if [ -f index.html ]; then
     if [ .index.html -nt index.html ]; then
-        rm -fv index.html
+        rm -f index.html
         <<create index.html from .index.html>>
     else
         echo "index.html is up to date."
@@ -273,7 +273,7 @@ generate render 'print LAST MODIFIED'
 <<template exports 3 4>>=
 <<template exports 3>> <<template exports 4>>
 <<template exports>>=
-<<template exports 0 1 2>> <<template exports 3 4>> 
+<<template exports 0 1 2>> <<template exports 3 4>>
 @
 
 This is used by new-item.sh as a partial document.
