@@ -65,7 +65,7 @@ font-size: 14pt; }
             (begin
                 (format #t "argv ~a: ~s~%" i (argv i))
                 (loop (+ i 1)))
-            #f))
+            (values)))
     (loop 1))
 (show argc)
 (show (argv 0))
@@ -128,6 +128,13 @@ font-size: 14pt; }
   (append-map executables ((infix-splitter ":") (getenv "PATH"))))
 </code></pre>
 
+<p><a href="stdin1.sh">stdin1</a>:</p>
+
+<pre><code>(let ((input (read-line (current-input-port))))
+  (for-each (lambda (x) (display x) (newline))
+            (string-tokenize input)))
+</code></pre>
+
 <h2>Live Literate Program</h2>
 
 <p>All scripts follow the <em>live literate program</em> technique, some examples:</p>
@@ -180,9 +187,10 @@ This is a live literate program.
 <li><a href="https://en.wikibooks.org/wiki/Scheme_Programming/Looping">https://en.wikibooks.org/wiki/Scheme_Programming/Looping</a></li>
 <li><a href="https://en.wikipedia.org/wiki/Scsh">https://en.wikipedia.org/wiki/Scsh</a></li>
 <li><a href="https://scsh.net/docu/post/signall.html">https://scsh.net/docu/post/signall.html</a></li>
+<li><a href="https://stackoverflow.com/questions/3173327/getting-a-line-of-user-input-in-scheme">https://stackoverflow.com/questions/3173327/getting-a-line-of-user-input-in-scheme</a></li>
 </ul>
 
 <p>More details in the link below.</p>
-<p> This <a href="README.txt">page</a> was last modified on January 27, 2024 at 01:08:14 UTC.
+<p> This <a href="README.txt">page</a> was last modified on January 27, 2024 at 23:52:56 UTC.
 
-<!-- Generated in 0.118 seconds on January 27, 2024 at 01:08:19 UTC. -->
+<!-- Generated in 0.122 seconds on January 27, 2024 at 23:52:59 UTC. -->
