@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<title>ctarbi.de - scsh·examples</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=0.6">
+<link rel="canonical" href="https://ctarbide.github.io/pages/2024/2024-01-25_20h18m26_scsh·examples/index.html">
+<link rel="icon" href="../../../favicon.ico" type="image/x-icon">
+<style>
+pre {
+font-family: "Lucida Console", Courier, monospace;
+font-size: 14pt; }
+code {
+font-family: "Lucida Console", Courier, monospace;
+font-size: 14pt; }
+body {
+width: 90ch;
+max-width: calc(100vw - 4em);
+margin: 2em auto 0 auto;
+font-family: Georgia, "Bitstream Charter", serif;
+font-size: 14pt; }
+</style>
+<h1>ctarbi.de - scsh·examples</h1>
+
+<h2>Snippets</h2>
+
+<p><a href="hello1.sh">hello1</a>:</p>
+
+<pre><code>(display "hello world!\n")
+</code></pre>
+
+<p><a href="hello2.sh">hello2</a>:</p>
+
+<pre><code>(define (main args)
+    (display "hello world!\n")
+    (display (string-append
+        "called with "
+        (number-&gt;string (length args))
+        " args\n"))
+    (format #t "args: ~s~%" args))
+</code></pre>
+
+<p><a href="args1.sh">args1</a>:</p>
+
+<pre><code>(define argc (length command-line-arguments))
+(format #t "argc: ~a~%" argc)
+</code></pre>
+
+<p><a href="args2.sh">args2</a>:</p>
+
+<pre><code>(define argc (length command-line-arguments))
+(format #t "argc: ~a~%" argc)
+(format #t "args: ~s~%" command-line-arguments)
+(format #t "argv 0: ~a~%" (argv 0))
+</code></pre>
+
+<p><a href="args3.sh">args3</a>:</p>
+
+<pre><code>(define argc (length command-line-arguments))
+(define (show v)
+    (display v)
+    (newline))
+(define (show-args n)
+    (define (loop i)
+        (if (&lt;= i n)
+            (begin
+                (format #t "argv ~a: ~s~%" i (argv i))
+                (loop (+ i 1)))
+            #f))
+    (loop 1))
+(show argc)
+(show (argv 0))
+(show-args argc)
+</code></pre>
+
+<p><a href="for-each1.sh">for-each1</a>:</p>
+
+<pre><code>(define argc (length command-line-arguments))
+(format #t "argc: ~a~%" argc)
+(format #t "args: ~s~%" command-line-arguments)
+(for-each (lambda (arg)
+    (format #t "arg: ~s~%" arg))
+    command-line-arguments)
+</code></pre>
+
+<p><a href="fac1.sh">fac1</a>:</p>
+
+<pre><code>(define !
+    (lambda (n)
+        (if (= n 0)
+            1
+            (* n (! (- n 1))))))
+(format #t "~s~%" (! 5))
+</code></pre>
+
+<p><a href="fac2.sh">fac2</a>:</p>
+
+<pre><code>(define (! n)
+    (if (= n 0)
+        1
+        (* n (! (- n 1)))))
+(format #t "~s~%" (! 5))
+</code></pre>
+
+<p><a href="fac3.sh">fac3</a>:</p>
+
+<pre><code>(define (! n)
+    (define (!! acc n)
+        (if (= n 1)
+            acc
+            (!! (* n acc) (- n 1))))
+    (!! 1 n))
+(format #t "~s~%" (! 5))
+</code></pre>
+
+<p><a href="list-path.sh">list-path</a>:</p>
+
+<pre><code>(define (writeln x) (display x) (newline))
+(for-each writeln ((infix-splitter ":") (getenv "PATH")))
+</code></pre>
+
+<p><a href="list-executables.sh">list-executables</a>:</p>
+
+<pre><code>(define (executables dir)
+  (with-cwd dir
+    (filter file-executable? (directory-files dir #t))))
+(define (writeln x) (display x) (newline))
+(for-each writeln
+  (append-map executables ((infix-splitter ":") (getenv "PATH"))))
+</code></pre>
+
+<h2>Live Literate Program</h2>
+
+<p>All scripts follow the <em>live literate program</em> technique, some examples:</p>
+
+<p><a href="hello1.sh">hello1</a>:</p>
+
+<pre><code>#!/bin/sh
+exec nofake-exec.sh --error -Rprog "$0" -- scsh -s
+exit 1
+
+This is a live literate program.
+
+&lt;&lt;prog>>=
+(display "hello world!\n")
+&#x40;
+</code></pre>
+
+<p><a href="hello2.sh">hello2</a>:</p>
+
+<pre><code>#!/bin/sh
+set -eu; thisprog=$0 aa=
+for i; do
+    case "${i}" in
+        --) aa=${aa:+${aa} }"'--dd--'" ;;
+        *) aa=${aa:+${aa} }"'--aa' '${i}'" ;;
+    esac
+done
+eval "set -- ${aa}"
+exec nofake-exec.sh --error -Rprog "${thisprog}" "$@" -- scsh -e main -s
+exit 1
+
+This is a live literate program.
+
+&lt;&lt;prog>>=
+(define (main args)
+    (display "hello world!\n")
+    (display (string-append
+        "called with "
+        (number->string (length args))
+        " args\n"))
+    (format #t "args: ~s~%" args))
+&#x40;
+</code></pre>
+
+<p><code>nofake-exec.sh</code> is provided by <a href="https://github.com/ctarbide/coolscripts">coolscripts</a>.</p>
+
+<h2>References</h2>
+
+<ul>
+<li><a href="https://en.wikibooks.org/wiki/Scheme_Programming/Looping">https://en.wikibooks.org/wiki/Scheme_Programming/Looping</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Scsh">https://en.wikipedia.org/wiki/Scsh</a></li>
+<li><a href="https://scsh.net/docu/post/signall.html">https://scsh.net/docu/post/signall.html</a></li>
+</ul>
+
+<p>More details in the link below.</p>
+<p> This <a href="README.txt">page</a> was last modified on January 27, 2024 at 01:08:14 UTC.
+
+<!-- Generated in 0.118 seconds on January 27, 2024 at 01:08:19 UTC. -->
