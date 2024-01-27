@@ -28,7 +28,7 @@ This is a live literate program.
             (begin
                 (format #t "argv ~a: ~s~%" i (argv i))
                 (loop (+ i 1)))
-            #f))
+            (values)))
     (loop 1))
 (show argc)
 (show (argv 0))

@@ -188,7 +188,7 @@ hello1.sh hello2.sh args1.sh args2.sh args3.sh
 <<snippets 1>>=
 for-each1.sh fac1.sh fac2.sh fac3.sh
 <<snippets 2>>=
-list-path.sh list-executables.sh
+list-path.sh list-executables.sh stdin1.sh
 <<snippets>>=
 <<snippets 0>> <<snippets 1>> <<snippets 2>>
 @
