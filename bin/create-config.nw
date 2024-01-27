@@ -59,10 +59,11 @@ fi
 
 <<get kbdir>>=
 kbdir=`"${thisdir}/show-config.sh" kbdir`
+kbdir_ftl=`"${thisdir}/show-config.sh" kbdir-from-top-level`
 test -d "${kbdir}" || die 1 "Error, directory not found: ${kbdir}."
 @
 
-<<*>>=
+<<create scripts>>=
 <<sh preamble>>
 CHMOD='chmod 0555' nofake.sh -Rcreate-config.sh -ocreate-config.sh shell.nw create-config.nw
 CHMOD='chmod 0555' nofake.sh -Rshow-config.sh -oshow-config.sh shell.nw create-config.nw
@@ -72,4 +73,8 @@ CHMOD='chmod 0555' nofake.sh -Rfind.sh -ofind.sh shell.nw create-config.nw tempo
 CHMOD='chmod 0555' nofake.sh -Rhead-README.sh -ohead-README.sh shell.nw create-config.nw temporary-files-shell.nw head-README.nw
 CHMOD='chmod 0555' nofake.sh -Rshow-README.sh -oshow-README.sh shell.nw create-config.nw temporary-files-shell.nw show-README.nw
 CHMOD='chmod 0555' nofake.sh -Rcat-README.sh -ocat-README.sh shell.nw create-config.nw temporary-files-shell.nw cat-README.nw
+@
+
+<<*>>=
+nofake --error -R'create scripts' shell.nw create-config.nw
 @

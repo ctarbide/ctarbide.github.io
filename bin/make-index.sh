@@ -5,6 +5,7 @@ thispath=`perl -MCwd=realpath -le'print(realpath(\$ARGV[0]))' -- "${0}"`
 thisdir=${thispath%/*}
 
 kbdir=`"${thisdir}/show-config.sh" kbdir`
+kbdir_ftl=`"${thisdir}/show-config.sh" kbdir-from-top-level`
 test -d "${kbdir}" || die 1 "Error, directory not found: ${kbdir}."
 
 cd "${kbdir}"

@@ -10,33 +10,31 @@
 
     - literate programming tool, already included in coolscripts above
 
-- https://stackoverflow.com/questions/5641997/is-it-necessary-to-write-head-body-and-html-tags
+- <https://stackoverflow.com/questions/5641997/is-it-necessary-to-write-head-body-and-html-tags>
 
     - context: html body tag not required
 
-- https://gist.github.com/pfig/1808188
+- <https://gist.github.com/pfig/1808188>
 
     - context: imagemagick favicon generator
 
-    - https://www.imagemagick.org/Usage/thumbnails/#favicon
+    - <https://www.imagemagick.org/Usage/thumbnails/#favicon>
 
-- https://www.atomic-scale-physics.de/lattice/struk.picts/bh.s.png
+- <https://www.atomic-scale-physics.de/lattice/struk.picts/bh.s.png>
 
-    - https://www.atomic-scale-physics.de/lattice/faq.html#useofsite
+    - <https://www.atomic-scale-physics.de/lattice/faq.html#useofsite>
 
         - "This page is in the public domain."
 
     - Pictures (and/or text) taken from the Crystal Lattice Structures Web
-      page, http://cst-www.nrl.navy.mil/lattice/, provided by the Center for
-      Computational Materials Science of the United States Naval Research
-      Laboratory.
+      page, <http://cst-www.nrl.navy.mil/lattice/>, provided by the Center for
+      Computational Materials Science of the United States Naval Research Laboratory.
 @
 
-<<body>>=
+<<body in markdown>>=
 <h1><<TITLE>></h1>
 <h2>References</h2>
-<<rendered references>>
-<p> More details in the link below.
+<<references>>
 @
 
 <<PRIMARY SOURCES>>=
@@ -107,23 +105,6 @@ perl -MTime::HiRes=time -MPOSIX=strftime -le'
 ' -- "${t0}"
 @
 
-<<standard data>>=
-<<print LAST MODIFIED>>
-cat <<PRIMARY SOURCES>>
-@
-
-<<aux data>>=
-printf '@<<rendered references>>=\n'
-nofake -Rreferences README.txt | <<assets - md.pl for pages>>
-printf '@\n'
-@
-
-<<generate>>=
-<<sh preamble>>
-<<standard data>>
-<<aux data>>
-@
-
 <<create index.html from .index.html>>=
 cat .index.html > index.html
 <<generated: $t1 - $t0>> @>> index.html
@@ -143,8 +124,20 @@ else
 fi
 @
 
+<<generate>>=
+<<sh preamble>>
+<<print LAST MODIFIED>>
+cat <<PRIMARY SOURCES>>
+@
+
 <<update (or not) .index.html from primary sources>>=
-nofake --error -Rgenerate <<PRIMARY SOURCES>> | sh | CHMOD='chmod 0444' nofake.sh --error -Rindex.html -o.index.html
+nofake --error -Rgenerate <<PRIMARY SOURCES>> | sh | gzip > .cache
+(
+    gzip -dc .cache
+    printf '@<<body>>=\n'
+    gzip -dc .cache | nofake --error -R'body in markdown' | <<assets - md.pl for pages>>
+    printf '@\n'
+) | CHMOD='chmod 0444' nofake.sh --error -Rindex.html -o.index.html
 @
 
 <<render>>=
@@ -261,7 +254,7 @@ This was generated from <<PAGE DIR>>/README.txt, do not change this file.
 <<template exports 0>>=
 'PRIMARY SOURCES' TOP PAGES TITLE 'sh preamble' index.html footer
 <<template exports 1>>=
-'standard data' 'aux data' 'set $t0' 'generated: $t1 - $t0'
+'set $t0' 'generated: $t1 - $t0'
 <<template exports 2>>=
 'create index.html from .index.html' 'update (or not) index.html from .index.html'
 <<template exports 3>>=

@@ -22,3 +22,4 @@ pages: unlink-draft-pages
 	$(MAKE) -C 'pages/2024/2024-01-08_10h24m46_compiling_cmucl_2023-08_on_a_void-live-i686_vm'
 	$(MAKE) -C 'pages/2024/2024-01-10_00h50m10_markdown·basics'
 	$(MAKE) -C 'pages/2024/2024-01-10_00h50m14_markdown·syntax'
+	$(MAKE) -C 'pages/2024/2024-01-25_20h18m26_scsh·examples'

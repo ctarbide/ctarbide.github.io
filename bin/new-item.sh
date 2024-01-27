@@ -4,14 +4,6 @@ die(){ ev=$1; shift; for msg in "$@"; do echo "${msg}"; done; exit "${ev}"; }
 thispath=`perl -MCwd=realpath -le'print(realpath(\$ARGV[0]))' -- "${0}"`
 thisdir=${thispath%/*}
 
-configname="${thisdir}/website.cfg"
-configure(){
-    if [ x"${1#*.}" = x"${1}" ] || ! git config -f "${configname}" "$@"; then
-        name="website.${1}"; shift
-        git config -f "${configname}" "${name}" "$@"
-    fi
-}
-
 if [ "$#" -lt 1 ]; then
     die 1 "usage: ${thispath##*/} id1 id2 ... idN"
 fi
@@ -59,11 +51,12 @@ cat - "${META_DIR}/template.nw" <<EOF >README.txt
 - <http://www.literateprogramming.com/>
 @
 
-<<body>>=
+<<body in markdown>>=
 <h1><<TITLE>></h1>
 <h2>References</h2>
-<<rendered references>>
-<p> More details in the link below.
+<<references>>
+
+More details in the link below.
 @
 
 <<YEAR>>=
@@ -96,7 +89,7 @@ if git-file-is-pristine.sh README.txt; then
     rm -f .draft
 else
     date '+%Y-%m-%d_%Hh%Mm%S' > .draft
-    git reset --quiet index.html
+    git reset --quiet -- index.html
 fi
 nofake --error -Rrender <<PRIMARY SOURCES>> | sh
 @

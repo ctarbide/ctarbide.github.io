@@ -1,3 +1,64 @@
+
+<<body in markdown>>=
+<h1><<TITLE>></h1>
+<h2>Snippets</h2>
+
+<<snippet listing>>
+
+<h2>Live Literate Program</h2>
+
+All scripts follow the *live literate program* technique, some examples:
+
+[hello1](hello1.sh):
+
+<<htmlified hello1.sh>>
+
+[hello2](hello2.sh):
+
+<<htmlified hello2.sh>>
+
+`nofake-exec.sh` is provided by [coolscripts](https://github.com/ctarbide/coolscripts).
+
+<h2>References</h2>
+<<references>>
+
+More details in the link below.
+@
+
+<<YEAR>>=
+2024
+@
+
+<<STAMP>>=
+2024-01-25_20h18m26
+@
+
+<<ITEM_ID>>=
+scsh·examples
+@
+
+<<PAGE DIR>>=
+pages/<<YEAR>>/<<STAMP>>_<<ITEM_ID>>
+@
+
+<<URL PREFIX>>=
+<<assets - base url>><<PAGE DIR>>
+@
+
+<<CANONICAL URL>>=
+<<URL PREFIX>>/index.html
+@
+
+<<*>>=
+<<sh preamble>>
+if git-file-is-pristine.sh README.txt; then
+    rm -f .draft
+else
+    date '+%Y-%m-%d_%Hh%Mm%S' > .draft
+    git reset --quiet -- index.html
+fi
+nofake --error -Rrender <<PRIMARY SOURCES>> | sh
+@
 <<PRIMARY SOURCES>>=
 <<TOP>>/assets.nw README.txt
 @
@@ -42,6 +103,24 @@ perl -MTime::HiRes=time -MPOSIX=strftime -le'
 ' -- "${t0}"
 @
 
+<<standard data>>=
+<<print LAST MODIFIED>>
+cat <<PRIMARY SOURCES>>
+@
+
+<<aux data>>=
+escape(){ perl -lpe's,<,&lt;,g; s,^\@,&#x40;,' -- "$@"; }
+printf '@<<references>>=\n'
+nofake --error -Rreferences README.txt *.sh | LC_ALL=C sort -u
+printf '@\n'
+printf '@<<htmlified hello1.sh>>=\n<pre><code>'
+escape hello1.sh
+printf '</code></pre>\n@\n'
+printf '@<<htmlified hello2.sh>>=\n<pre><code>'
+escape hello2.sh
+printf '</code></pre>\n@\n'
+@
+
 <<create index.html from .index.html>>=
 cat .index.html > index.html
 <<generated: $t1 - $t0>> @>> index.html
@@ -61,14 +140,9 @@ else
 fi
 @
 
-<<generate>>=
-<<sh preamble>>
-<<print LAST MODIFIED>>
-cat <<PRIMARY SOURCES>>
-@
-
 <<update (or not) .index.html from primary sources>>=
-nofake --error -Rgenerate <<PRIMARY SOURCES>> | sh | gzip > .cache
+nofake --error -R'sh preamble' -R'standard data' -R'aux data' -R'list snippets' \
+    <<PRIMARY SOURCES>> | sh | gzip > .cache
 (
     gzip -dc .cache
     printf '@<<body>>=\n'
@@ -109,3 +183,25 @@ nofake --error -Rgenerate <<PRIMARY SOURCES>> | sh | gzip > .cache
 2023/2023-10-19_21h40m15_perl·markdown·daringfireball.net/
 @
 
+<<snippets 0>>=
+hello1.sh hello2.sh args1.sh args2.sh args3.sh
+<<snippets 1>>=
+for-each1.sh fac1.sh fac2.sh fac3.sh
+<<snippets 2>>=
+list-path.sh list-executables.sh
+<<snippets>>=
+<<snippets 0>> <<snippets 1>> <<snippets 2>>
+@
+
+<<list snippets>>=
+for i in <<snippets>>; do
+    j=${i%.sh}
+    printf '@<<%s snippet>>=\n<pre><code>' "${j}"
+    nofake-htmlify-chunk.sh prog "${i}"
+    printf '</code></pre>\n'
+    printf '@<<snippet listing>>=\n'
+    printf '[%s](%s):\n\n' "${j}" "${i}"
+    printf '@<<%s snippet>>\n\n' "${j}"
+done
+printf '@\n'
+@
