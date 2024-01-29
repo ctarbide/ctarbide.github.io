@@ -1,0 +1,51 @@
+#!/bin/sh
+set -eu; thisprog=$0 aa=
+for i; do
+    case "${i}" in
+        --) aa=${aa:+${aa} }"'--dd--'" ;;
+        *) aa=${aa:+${aa} }"'--aa' '${i}'" ;;
+    esac
+done
+eval "set -- ${aa}"
+exec nofake-exec.sh --error -Rprog "${thisprog}" "$@" -- scsh -s
+exit 1
+
+This is a live literate program.
+
+<<references from fork-waitpid-exec.sh>>=
+- `man execve`
+
+@
+
+<<prog>>=
+<<show function>>
+<<slurp functions>>
+
+(show "(seq 10): " (port->string-list (run/port (seq 10))))
+(show "(seq 10): " (run/strings (seq 10)))
+(show "(seq 10): " (slurp-to-list '(seq 10)))
+(show "(seq 10): " (run/string (seq 10)))
+(show "(seq 10): " (slurp-to-string '(seq 10)))
+
+(& (sh -c "sleep 1; date"))
+
+(run (| (seq 100) (perl -lne"$s+=$_}{print$s")))
+
+(exec-epf (date))
+
+(display "Will never happen, due to 'execve' system call above.")
+@
+
+<<show function>>=
+(define (show p v)
+    (format #t "~a~s~%" p v))
+@
+
+slurp-to-* uses the procedural equivalent of the special forms run/port and exec-epf
+
+<<slurp functions>>=
+(define (slurp-to-string epf)
+    (port->string (run/port* (lambda () (apply exec-path epf)))))
+(define (slurp-to-list epf)
+    (port->string-list (run/port* (lambda () (apply exec-path epf)))))
+@

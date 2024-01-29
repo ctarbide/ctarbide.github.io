@@ -2,32 +2,32 @@
 <<references>>=
 - [Markdown FTW](<<PAGES>>/<<md prefix>>index.html)
 
-- <https://github.com/ctarbide/coolscripts/blob/master/README.txt>
+- https://github.com/ctarbide/coolscripts/blob/master/README.txt
 
     - dependency
 
-- <https://github.com/ctarbide/ctweb/blob/master/tools/nofake-README.txt>
+- https://github.com/ctarbide/ctweb/blob/master/tools/nofake-README.txt
 
     - literate programming tool, already included in coolscripts above
 
-- <https://stackoverflow.com/questions/5641997/is-it-necessary-to-write-head-body-and-html-tags>
+- https://stackoverflow.com/questions/5641997/is-it-necessary-to-write-head-body-and-html-tags
 
     - context: html body tag not required
 
-- <https://gist.github.com/pfig/1808188>
+- https://gist.github.com/pfig/1808188
 
     - context: imagemagick favicon generator
 
-    - <https://www.imagemagick.org/Usage/thumbnails/#favicon>
+    - https://www.imagemagick.org/Usage/thumbnails/#favicon
 
-- <https://www.atomic-scale-physics.de/lattice/struk.picts/bh.s.png>
+- https://www.atomic-scale-physics.de/lattice/struk.picts/bh.s.png
 
-    - <https://www.atomic-scale-physics.de/lattice/faq.html#useofsite>
+    - https://www.atomic-scale-physics.de/lattice/faq.html#useofsite
 
         - "This page is in the public domain."
 
     - Pictures (and/or text) taken from the Crystal Lattice Structures Web
-      page, <http://cst-www.nrl.navy.mil/lattice/>, provided by the Center for
+      page, http://cst-www.nrl.navy.mil/lattice/, provided by the Center for
       Computational Materials Science of the United States Naval Research Laboratory.
 @
 
@@ -124,18 +124,42 @@ else
 fi
 @
 
+<<gen: base url>>=
+printf '@<<base url>>=\n'
+<<TOP>>/bin/show-config.sh website.base-url
+printf '@\n'
+@
+
 <<generate>>=
 <<sh preamble>>
 <<print LAST MODIFIED>>
 cat <<PRIMARY SOURCES>>
+<<gen: base url>>
+@
+
+<<function autoheader_and_autolink>>=
+autoheader_and_autolink(){
+    perl -lpe'
+        s,^\*{64} (.*)$,<h1>${1}</h1>,;
+        s,^\*{16} (.*)$,<h2>${1}</h2>,;
+        s,^\*{4} (.*)$,<h3>${1}</h3>,;
+        s,
+            (^|[^\w<])
+            ( https? :// [\w\-.]+ / (?: [\w\-./?=&%\#]* [\w/] )? )
+            ([^\w>]|$)
+        ,${1}<${2}>${3},xg;
+    '
+}
 @
 
 <<update (or not) .index.html from primary sources>>=
 nofake --error -Rgenerate <<PRIMARY SOURCES>> | sh | gzip > .cache
+<<function autoheader_and_autolink>>
 (
     gzip -dc .cache
     printf '@<<body>>=\n'
-    gzip -dc .cache | nofake --error -R'body in markdown' | <<assets - md.pl for pages>>
+    gzip -dc .cache | nofake --error -R'body in markdown' |
+        autoheader_and_autolink | <<assets - md.pl for pages>>
     printf '@\n'
 ) | CHMOD='chmod 0444' nofake.sh --error -Rindex.html -o.index.html
 @
@@ -176,9 +200,14 @@ else
     date '+%Y-%m-%d_%Hh%Mm%S' > .draft
     git reset --quiet -- index.html
 fi
-CHMOD='chmod 0444' nofake.sh --error -Rassets.nw -o'<<TOP>>/assets.nw' README.txt
-nofake --error -R'create template' <<PRIMARY SOURCES>> | sh
 nofake --error -Rrender <<PRIMARY SOURCES>> | sh
+<<create assets from cache>>
+nofake --error -R'create template' <<PRIMARY SOURCES>> | sh
+@
+
+<<create assets from cache>>=
+gzip -dc .cache |
+    CHMOD='chmod 0444' nofake.sh --error -Rassets.nw -o'<<TOP>>/assets.nw'
 @
 
 <<https://www.imagemagick.org/Usage/thumbnails/#favicon snippet>>=
@@ -203,7 +232,7 @@ magick favicon.png \
 
 <<assets.nw - misc>>=
 @<<assets - base url>>=
-https://ctarbide.github.io/
+<<base url>>
 @@
 @<<assets - favicon.ico for top level>>=
 favicon.ico
@@ -254,13 +283,13 @@ This was generated from <<PAGE DIR>>/README.txt, do not change this file.
 <<template exports 0>>=
 'PRIMARY SOURCES' TOP PAGES TITLE 'sh preamble' index.html footer
 <<template exports 1>>=
-'set $t0' 'generated: $t1 - $t0'
+'set $t0' 'generated: $t1 - $t0' 'gen: base url'
 <<template exports 2>>=
 'create index.html from .index.html' 'update (or not) index.html from .index.html'
 <<template exports 3>>=
 'update (or not) .index.html from primary sources' 'metas and links' 'md prefix'
 <<template exports 4>>=
-generate render 'print LAST MODIFIED'
+generate render 'print LAST MODIFIED' 'function autoheader_and_autolink'
 <<template exports 0 1 2>>=
 <<template exports 0>> <<template exports 1>> <<template exports 2>>
 <<template exports 3 4>>=

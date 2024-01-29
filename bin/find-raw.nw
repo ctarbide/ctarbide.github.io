@@ -1,0 +1,8 @@
+
+nofake shell.nw create-config.nw
+
+<<find-raw.sh>>=
+<<sh preamble>>
+<<thisdir>>
+PERLPRINT='print(qq{${_}/})}{exit(!$.)' exec "${thisdir}/find.sh" "$@"
+@
