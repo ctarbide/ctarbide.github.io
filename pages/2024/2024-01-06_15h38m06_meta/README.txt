@@ -137,29 +137,14 @@ cat <<PRIMARY SOURCES>>
 <<gen: base url>>
 @
 
-<<function autoheader_and_autolink>>=
-autoheader_and_autolink(){
-    perl -lpe'
-        s,^\*{64} (.*)$,<h1>${1}</h1>,;
-        s,^\*{16} (.*)$,<h2>${1}</h2>,;
-        s,^\*{4} (.*)$,<h3>${1}</h3>,;
-        s,
-            (^|[^\w<])
-            ( https? :// [\w\-.]+ / (?: [\w\-./?=&%\#]* [\w/] )? )
-            ([^\w>]|$)
-        ,${1}<${2}>${3},xg;
-    '
-}
-@
-
 <<update (or not) .index.html from primary sources>>=
 nofake --error -Rgenerate <<PRIMARY SOURCES>> | sh | gzip > .cache
-<<function autoheader_and_autolink>>
 (
     gzip -dc .cache
     printf '@<<body>>=\n'
     gzip -dc .cache | nofake --error -R'body in markdown' |
-        autoheader_and_autolink | <<assets - md.pl for pages>>
+        "<<TOP>>/bin/md-autoheader-autolink.pl" |
+        <<assets - md.pl for pages>>
     printf '@\n'
 ) | CHMOD='chmod 0444' nofake.sh --error -Rindex.html -o.index.html
 @
@@ -289,7 +274,7 @@ This was generated from <<PAGE DIR>>/README.txt, do not change this file.
 <<template exports 3>>=
 'update (or not) .index.html from primary sources' 'metas and links' 'md prefix'
 <<template exports 4>>=
-generate render 'print LAST MODIFIED' 'function autoheader_and_autolink'
+generate render 'print LAST MODIFIED'
 <<template exports 0 1 2>>=
 <<template exports 0>> <<template exports 1>> <<template exports 2>>
 <<template exports 3 4>>=
