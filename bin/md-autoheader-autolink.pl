@@ -1,6 +1,10 @@
 #!/usr/bin/env perl
-
-# very specific improvements
+#
+# very specific improvements to be applied before md.pl
+#
+# tip: use &colon; to suppress autolinking, example:
+#      http&colon;//ds26gte.github.io/tex2page/celeb.html
+#
 
 eval 'exec perl -wS $0 ${1+"$@"}'
     if 0;
@@ -35,7 +39,7 @@ while (<>) {
     }xie;
     s{
         (^ \s* | [^\w<"'] )
-        ( https? :// [\w\-.%]+ \. \w{2,3} / (?: [\w\-.%/?=&\#+]* [\w/] )? )
+        ( https? :// (?: [\w\-.%]+ \. \w{2,3} | [\d][\d.]+ ) / (?: [\w\-.%/?=&\#+,·]* [\w/] )? )
         ( [^\w>"'] | \s* $)
     }{${1}<${2}>${3}}xg;
     print;

@@ -142,7 +142,10 @@ font-size: 14pt; }
 <p><a href="hello1.sh">hello1</a>:</p>
 
 <pre><code>#!/bin/sh
-exec nofake-exec.sh --error -Rprog "$0" -- scsh -s
+# https://ctarbide.github.io/pages/2024/TBD_hello-worlds
+# https://github.com/ctarbide/coolscripts/blob/master/bin/nofake-exec.nw
+set -eu; set -- "${0}" --ba-- "$@" --ea--
+exec nofake-exec.sh --error -Rprog "$@" -- scsh -s
 exit 1
 
 This is a live literate program.
@@ -155,15 +158,10 @@ This is a live literate program.
 <p><a href="hello2.sh">hello2</a>:</p>
 
 <pre><code>#!/bin/sh
-set -eu; thisprog=$0 aa=
-for i; do
-    case "${i}" in
-        --) aa=${aa:+${aa} }"'--dd--'" ;;
-        *) aa=${aa:+${aa} }"'--aa' '${i}'" ;;
-    esac
-done
-eval "set -- ${aa}"
-exec nofake-exec.sh --error -Rprog "${thisprog}" "$@" -- scsh -e main -s
+# https://ctarbide.github.io/pages/2024/TBD_hello-worlds
+# https://github.com/ctarbide/coolscripts/blob/master/bin/nofake-exec.nw
+set -eu; set -- "${0}" --ba-- "$@" --ea--
+exec nofake-exec.sh --error -Rprog "$@" -- scsh -e main -s
 exit 1
 
 This is a live literate program.
@@ -191,6 +189,6 @@ This is a live literate program.
 </ul>
 
 <p>More details in the link below.</p>
-<p> This <a href="README.txt">page</a> was last modified on January 27, 2024 at 23:52:56 UTC.
+<p> This <a href="README.txt">page</a> was last modified on February  5, 2024 (DRAFT).
 
-<!-- Generated in 0.122 seconds on January 27, 2024 at 23:52:59 UTC. -->
+<!-- Generated in 0.125 seconds on February  5, 2024 at 10:53:08 UTC. -->
