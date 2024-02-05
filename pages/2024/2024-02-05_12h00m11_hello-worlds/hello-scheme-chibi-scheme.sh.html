@@ -1,0 +1,34 @@
+<p><!DOCTYPE html></p>
+
+<h3><a href="index.html">index.html</a></h3>
+
+<h3><a href="README.txt">README.txt</a></h3>
+
+<h3>Code for <a href="hello-scheme-chibi-scheme.sh"><code>hello-scheme-chibi-scheme.sh</code></a>:</h3>
+
+<pre style="margin-left: 5ch;"><code>#!/bin/sh
+# https&colon;//ctarbide.github.io/pages/2024/2024-02-05_12h00m11_hello-worlds/
+# https&colon;//github.com/ctarbide/coolscripts/blob/master/bin/nofake-exec.nw
+set -eu; set -- "${0}" --ba-- "$@" --ea--
+exec nofake-exec.sh --error -Rprog "$@" -- chibi-scheme
+exit 1
+
+This is a live literate program.
+
+&lt;&lt;tested with versions>>=
+- chibi-scheme 0.10.0 "neon"
+&#x40;
+
+&lt;&lt;references>>=
+- https&colon;//github.com/scheme-requests-for-implementation/srfi-180/blob/master/srfi/run-chibi.sh
+
+- https&colon;//github.com/scheme-requests-for-implementation/srfi-180/blob/master/srfi/run-r7rs-checks.scm
+
+&#x40;
+
+&lt;&lt;prog>>=
+(import (chibi))
+; (import (scheme r5rs))
+; (import (scheme process-context))
+(display "hello world!\n")
+</code></pre>

@@ -173,10 +173,6 @@ cat *.sh | nofake-export-chunks.sh \
   'references from run.sh'
 @
 
-<<function escape>>=
-escape(){ perl -lpe's,<,&lt;,g; s,^\@,&#x40;,' -- "$@"; }
-@
-
 <<gen: htmlified hello prog>>=
 printf '@<<htmlified hello prog>>=\n<pre><code>'
 nofake --error -Rprog hello.sh | escape
@@ -215,7 +211,7 @@ printf '</code></pre>\n@\n'
 
 <<generate>>=
 <<sh preamble>>
-<<function escape>>
+<<asset - function escape>>
 <<print LAST MODIFIED>>
 cat <<PRIMARY SOURCES>>
 <<gen: base url>>

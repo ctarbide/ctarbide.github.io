@@ -1,0 +1,52 @@
+<p><!DOCTYPE html></p>
+
+<h3><a href="index.html">index.html</a></h3>
+
+<h3><a href="README.txt">README.txt</a></h3>
+
+<h3>Code for <a href="hello-nasm_x86_64.sh"><code>hello-nasm_x86_64.sh</code></a>:</h3>
+
+<pre style="margin-left: 5ch;"><code>#!/bin/sh
+# https&colon;//ctarbide.github.io/pages/2024/2024-02-05_12h00m11_hello-worlds/
+# https&colon;//github.com/ctarbide/coolscripts/blob/master/bin/nofake-exec.nw
+set -eu; set -- "${0}" --ba-- "$@" --ea--
+set -- "$@" --tmp-- .o --tmp-- .out
+SH=${SH&colon;-sh}; export SH
+exec nofake-exec.sh --error -Rprog "$@" -- "${SH}" -eu -c '
+    nasm -f elf64 -o "${0}.o" "${0}"
+    ld -o "${0}.out" "${0}.o"
+    exec "${0}.out" "$@"
+'
+exit 1
+
+This is a live literate program.
+
+&lt;&lt;tested with versions>>=
+- NASM version 2.16.01 compiled on Apr 21 2023
+&#x40;
+
+&lt;&lt;references>>=
+- https&colon;//jameshfisher.com/2018/03/10/linux-assembly-hello-world/
+
+&#x40;
+
+&lt;&lt;prog>>=
+global _start
+
+section .text
+
+_start&colon;
+    mov rax, 1        ; write(
+    mov rdi, 1        ;   STDOUT_FILENO,
+    mov rsi, msg      ;   "hello world!\n",
+    mov rdx, msglen   ;   sizeof("Hello, world!\n")
+    syscall           ; );
+
+    mov rax, 60       ; exit(
+    mov rdi, 0        ;   EXIT_SUCCESS
+    syscall           ; );
+
+section .rodata
+    msg&colon; db "hello world!", 10
+    msglen&colon; equ $ - msg
+</code></pre>

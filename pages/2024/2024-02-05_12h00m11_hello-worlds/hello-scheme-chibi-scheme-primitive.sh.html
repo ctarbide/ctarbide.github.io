@@ -1,0 +1,47 @@
+<p><!DOCTYPE html></p>
+
+<h3><a href="index.html">index.html</a></h3>
+
+<h3><a href="README.txt">README.txt</a></h3>
+
+<h3>Code for <a href="hello-scheme-chibi-scheme-primitive.sh"><code>hello-scheme-chibi-scheme-primitive.sh</code></a>:</h3>
+
+<pre style="margin-left: 5ch;"><code>#!/bin/sh
+# https&colon;//ctarbide.github.io/pages/2024/2024-02-05_12h00m11_hello-worlds/
+# https&colon;//github.com/ctarbide/coolscripts/blob/master/bin/nofake-exec.nw
+set -eu; set -- "${0}" --ba-- "$@" --ea--
+SH=${SH&colon;-sh}; export SH
+exec nofake-exec.sh --error -Rprog "$@" -- "${SH}" -eu -c '
+    exec chibi-scheme -x "chibi primitive" \
+        -e "(%load \"${0}\" (current-environment))" -- "$@"
+'
+exit 1
+
+This is a live literate program.
+
+&lt;&lt;tested with versions>>=
+- chibi-scheme 0.10.0 "neon"
+&#x40;
+
+&lt;&lt;references>>=
+- https&colon;//github.com/ashinn/chibi-scheme/blob/master/lib/init-7.scm
+
+- https&colon;//github.com/ashinn/chibi-scheme/blob/master/lib/meta-7.scm
+
+&#x40;
+
+&lt;&lt;test 1>>=
+chibi-scheme -x 'chibi primitive' -e '
+    (%write-string "hello world!\n" #t (current-output-port))'
+&lt;&lt;test 2>>=
+chibi-scheme -x 'chibi' -e '
+    (%load "hello.scm" (interaction-environment))'
+&lt;&lt;test 3>>=
+nofake.sh -Rprog -ohello.scm hello-scheme-chibi-scheme-primitive.sh
+chibi-scheme -x 'chibi primitive' -e '
+    (%load "hello.scm" (current-environment))'
+&#x40;
+
+&lt;&lt;prog>>=
+(%write-string "hello world!\n" #t (current-output-port))
+</code></pre>

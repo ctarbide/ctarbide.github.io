@@ -1,0 +1,112 @@
+\documentclass{article}% ===> this file was generated automatically by noweave --- better not edit it
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    urlcolor=blue,
+    linkcolor=blue,
+    citecolor=red,
+    pdftitle={Hello World},
+    pdfpagemode=FullScreen,
+}
+\usepackage{multicol}
+\usepackage{noweb}
+\pagestyle{noweb}
+\noweboptions{shift}
+\title{Hello world!}
+\author{Cungsten Tarbide}
+\begin{document}
+\maketitle
+\tableofcontents
+
+\section{Hello Section!}
+
+Hello live literate program!
+
+
+\section{References}
+
+\begin{itemize}
+\item \href{https://github.com/ctarbide/coolscripts/blob/master/bin/nofake.nw}{nofake.nw} and
+    \href{https://raw.githubusercontent.com/ctarbide/coolscripts/master/bin/nofake.pdf}{nofake.pdf}
+    for \LaTeX{} tips.
+\item \url{https://github.com/ctarbide/ctweb}
+\item \url{https://github.com/thomasWeise/docker-texlive}
+\end{itemize}
+
+\section{Configuration}
+
+\nwfilename{/tmp/tmp.10KqoEAoO1.nw}\nwbegincode{1}\sublabel{NW1YtgvQ-38jgpJ-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW1YtgvQ-38jgpJ-1}}}\moddef{nwmac.tex~{\nwtagstyle{}\subpageref{NW1YtgvQ-38jgpJ-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1YtgvQ-2gB9lP-1}}\nwenddeflinemarkup
+$\{HOME\}/texmf/tex/plain/local/nwmac.tex
+\nwused{\\{NW1YtgvQ-2gB9lP-1}}\nwendcode{}\nwbegindocs{2}\nwdocspar
+
+\nwenddocs{}\nwbegincode{3}\sublabel{NW1YtgvQ-3olr1Q-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW1YtgvQ-3olr1Q-1}}}\moddef{noweb.sty~{\nwtagstyle{}\subpageref{NW1YtgvQ-3olr1Q-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1YtgvQ-2gB9lP-1}}\nwenddeflinemarkup
+$\{HOME\}/texmf/tex/latex/local/noweb.sty
+\nwused{\\{NW1YtgvQ-2gB9lP-1}}\nwendcode{}\nwbegindocs{4}\nwdocspar
+
+\section{Program Chunk}
+
+This is referenced by \hyperlink{scriptpreamble}{script preamble}.
+
+\nwenddocs{}\nwbegincode{5}\sublabel{NW1YtgvQ-2gB9lP-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW1YtgvQ-2gB9lP-1}}}\moddef{prog~{\nwtagstyle{}\subpageref{NW1YtgvQ-2gB9lP-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
+thisprog=$\{1\}; shift
+perl -lne'last if m\{^\\s*$\};\}\{while(<>)\{chomp;print\}' -- \\
+    "$\{thisprog\}" >"$\{0\}.nw"
+(
+    printf -- '\\\\section\{Script Preamble\}\\n\\n'
+    printf -- '\\hypertarget\{scriptpreamble\}\{%s\}.\\n\\n' \\
+        'This is where it all begins'
+    printf -- '<<script preamble>>=\\n'
+    perl -lne'last if m\{^\\s*$\};print' -- "$\{thisprog\}"
+    printf -- '@\\n\\n'
+) >>"$\{0\}.nw"
+nofake -R'document footer' "$\{thisprog\}" >>"$\{0\}.nw"
+noweave -delay -index -latex "$\{0\}.nw" >hello-pdf.tex
+docker-cwd.sh --rm -v "`pwd`:/doc" \\
+    -v "\LA{}nwmac.tex~{\nwtagstyle{}\subpageref{NW1YtgvQ-38jgpJ-1}}\RA{}:/texmf/tex/plain/local/nwmac.tex" \\
+    -v "\LA{}noweb.sty~{\nwtagstyle{}\subpageref{NW1YtgvQ-3olr1Q-1}}\RA{}:/texmf/tex/latex/local/noweb.sty" \\
+    thomasweise/texlive \\
+    sh -eux -c 'texhash /texmf; latexmk -pdf hello-pdf'
+\nwnotused{prog}\nwendcode{}\nwbegindocs{6}\nwdocspar
+
+\section{Document Footer}
+
+\nwenddocs{}\nwbegincode{7}\sublabel{NW1YtgvQ-1imcse-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW1YtgvQ-1imcse-1}}}\moddef{document footer~{\nwtagstyle{}\subpageref{NW1YtgvQ-1imcse-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
+\\bibliographystyle\{plain\}
+\\bibliography\{web\}
+
+\\section\{List of all chunks\}
+\\nowebchunks
+
+\\end\{document\}
+\nwnotused{document footer}\nwendcode{}\nwbegindocs{8}\nwdocspar
+\section{Script Preamble}
+
+\hypertarget{scriptpreamble}{This is where it all begins}.
+
+\nwenddocs{}\nwbegincode{9}\sublabel{NW1YtgvQ-1FIOzL-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW1YtgvQ-1FIOzL-1}}}\moddef{script preamble~{\nwtagstyle{}\subpageref{NW1YtgvQ-1FIOzL-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
+#!/bin/sh
+# https://ctarbide.github.io/pages/2024/TBD_hello-worlds
+# https://github.com/ctarbide/coolscripts/blob/master/bin/nofake-exec.nw
+set -eu; set -- "$\{0\}" --ba-- "$\{0\}" "$@" --ea--
+set -- "$@" --tmp-- .nw
+SH=$\{SH:-sh\}; export SH
+exec nofake-exec.sh --error -Rprog "$@" -- "$\{SH\}" -eu
+exit 1
+\nwnotused{script preamble}\nwendcode{}
+
+\nwixlogsorted{c}{{document footer}{NW1YtgvQ-1imcse-1}{\nwixd{NW1YtgvQ-1imcse-1}}}%
+\nwixlogsorted{c}{{noweb.sty}{NW1YtgvQ-3olr1Q-1}{\nwixd{NW1YtgvQ-3olr1Q-1}\nwixu{NW1YtgvQ-2gB9lP-1}}}%
+\nwixlogsorted{c}{{nwmac.tex}{NW1YtgvQ-38jgpJ-1}{\nwixd{NW1YtgvQ-38jgpJ-1}\nwixu{NW1YtgvQ-2gB9lP-1}}}%
+\nwixlogsorted{c}{{prog}{NW1YtgvQ-2gB9lP-1}{\nwixd{NW1YtgvQ-2gB9lP-1}}}%
+\nwixlogsorted{c}{{script preamble}{NW1YtgvQ-1FIOzL-1}{\nwixd{NW1YtgvQ-1FIOzL-1}}}%
+\nwbegindocs{10}\nwdocspar
+
+\bibliographystyle{plain}
+\bibliography{web}
+
+\section{List of all chunks}
+\nowebchunks
+
+\end{document}
+\nwenddocs{}

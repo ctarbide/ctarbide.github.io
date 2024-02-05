@@ -1,0 +1,32 @@
+<p><!DOCTYPE html></p>
+
+<h3><a href="index.html">index.html</a></h3>
+
+<h3><a href="README.txt">README.txt</a></h3>
+
+<h3>Code for <a href="hello-cl-abcl.sh"><code>hello-cl-abcl.sh</code></a>:</h3>
+
+<pre style="margin-left: 5ch;"><code>#!/bin/sh
+# https&colon;//ctarbide.github.io/pages/2024/2024-02-05_12h00m11_hello-worlds/
+# https&colon;//github.com/ctarbide/coolscripts/blob/master/bin/nofake-exec.nw
+set -eu; set -- "${0}" --ba-- "$@" --ea--
+ABCL=${ABCL&colon;-abcl.sh}; export ABCL
+exec nofake-exec.sh --error -Rprog "$@" -- "${ABCL}" --noinform --batch --load
+exit 1
+
+This is a live literate program.
+
+&lt;&lt;tested with versions>>=
+- Armed Bear Common Lisp 1.9.2
+&#x40;
+
+&lt;&lt;see also>>=
+- https&colon;//github.com/ctarbide/java-scripting
+
+    - provides an `abcl.sh`
+
+&#x40;
+
+&lt;&lt;prog>>=
+(format t "hello world!~%")
+</code></pre>

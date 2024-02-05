@@ -1,0 +1,26 @@
+<p><!DOCTYPE html></p>
+
+<h3><a href="index.html">index.html</a></h3>
+
+<h3><a href="README.txt">README.txt</a></h3>
+
+<h3>Code for <a href="hello-icon.sh"><code>hello-icon.sh</code></a>:</h3>
+
+<pre style="margin-left: 5ch;"><code>#!/bin/sh
+# https&colon;//ctarbide.github.io/pages/2024/2024-02-05_12h00m11_hello-worlds/
+# https&colon;//github.com/ctarbide/coolscripts/blob/master/bin/nofake-exec.nw
+set -eu; set -- "${0}" --ba-- "$@" --ea--
+exec nofake-exec.sh --error -Rprog "$@" -- icon
+exit 1
+
+This is a live literate program.
+
+&lt;&lt;tested with versions>>=
+- Icon Version 9.5.22e, July 23, 2022
+&#x40;
+
+&lt;&lt;prog>>=
+procedure main(args)
+    write("hello world!")
+end
+</code></pre>

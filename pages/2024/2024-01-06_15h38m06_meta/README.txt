@@ -259,10 +259,19 @@ body {
 @@
 @
 
+<<assets.nw - function escape>>=
+@<<asset - function escape>>=
+escape(){
+    perl -lpe's,&,&amp;,g; s,<,&lt;,g; s,:,&colon;,g; s,^\@,&#x40;,' -- "$@"
+}
+@@
+@
+
 <<assets.nw>>=
 This was generated from <<PAGE DIR>>/README.txt, do not change this file.
 <<assets.nw - misc>>
 <<assets.nw - style>>
+<<assets.nw - function escape>>
 @
 
 <<template exports 0>>=

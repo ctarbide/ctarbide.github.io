@@ -23,24 +23,24 @@ font-size: 14pt; }
 <p> This page was automatically generated with these abstract recipes:
 <pre><code>
 &lt;&lt;render&gt;&gt;=
-&lt;&lt;sh preamble&gt;&gt;
-&lt;&lt;set $t0&gt;&gt;
-&lt;&lt;update (or not) .index.html from primary sources&gt;&gt;
-&lt;&lt;update (or not) index.html from .index.html&gt;&gt;
+&lt;&lt;sh preamble>>
+&lt;&lt;set $t0>>
+&lt;&lt;update (or not) .index.html from primary sources>>
+&lt;&lt;update (or not) index.html from .index.html>>
 @
 &lt;&lt;generate&gt;&gt;=
-&lt;&lt;sh preamble&gt;&gt;
-&lt;&lt;standard data&gt;&gt;
-&lt;&lt;aux data&gt;&gt;
+&lt;&lt;sh preamble>>
+&lt;&lt;standard data>>
+&lt;&lt;aux data>>
 @
 &lt;&lt;aux data&gt;&gt;=
-printf '@&lt;&lt;rendered references&gt;&gt;=\n'
-nofake -Rreferences README.txt | &lt;&lt;assets - md.pl for pages&gt;&gt;
+printf '@&lt;&lt;rendered references>>=\n'
+nofake -Rreferences README.txt | &lt;&lt;assets - md.pl for pages>>
 printf '@\n'
-&lt;&lt;md Markdown Readme.text&gt;&gt;
-&lt;&lt;htmlify render chunk&gt;&gt;
-&lt;&lt;htmlify generate chunk&gt;&gt;
-&lt;&lt;htmlify 'aux data' chunk&gt;&gt;
+&lt;&lt;md Markdown Readme.text>>
+&lt;&lt;htmlify render chunk>>
+&lt;&lt;htmlify generate chunk>>
+&lt;&lt;htmlify 'aux data' chunk>>
 @
 </code></pre>
 <h2>References</h2>
@@ -377,4 +377,4 @@ software, even if advised of the possibility of such damage.</p>
 
 <p> This <a href="README.txt">page</a> was last modified on January 10, 2024 at 19:38:06 UTC.
 
-<!-- Generated in 0.084 seconds on January 11, 2024 at 01:36:32 UTC. -->
+<!-- Generated in 0.094 seconds on February  5, 2024 at 14:37:48 UTC. -->

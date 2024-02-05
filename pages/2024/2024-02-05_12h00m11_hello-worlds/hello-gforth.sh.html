@@ -1,0 +1,29 @@
+<p><!DOCTYPE html></p>
+
+<h3><a href="index.html">index.html</a></h3>
+
+<h3><a href="README.txt">README.txt</a></h3>
+
+<h3>Code for <a href="hello-gforth.sh"><code>hello-gforth.sh</code></a>:</h3>
+
+<pre style="margin-left: 5ch;"><code>#!/bin/sh
+# https&colon;//ctarbide.github.io/pages/2024/2024-02-05_12h00m11_hello-worlds/
+# https&colon;//github.com/ctarbide/coolscripts/blob/master/bin/nofake-exec.nw
+set -eu; set -- "${0}" --ba-- "$@" -e bye --ea--
+exec nofake-exec.sh --error -Rprog "$@" -- gforth
+exit 1
+
+This is a live literate program.
+
+&lt;&lt;tested with versions>>=
+- gforth 0.7.3
+&#x40;
+
+&lt;&lt;references>>=
+- https&colon;//gforth.org/manual/Using-files-for-Forth-code-Tutorial.html
+
+&#x40;
+
+&lt;&lt;prog>>=
+." hello world!" cr
+</code></pre>

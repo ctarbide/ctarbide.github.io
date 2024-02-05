@@ -30,3 +30,8 @@ font-family: Georgia, "Bitstream Charter", serif;
 font-size: 14pt; }
 </style>
 @
+<<asset - function escape>>=
+escape(){
+    perl -lpe's,&,&amp;,g; s,<,&lt;,g; s,:,&colon;,g; s,^\@,&#x40;,' -- "$@"
+}
+@

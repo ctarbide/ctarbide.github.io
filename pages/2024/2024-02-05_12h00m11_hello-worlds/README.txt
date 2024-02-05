@@ -1,26 +1,40 @@
 
 <<body in markdown>>=
 <h1><<TITLE>></h1>
-<h2>Snippets</h2>
 
-<<snippet listing>>
+**************** from simple to complex
 
-<h2>Live Literate Program</h2>
+- [hello cat](hello-cat.sh.html)
 
-All scripts follow the *live literate program* technique, some examples:
+- [hello perl](hello-perl.sh.html)
 
-[hello1](hello1.sh):
+- [hello sh](hello-sh.sh.html)
 
-<<htmlified hello1.sh>>
+- [hello nasm x86_64](hello-nasm_x86_64.sh.html)
 
-[hello2](hello2.sh):
+- [hello awk](hello-awk.sh.html)
 
-<<htmlified hello2.sh>>
+- [hello scheme, scheme48](hello-scheme-scheme48.sh.html)
 
-`nofake-exec.sh` is provided by [coolscripts](https://github.com/ctarbide/coolscripts).
+- [hello sh sh](hello-sh-sh.sh.html)
 
-<h2>References</h2>
-<<references>>
+**************** hello pdf?
+
+[Sure](hello-pdf.sh.html), here is the [output](hello-pdf.pdf).
+
+**************** Is there more?
+
+Sure, these are the ones so far:
+
+<<listing of all hellos>>
+
+More to come, as time goes by.
+
+**************** what is going on here?
+
+It all started in <<link to scsh·examples>>.
+
+Here is the [htmlifier of worlds](htmlify-all-hellos.sh.html).
 
 More details in the link below.
 @
@@ -30,11 +44,11 @@ More details in the link below.
 @
 
 <<STAMP>>=
-2024-01-25_20h18m26
+2024-02-05_12h00m11
 @
 
 <<ITEM_ID>>=
-scsh·examples
+hello-worlds
 @
 
 <<PAGE DIR>>=
@@ -82,7 +96,7 @@ set -eu
 
 <<print LAST MODIFIED>>=
 if [ -f .draft ]; then
-    last-modified.sh README.txt | perl -MPOSIX=strftime \
+    last-modified.sh README.txt htmlify-all-hellos.sh | perl -MPOSIX=strftime \
         -lne'print(strftime(qq{@<<LAST MODIFIED@>>=\n%B %e, %Y (DRAFT)\n@\n}, gmtime($_)))'
 else
     FORMAT='format:%B %e, %Y at %T UTC' git-last-modified.sh README.txt | perl \
@@ -101,24 +115,6 @@ perl -MTime::HiRes=time -MPOSIX=strftime -le'
     printf(qq{\n<!-- Generated in %.3f seconds on %s. -->\n},
         $t1 - $t0, strftime(q{%B %e, %Y at %T UTC}, gmtime))
 ' -- "${t0}"
-@
-
-<<standard data>>=
-<<print LAST MODIFIED>>
-cat <<PRIMARY SOURCES>>
-@
-
-<<aux data>>=
-<<asset - function escape>>
-printf '@<<references>>=\n'
-nofake --error -Rreferences README.txt *.sh | LC_ALL=C sort -u
-printf '@\n'
-printf '@<<htmlified hello1.sh>>=\n<pre><code>'
-escape hello1.sh
-printf '</code></pre>\n@\n'
-printf '@<<htmlified hello2.sh>>=\n<pre><code>'
-escape hello2.sh
-printf '</code></pre>\n@\n'
 @
 
 <<create index.html from .index.html>>=
@@ -140,13 +136,54 @@ else
 fi
 @
 
+<<gen: base url>>=
+printf '@<<base url>>=\n'
+<<TOP>>/bin/show-config.sh website.base-url
+printf '@\n'
+@
+
+<<gen: link to scsh·examples>>=
+printf '@<<link to scsh·examples>>=\n'
+<<TOP>>/bin/find-raw.sh 2024-01 scsh examples |
+    perl -lne'print qq{[scsh examples](<<PAGES>>/${_})}'
+printf '@\n'
+@
+
+<<${i} -> name>>=
+perl -sle'$_=$n; s,_,&#x5f;,g; print $1 if m{^ hello- (.*) \.sh\.html $}xi' -- -n="${i}"
+@
+
+<<gen: listing of all hellos>>=
+printf '@<<listing of all hellos>>=\n'
+for i in hello-*.sh.html; do
+    name=`<<${i} -> name>>`
+    printf ' [%s](%s)' "${name}" "${i}"
+done
+printf '\n@\n'
+@
+
+<<generate>>=
+<<sh preamble>>
+<<print LAST MODIFIED>>
+cat <<PRIMARY SOURCES>>
+<<gen: base url>>
+<<gen: link to scsh·examples>>
+<<gen: listing of all hellos>>
+@
+
+<<md-autoheader-autolink.pl>>=
+<<TOP>>/bin/md-autoheader-autolink.pl
+@
+
 <<update (or not) .index.html from primary sources>>=
-nofake --error -R'sh preamble' -R'standard data' -R'aux data' -R'list snippets' \
-    <<PRIMARY SOURCES>> | sh | gzip > .cache
+./htmlify-all-hellos.sh
+nofake --error -Rgenerate <<PRIMARY SOURCES>> | sh | gzip > .cache
 (
     gzip -dc .cache
     printf '@<<body>>=\n'
-    gzip -dc .cache | nofake --error -R'body in markdown' | <<assets - md.pl for pages>>
+    gzip -dc .cache | nofake --error -R'body in markdown' |
+        <<md-autoheader-autolink.pl>> |
+        <<assets - md.pl for pages>>
     printf '@\n'
 ) | CHMOD='chmod 0444' nofake.sh --error -Rindex.html -o.index.html
 @
@@ -183,25 +220,3 @@ nofake --error -R'sh preamble' -R'standard data' -R'aux data' -R'list snippets' 
 2023/2023-10-19_21h40m15_perl·markdown·daringfireball.net/
 @
 
-<<snippets 0>>=
-hello1.sh hello2.sh args1.sh args2.sh args3.sh
-<<snippets 1>>=
-for-each1.sh fac1.sh fac2.sh fac3.sh
-<<snippets 2>>=
-list-path.sh list-executables.sh stdin1.sh
-<<snippets>>=
-<<snippets 0>> <<snippets 1>> <<snippets 2>>
-@
-
-<<list snippets>>=
-for i in <<snippets>>; do
-    j=${i%.sh}
-    printf '@<<%s snippet>>=\n<pre><code>' "${j}"
-    nofake-htmlify-chunk.sh prog "${i}"
-    printf '</code></pre>\n'
-    printf '@<<snippet listing>>=\n'
-    printf '[%s](%s):\n\n' "${j}" "${i}"
-    printf '@<<%s snippet>>\n\n' "${j}"
-done
-printf '@\n'
-@
