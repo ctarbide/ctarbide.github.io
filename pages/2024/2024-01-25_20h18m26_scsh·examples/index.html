@@ -34,23 +34,23 @@ font-size: 14pt; }
     (display "hello world!\n")
     (display (string-append
         "called with "
-        (number-&gt;string (length args))
+        (number->string (length args))
         " args\n"))
-    (format #t "args: ~s~%" args))
+    (format #t "args&colon; ~s~%" args))
 </code></pre>
 
 <p><a href="args1.sh">args1</a>:</p>
 
 <pre><code>(define argc (length command-line-arguments))
-(format #t "argc: ~a~%" argc)
+(format #t "argc&colon; ~a~%" argc)
 </code></pre>
 
 <p><a href="args2.sh">args2</a>:</p>
 
 <pre><code>(define argc (length command-line-arguments))
-(format #t "argc: ~a~%" argc)
-(format #t "args: ~s~%" command-line-arguments)
-(format #t "argv 0: ~a~%" (argv 0))
+(format #t "argc&colon; ~a~%" argc)
+(format #t "args&colon; ~s~%" command-line-arguments)
+(format #t "argv 0&colon; ~a~%" (argv 0))
 </code></pre>
 
 <p><a href="args3.sh">args3</a>:</p>
@@ -63,7 +63,7 @@ font-size: 14pt; }
     (define (loop i)
         (if (&lt;= i n)
             (begin
-                (format #t "argv ~a: ~s~%" i (argv i))
+                (format #t "argv ~a&colon; ~s~%" i (argv i))
                 (loop (+ i 1)))
             (values)))
     (loop 1))
@@ -75,10 +75,10 @@ font-size: 14pt; }
 <p><a href="for-each1.sh">for-each1</a>:</p>
 
 <pre><code>(define argc (length command-line-arguments))
-(format #t "argc: ~a~%" argc)
-(format #t "args: ~s~%" command-line-arguments)
+(format #t "argc&colon; ~a~%" argc)
+(format #t "args&colon; ~s~%" command-line-arguments)
 (for-each (lambda (arg)
-    (format #t "arg: ~s~%" arg))
+    (format #t "arg&colon; ~s~%" arg))
     command-line-arguments)
 </code></pre>
 
@@ -115,7 +115,7 @@ font-size: 14pt; }
 <p><a href="list-path.sh">list-path</a>:</p>
 
 <pre><code>(define (writeln x) (display x) (newline))
-(for-each writeln ((infix-splitter ":") (getenv "PATH")))
+(for-each writeln ((infix-splitter "&colon;") (getenv "PATH")))
 </code></pre>
 
 <p><a href="list-executables.sh">list-executables</a>:</p>
@@ -125,7 +125,7 @@ font-size: 14pt; }
     (filter file-executable? (directory-files dir #t))))
 (define (writeln x) (display x) (newline))
 (for-each writeln
-  (append-map executables ((infix-splitter ":") (getenv "PATH"))))
+  (append-map executables ((infix-splitter "&colon;") (getenv "PATH"))))
 </code></pre>
 
 <p><a href="stdin1.sh">stdin1</a>:</p>
@@ -142,8 +142,8 @@ font-size: 14pt; }
 <p><a href="hello1.sh">hello1</a>:</p>
 
 <pre><code>#!/bin/sh
-# https://ctarbide.github.io/pages/2024/TBD_hello-worlds
-# https://github.com/ctarbide/coolscripts/blob/master/bin/nofake-exec.nw
+# https&colon;//ctarbide.github.io/pages/2024/2024-02-05_12h00m11_hello-worlds/
+# https&colon;//github.com/ctarbide/coolscripts/blob/master/bin/nofake-exec.nw
 set -eu; set -- "${0}" --ba-- "$@" --ea--
 exec nofake-exec.sh --error -Rprog "$@" -- scsh -s
 exit 1
@@ -158,8 +158,8 @@ This is a live literate program.
 <p><a href="hello2.sh">hello2</a>:</p>
 
 <pre><code>#!/bin/sh
-# https://ctarbide.github.io/pages/2024/TBD_hello-worlds
-# https://github.com/ctarbide/coolscripts/blob/master/bin/nofake-exec.nw
+# https&colon;//ctarbide.github.io/pages/2024/2024-02-05_12h00m11_hello-worlds/
+# https&colon;//github.com/ctarbide/coolscripts/blob/master/bin/nofake-exec.nw
 set -eu; set -- "${0}" --ba-- "$@" --ea--
 exec nofake-exec.sh --error -Rprog "$@" -- scsh -e main -s
 exit 1
@@ -173,7 +173,7 @@ This is a live literate program.
         "called with "
         (number->string (length args))
         " args\n"))
-    (format #t "args: ~s~%" args))
+    (format #t "args&colon; ~s~%" args))
 &#x40;
 </code></pre>
 
@@ -189,6 +189,6 @@ This is a live literate program.
 </ul>
 
 <p>More details in the link below.</p>
-<p> This <a href="README.txt">page</a> was last modified on January 27, 2024 at 23:52:56 UTC.
+<p> This <a href="README.txt">page</a> was last modified on February  5, 2024 at 15:02:40 UTC.
 
-<!-- Generated in 0.123 seconds on February  5, 2024 at 10:57:59 UTC. -->
+<!-- Generated in 0.126 seconds on February  5, 2024 at 15:06:35 UTC. -->

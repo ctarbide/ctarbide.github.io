@@ -137,13 +137,13 @@ hello world!
 (define (slurp-to-list epf)
     (port->string-list (run/port* (lambda () (apply exec-path epf)))))
 
-(show "(seq 10): " (port->string-list (run/port (seq 10))))
-(show "(seq 10): " (run/strings (seq 10)))
-(show "(seq 10): " (slurp-to-list '(seq 10)))
-(show "(seq 10): " (run/string (seq 10)))
-(show "(seq 10): " (slurp-to-string '(seq 10)))
+(show "(seq 10)&colon; " (port->string-list (run/port (seq 10))))
+(show "(seq 10)&colon; " (run/strings (seq 10)))
+(show "(seq 10)&colon; " (slurp-to-list '(seq 10)))
+(show "(seq 10)&colon; " (run/string (seq 10)))
+(show "(seq 10)&colon; " (slurp-to-string '(seq 10)))
 
-(& (sh -c "sleep 1; date"))
+(&amp; (sh -c "sleep 1; date"))
 
 (run (| (seq 100) (perl -lne"$s+=$_}{print$s")))
 
@@ -154,14 +154,14 @@ hello world!
 
 <p>output</p>
 
-<pre><code>(seq 10): ("1" "2" "3" "4" "5" "6" "7" "8" "9" "10")
-(seq 10): ("1" "2" "3" "4" "5" "6" "7" "8" "9" "10")
-(seq 10): ("1" "2" "3" "4" "5" "6" "7" "8" "9" "10")
-(seq 10): "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n"
-(seq 10): "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n"
+<pre><code>(seq 10)&colon; ("1" "2" "3" "4" "5" "6" "7" "8" "9" "10")
+(seq 10)&colon; ("1" "2" "3" "4" "5" "6" "7" "8" "9" "10")
+(seq 10)&colon; ("1" "2" "3" "4" "5" "6" "7" "8" "9" "10")
+(seq 10)&colon; "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n"
+(seq 10)&colon; "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n"
 5050
-Mon Feb  5 10:57:59 UTC 2024
-Mon Feb  5 10:58:00 UTC 2024
+Mon Feb  5 15&colon;06&colon;36 UTC 2024
+Mon Feb  5 15&colon;06&colon;37 UTC 2024
 </code></pre>
 
 <h2>References</h2>
@@ -184,6 +184,6 @@ Mon Feb  5 10:58:00 UTC 2024
 </ul>
 
 <p>More details in the link below.</p>
-<p> This <a href="README.txt">page</a> was last modified on January 29, 2024 at 23:56:06 UTC.
+<p> This <a href="README.txt">page</a> was last modified on February  5, 2024 at 15:02:40 UTC.
 
-<!-- Generated in 1.335 seconds on February  5, 2024 at 10:58:01 UTC. -->
+<!-- Generated in 1.336 seconds on February  5, 2024 at 15:06:37 UTC. -->
