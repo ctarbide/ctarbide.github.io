@@ -1,0 +1,33 @@
+<p><!DOCTYPE html></p>
+
+<h3><a href="index.html">index.html</a></h3>
+
+<h3><a href="README.txt">README.txt</a></h3>
+
+<h3>Code for <a href="hello-scheme-gsi.sh"><code>hello-scheme-gsi.sh</code></a>:</h3>
+
+<pre style="margin-left: 5ch;"><code>#!/bin/sh
+# https&colon;//ctarbide.github.io/pages/2024/2024-02-05_12h00m11_hello-worlds/
+# https&colon;//github.com/ctarbide/coolscripts/blob/master/bin/nofake-exec.nw
+set -eu; set -- "${0}" --ba-- "$@" --ea--
+GSI=${GSI&colon;-gsi}; export GSI
+exec nofake-exec.sh --error -Rprog "$@" -- "${GSI}"
+exit 1
+
+This is a live literate program.
+
+&lt;&lt;tested with versions>>=
+- gambit v4.9.5 20230726044844
+
+&#x40;
+
+&lt;&lt;references>>=
+- http&colon;//www.iro.umontreal.ca/~gambit/doc/gambit.html
+
+- http&colon;//www.iro.umontreal.ca/~gambit/doc/gambit.pdf
+
+&#x40;
+
+&lt;&lt;prog>>=
+(display "hello world!\n")
+</code></pre>

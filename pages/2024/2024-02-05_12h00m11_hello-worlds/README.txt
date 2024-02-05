@@ -30,7 +30,7 @@ Sure, these are the ones so far:
 
 More to come, as time goes by.
 
-**************** what is going on here?
+**************** What is going on here?
 
 It all started in <<link to scsh·examples>>.
 
@@ -157,7 +157,7 @@ perl -sle'$_=$n; s,_,&#x5f;,g; print $1 if m{^ hello- (.*) \.sh\.html $}xi' -- -
 printf '@<<listing of all hellos>>=\n'
 for i in hello-*.sh.html; do
     name=`<<${i} -> name>>`
-    printf ' [%s](%s)' "${name}" "${i}"
+    printf -- '- [%s](%s)\n' "${name}" "${i}"
 done
 printf '\n@\n'
 @

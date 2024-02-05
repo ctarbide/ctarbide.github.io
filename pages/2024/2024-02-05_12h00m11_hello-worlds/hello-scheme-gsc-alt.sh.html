@@ -1,0 +1,43 @@
+<p><!DOCTYPE html></p>
+
+<h3><a href="index.html">index.html</a></h3>
+
+<h3><a href="README.txt">README.txt</a></h3>
+
+<h3>Code for <a href="hello-scheme-gsc-alt.sh"><code>hello-scheme-gsc-alt.sh</code></a>:</h3>
+
+<pre style="margin-left: 5ch;"><code>#!/bin/sh
+# https&colon;//ctarbide.github.io/pages/2024/2024-02-05_12h00m11_hello-worlds/
+# https&colon;//github.com/ctarbide/coolscripts/blob/master/bin/nofake-exec.nw
+set -eu; set -- "${0}" --ba-- "$@" --ea--
+set -- "$@" --tmp-- .out
+SH=${SH&colon;-sh}
+GSC=${GSC&colon;-gambit-gsc}
+export SH GSC
+exec nofake-exec.sh --error -Rprog "$@" -- "${SH}" -eu -c '
+    "${GSC}" -exe -o "${0}.out" "${0}"
+    exec "${0}.out" "$@"
+'
+exit 1
+
+This is a live literate program.
+
+&lt;&lt;tested with versions>>=
+- Gambit v4.9.5 20230726044844
+
+&#x40;
+
+&lt;&lt;references>>=
+- https&colon;//www.gambitscheme.org/latest/manual/#GSC
+
+- https&colon;//www.gambitscheme.org/latest/manual/#Compiling-scripts
+
+&#x40;
+
+&lt;&lt;tip&colon; how to use alternate program name>>=
+GSC=gsc ./hello-scheme-gsc-alt.sh
+&#x40;
+
+&lt;&lt;prog>>=
+(display "hello world!\n")
+</code></pre>
