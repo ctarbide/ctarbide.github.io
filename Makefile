@@ -26,3 +26,4 @@ pages: unlink-draft-pages
 	$(MAKE) -C 'pages/2024/2024-01-29_10h43m49_scsh·ipc·fork·exec·waitpid·run'
 	$(MAKE) -C 'pages/2024/2024-02-01_13h35m19_sicp·book'
 	$(MAKE) -C 'pages/2024/2024-02-05_12h00m11_hello-worlds'
+	$(MAKE) -C 'pages/2024/2024-02-10_10h47m46_slackware64-13.37_from_2011_on_qemu_v8.1.3'
