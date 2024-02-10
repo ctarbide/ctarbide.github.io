@@ -60,7 +60,6 @@ slackware64-13.37-install-dvd.iso
 &#x40;
 
 &lt;&lt;main>>=
-~/showargs-nl 'main' "$@"
 set -- "${1}" --ba-- "$@" --ea--
 nofake-exec.sh --error -R'step 1 - create base image' "$@" -- "${SH}" -eu
 nofake-exec.sh --error -R'step 2 - start installer' "$@" -- "${SH}" -eu
@@ -80,7 +79,6 @@ boot installer dvd if base image was created 5 seconds ago
 
 &lt;&lt;step 2 - start installer>>=
 &lt;&lt;function time_delta>>
-set -x
 if [ "`time_delta '&lt;&lt;base image created>>'`" -le 5 ]; then
     qemu-system-x86_64 -m 4096 -enable-kvm \
         -monitor stdio \
@@ -99,7 +97,6 @@ fi
 &#x40;
 
 &lt;&lt;step 4 - first run>>=
-set -x
 qemu-system-x86_64 -m 4096 -enable-kvm \
     -monitor stdio \
     -hda '&lt;&lt;backed image>>'
@@ -178,6 +175,6 @@ rm -fv '&lt;&lt;base image>>' '&lt;&lt;base image created>>' '&lt;&lt;backed ima
 </ul>
 
 <p>More details in the link below.</p>
-<p> This <a href="README.txt">page</a> was last modified on February 10, 2024 at 13:37:15 UTC.
+<p> This <a href="README.txt">page</a> was last modified on February 10, 2024 at 14:03:24 UTC.
 
-<!-- Generated in 0.066 seconds on February 10, 2024 at 13:41:42 UTC. -->
+<!-- Generated in 0.066 seconds on February 10, 2024 at 14:03:29 UTC. -->
