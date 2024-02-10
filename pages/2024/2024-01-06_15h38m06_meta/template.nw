@@ -114,7 +114,3 @@ nofake --error -Rgenerate <<PRIMARY SOURCES>> | sh | gzip > .cache
 <p> This <a href="README.txt">page</a> was last modified on <<LAST MODIFIED>>.
 @
 
-<<md prefix>>=
-2023/2023-10-19_21h40m15_perl·markdown·daringfireball.net/
-@
-

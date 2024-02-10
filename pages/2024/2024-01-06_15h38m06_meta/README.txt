@@ -281,7 +281,7 @@ This was generated from <<PAGE DIR>>/README.txt, do not change this file.
 <<template exports 2>>=
 'create index.html from .index.html' 'update (or not) index.html from .index.html'
 <<template exports 3>>=
-'update (or not) .index.html from primary sources' 'metas and links' 'md prefix'
+'update (or not) .index.html from primary sources' 'metas and links'
 <<template exports 4>>=
 generate render 'print LAST MODIFIED'
 <<template exports 0 1 2>>=

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<title>ctarbi.de - slackware64-13.37 from 2011 on qemu_v8.1.3</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=0.6">
+<link rel="canonical" href="https://ctarbide.github.io/pages/2024/2024-02-10_10h47m46_slackware64-13.37 from 2011 on qemu_v8.1.3/index.html">
+<link rel="icon" href="../../../favicon.ico" type="image/x-icon">
+<style>
+pre {
+font-family: "Lucida Console", Courier, monospace;
+font-size: 14pt; }
+code {
+font-family: "Lucida Console", Courier, monospace;
+font-size: 14pt; }
+body {
+width: 90ch;
+max-width: calc(100vw - 4em);
+margin: 2em auto 0 auto;
+font-family: Georgia, "Bitstream Charter", serif;
+font-size: 14pt; }
+</style>
+<h1>ctarbi.de - slackware64-13.37 from 2011 on qemu_v8.1.3</h1>
+
+<p>How to install x86_64 version of Slackware Linux version 13.37 from 2011.</p>
+
+<p>The <code>slack64.sh</code> that follows is a live literate program [1].</p>
+
+<h3><a href="slack64.sh"><code>slack64.sh</code></a>:</h3>
+
+<pre style="margin-left: 3ch;"><code>#!/bin/sh
+# https&colon;//ctarbide.github.io/pages/2024/2024-02-05_12h00m11_hello-worlds/
+# https&colon;//github.com/ctarbide/coolscripts/blob/master/bin/nofake-exec.nw
+set -eu; set -- "${0}" --ba-- "${0}" "$@" --ea--
+SH=${SH&colon;-sh}; export SH
+exec nofake-exec.sh --error -Rmain "$@" -- "${SH}" -eu
+exit 1
+
+This is a live literate program.
+
+&lt;&lt;base image>>=
+slack64-base.qcow2
+&#x40;
+
+&lt;&lt;backed image>>=
+slack64.qcow2
+&#x40;
+
+&lt;&lt;base image size>>=
+20G
+&#x40;
+
+stat's ctime is not portable/reliable, use mtime of a different file instead
+
+&lt;&lt;base image created>>=
+&lt;&lt;base image>>.created
+&#x40;
+
+&lt;&lt;iso installer>>=
+slackware64-13.37-install-dvd.iso
+&#x40;
+
+&lt;&lt;main>>=
+~/showargs-nl 'main' "$@"
+set -- "${1}" --ba-- "$@" --ea--
+nofake-exec.sh --error -R'step 1 - create base image' "$@" -- "${SH}" -eu
+nofake-exec.sh --error -R'step 2 - start installer' "$@" -- "${SH}" -eu
+nofake-exec.sh --error -R'step 3 - create backed image' "$@" -- "${SH}" -eu
+nofake-exec.sh --error -R'step 4 - first run' "$@" -- "${SH}" -eu
+echo all done
+&#x40;
+
+&lt;&lt;step 1 - create base image>>=
+if [ ! -f '&lt;&lt;base image>>' ]; then
+    qemu-img create -f qcow2 '&lt;&lt;base image>>' '&lt;&lt;base image size>>'
+    perl -le'print(q{mtime should be } . time)' > '&lt;&lt;base image created>>'
+fi
+&#x40;
+
+boot installer dvd if base image was created 5 seconds ago
+
+&lt;&lt;step 2 - start installer>>=
+&lt;&lt;function time_delta>>
+set -x
+if [ "`time_delta '&lt;&lt;base image created>>'`" -le 5 ]; then
+    qemu-system-x86_64 -m 4096 -enable-kvm \
+        -monitor stdio \
+        -hda '&lt;&lt;base image>>' \
+        -cdrom '&lt;&lt;iso installer>>' \
+        -boot d
+fi
+&#x40;
+
+&lt;&lt;step 3 - create backed image>>=
+if [ ! -f '&lt;&lt;backed image>>' ]; then
+    chmod a-w '&lt;&lt;base image>>'
+    qemu-img create -f qcow2 -o backing_file='&lt;&lt;base image>>' \
+        -F qcow2 '&lt;&lt;backed image>>'
+fi
+&#x40;
+
+&lt;&lt;step 4 - first run>>=
+set -x
+qemu-system-x86_64 -m 4096 -enable-kvm \
+    -monitor stdio \
+    -hda '&lt;&lt;backed image>>'
+&#x40;
+
+&lt;&lt;function time_delta>>=
+time_delta(){
+    perl -sle'@s = stat $name; print time - $s[9]' -- -name="${1}"
+}
+&#x40;
+
+&lt;&lt;tips>>=
+
+### ssh connection to guest from host
+
+in guest&colon;
+
+    ssh -R2223&colon;127.0.0.1&colon;22 hostuser@10.0.2.2 'while date; do sleep 30; done'
+
+in host&colon;
+
+    TERM=screen ssh -p2223 slack@127.0.0.1
+
+&#x40;
+
+nofake -Rclean slack64.sh
+
+&lt;&lt;clean>>=
+rm -fv '&lt;&lt;base image>>' '&lt;&lt;base image created>>' '&lt;&lt;backed image>>'
+&#x40;
+</code></pre>
+
+<p>[1]: literate program ready for execution, i.e. self-tangling</p>
+
+<h2>Screenshots</h2>
+
+<p><img src="12-11-28.png" alt="12-11-28" title="12-11-28"></p>
+
+<p><img src="12-19-21.png" alt="12-19-21" title="12-19-21"></p>
+
+<p><img src="12-20-12.png" alt="12-20-12" title="12-20-12"></p>
+
+<p><img src="12-20-22.png" alt="12-20-22" title="12-20-22"></p>
+
+<p><img src="12-20-52.png" alt="12-20-52" title="12-20-52"></p>
+
+<p><img src="12-21-02.png" alt="12-21-02" title="12-21-02"></p>
+
+<p><img src="12-21-32.png" alt="12-21-32" title="12-21-32"></p>
+
+<p><img src="12-22-16.png" alt="12-22-16" title="12-22-16"></p>
+
+<p><img src="12-22-29.png" alt="12-22-29" title="12-22-29"></p>
+
+<p><img src="12-22-41.png" alt="12-22-41" title="12-22-41"></p>
+
+<p><img src="12-23-25.png" alt="12-23-25" title="12-23-25"></p>
+
+<p><img src="12-24-21.png" alt="12-24-21" title="12-24-21"></p>
+
+<p><img src="12-24-45.png" alt="12-24-45" title="12-24-45"></p>
+
+<p><img src="12-25-24.png" alt="12-25-24" title="12-25-24"></p>
+
+<p><img src="12-25-56.png" alt="12-25-56" title="12-25-56"></p>
+
+<p><img src="12-59-14.png" alt="12-59-14" title="12-59-14"></p>
+
+<p><img src="13-00-18.png" alt="13-00-18" title="13-00-18"></p>
+
+<h2>References</h2>
+
+<ul>
+<li><p><a href="http://quantum-mirror.hu/mirrors/pub/slackware/slackware-iso/slackware64-13.37-iso/">http://quantum-mirror.hu/mirrors/pub/slackware/slackware-iso/slackware64-13.37-iso/</a></p></li>
+<li><p><a href="http://www.literateprogramming.com/">http://www.literateprogramming.com/</a></p></li>
+</ul>
+
+<p>More details in the link below.</p>
+<p> This <a href="README.txt">page</a> was last modified on February 10, 2024 at 13:37:15 UTC.
+
+<!-- Generated in 0.066 seconds on February 10, 2024 at 13:41:42 UTC. -->
