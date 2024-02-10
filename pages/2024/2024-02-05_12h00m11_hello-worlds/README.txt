@@ -157,7 +157,7 @@ perl -sle'$_=$n; s,_,&#x5f;,g; print $1 if m{^ hello- (.*) \.sh\.html $}xi' -- -
 printf '@<<listing of all hellos>>=\n'
 for i in hello-*.sh.html; do
     name=`<<${i} -> name>>`
-    printf -- '- [%s](%s)\n' "${name}" "${i}"
+    printf -- '- [%s](%s)\n\n' "${name}" "${i}"
 done
 printf '\n@\n'
 @
