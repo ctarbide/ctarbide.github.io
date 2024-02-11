@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<title>ctarbi.de - compiling_cmucl_2023-08_on_a_void-live-i686_vm</title>
+<title>ctarbi.de - compiling cmucl 2023-08 on a void-live-i686 vm</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=0.6">
 <link rel="canonical" href="https://ctarbide.github.io/pages/2024/2024-01-08_10h24m46_compiling_cmucl_2023-08_on_a_void-live-i686_vm/index.html">
@@ -19,7 +19,7 @@ margin: 2em auto 0 auto;
 font-family: Georgia, "Bitstream Charter", serif;
 font-size: 14pt; }
 </style>
-<h1>ctarbi.de - compiling_cmucl_2023-08_on_a_void-live-i686_vm</h1>
+<h1>ctarbi.de - compiling cmucl 2023-08 on a void-live-i686 vm</h1>
 
 <h2>Prepare VM</h2>
 
@@ -234,7 +234,7 @@ qemu-img create -f qcow2 -o backing_file="void-live-i686--base.qcow2" \
 favorite shell.</p>
 
 <pre><code>mkdir -p ~/Downloads
-git clone https://github.com/ctarbide/coolscripts.git ~/Downloads/coolscripts
+git clone 'https://github.com/ctarbide/coolscripts.git' ~/Downloads/coolscripts
 PATH=${HOME}/Downloads/coolscripts/bin:${PATH}
 (set -eux; cd ~/Downloads/coolscripts/examples; nofake shell-tips.nw | sh)
 </code></pre>
@@ -279,14 +279,14 @@ exec jwm
 <h3>Extract CMUCL binary</h3>
 
 <pre><code>cd ~
-wget -cN https://common-lisp.net/project/cmucl/downloads/snapshots/2023/08/cmucl-2023-08-x86-linux.tar.bz2
+wget -cN 'https://common-lisp.net/project/cmucl/downloads/snapshots/2023/08/cmucl-2023-08-x86-linux.tar.bz2'
 (set -eux; mkdir -pv ~/cmucl-2023-08-x86-linux; cd cmucl-2023-08-x86-linux; tar -xjf ../cmucl-2023-08-x86-linux.tar.bz2)
 </code></pre>
 
 <h3>Extract CMUCL sources</h3>
 
 <pre><code>cd ~
-wget -cN https://common-lisp.net/project/cmucl/downloads/snapshots/2023/08/cmucl-src-2023-08.tar.bz2
+wget -cN 'https://common-lisp.net/project/cmucl/downloads/snapshots/2023/08/cmucl-src-2023-08.tar.bz2'
 (set -eux; mkdir -pv ~/cmucl-src-2023-08; cd cmucl-src-2023-08; tar -xjf ../cmucl-src-2023-08.tar.bz2)
 </code></pre>
 
@@ -318,6 +318,6 @@ bin/make-dist.sh -V 2023-08 -I dist linux-4
 <li><p><a href="https://common-lisp.net/project/cmucl/downloads/snapshots/2023/08/cmucl-2023-08-x86-linux.tar.bz2">https://common-lisp.net/project/cmucl/downloads/snapshots/2023/08/cmucl-2023-08-x86-linux.tar.bz2</a></p></li>
 <li><p><a href="https://common-lisp.net/project/cmucl/downloads/snapshots/2023/08/cmucl-src-2023-08.tar.bz2">https://common-lisp.net/project/cmucl/downloads/snapshots/2023/08/cmucl-src-2023-08.tar.bz2</a></p></li>
 </ul>
-<p> This <a href="README.txt">page</a> was last modified on January 20, 2024 at 16:55:13 UTC.
+<p> This <a href="README.txt">page</a> was last modified on February 11, 2024 at 19:25:15 UTC.
 
-<!-- Generated in 0.060 seconds on January 20, 2024 at 16:55:22 UTC. -->
+<!-- Generated in 0.068 seconds on February 11, 2024 at 19:26:39 UTC. -->
