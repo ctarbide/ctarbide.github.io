@@ -1,6 +1,6 @@
 
 <<references>>=
-- <<<void-live-i686-20230628-base.iso>>>
+- <<void-live-i686-20230628-base.iso>>
 
 - <https://github.com/void-linux/void-mklive/blob/master/build-x86-images.sh>
 
@@ -14,9 +14,9 @@
 
 - <https://gitlab.common-lisp.net/cmucl/cmucl/-/blob/master/.gitlab-ci.yml>
 
-- <<<cmucl-2023-08-x86-linux.tar.bz2>>>
+- <<cmucl-2023-08-x86-linux.tar.bz2>>
 
-- <<<cmucl-src-2023-08.tar.bz2>>>
+- <<cmucl-src-2023-08.tar.bz2>>
 @
 
 <<void-live iso>>=
@@ -87,7 +87,7 @@ LC_COLLATE=C
 
 Download Void Linux live ISO image:
 
-- <<<void-live-i686-20230628-base.iso>>>
+- <<void-live-i686-20230628-base.iso>>
 
 Start `qemu` to install from `ISO` image (tested with `QEMU emulator version 8.1.3`):
 
@@ -229,13 +229,13 @@ https://common-lisp.net/project/cmucl/downloads/snapshots/2023/08/cmucl-src-2023
 
 <<download and extract cmucl>>=
 cd ~
-wget -cN <<cmucl-2023-08-x86-linux.tar.bz2>>
+wget -cN '<<cmucl-2023-08-x86-linux.tar.bz2>>'
 (set -eux; mkdir -pv ~/cmucl-2023-08-x86-linux; cd cmucl-2023-08-x86-linux; tar -xjf ../cmucl-2023-08-x86-linux.tar.bz2)
 @
 
 <<download and extract sources>>=
 cd ~
-wget -cN <<cmucl-src-2023-08.tar.bz2>>
+wget -cN '<<cmucl-src-2023-08.tar.bz2>>'
 (set -eux; mkdir -pv ~/cmucl-src-2023-08; cd cmucl-src-2023-08; tar -xjf ../cmucl-src-2023-08.tar.bz2)
 @
 
@@ -319,7 +319,7 @@ Some instructions below only applies to `zsh`, adapt accordingly to your
 favorite shell.
 
     mkdir -p ~/Downloads
-    git clone https://github.com/ctarbide/coolscripts.git ~/Downloads/coolscripts
+    git clone 'https://github.com/ctarbide/coolscripts.git' ~/Downloads/coolscripts
     PATH=${HOME}/Downloads/coolscripts/bin:${PATH}
     (set -eux; cd ~/Downloads/coolscripts/examples; nofake shell-tips.nw | sh)
 
@@ -419,7 +419,7 @@ nofake --error -Rrender <<PRIMARY SOURCES>> | sh
 @
 
 <<TITLE>>=
-ctarbi.de - <<ITEM_ID>>
+ctarbi.de - compiling cmucl 2023-08 on a void-live-i686 vm
 @
 
 <<sh preamble>>=
@@ -450,23 +450,6 @@ perl -MTime::HiRes=time -MPOSIX=strftime -le'
 ' -- "${t0}"
 @
 
-<<standard data>>=
-<<print LAST MODIFIED>>
-cat <<PRIMARY SOURCES>>
-@
-
-<<aux data>>=
-printf '@<<body>>=\n'
-nofake --error -R'body in markdown' <<PRIMARY SOURCES>> | <<assets - md.pl for pages>>
-printf '@\n'
-@
-
-<<generate>>=
-<<sh preamble>>
-<<standard data>>
-<<aux data>>
-@
-
 <<create index.html from .index.html>>=
 cat .index.html > index.html
 <<generated: $t1 - $t0>> @>> index.html
@@ -486,8 +469,22 @@ else
 fi
 @
 
+<<generate>>=
+<<sh preamble>>
+<<print LAST MODIFIED>>
+cat <<PRIMARY SOURCES>>
+@
+
 <<update (or not) .index.html from primary sources>>=
-nofake --error -Rgenerate <<PRIMARY SOURCES>> | sh | CHMOD='chmod 0444' nofake.sh --error -Rindex.html -o.index.html
+nofake --error -Rgenerate <<PRIMARY SOURCES>> | sh | gzip > .cache
+(
+    gzip -dc .cache
+    printf '@<<body>>=\n'
+    gzip -dc .cache | nofake --error -R'body in markdown' |
+        "<<TOP>>/bin/md-autoheader-autolink.pl" |
+        <<assets - md.pl for pages>>
+    printf '@\n'
+) | CHMOD='chmod 0444' nofake.sh --error -Rindex.html -o.index.html
 @
 
 <<render>>=
@@ -516,8 +513,4 @@ nofake --error -Rgenerate <<PRIMARY SOURCES>> | sh | CHMOD='chmod 0444' nofake.s
 
 <<footer>>=
 <p> This <a href="README.txt">page</a> was last modified on <<LAST MODIFIED>>.
-@
-
-<<md prefix>>=
-2023/2023-10-19_21h40m15_perl·markdown·daringfireball.net/
 @

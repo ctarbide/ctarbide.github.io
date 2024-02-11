@@ -4,7 +4,7 @@ http://ds26gte.github.io/tex2page/celeb.html
 @
 
 <<references>>=
-- <<<celeb>>>
+- <<celeb>>
 
 @
 
@@ -22,14 +22,14 @@ Harold Abelson and Gerald&#xa0;Jay Sussman with Julie Sussman.
 MIT Press, 2nd edition, 1996.
 </table>
 
-We learn that `curl-head-info.sh https://mitpress.mit.edu/sicp/full-text/book/book.html` gives:
+We learn that `curl-head-info.sh 'https://mitpress.mit.edu/sicp/full-text/book/book.html'` gives:
 
     HTTP/1.1 404 Not Found
     Content-Type: text/html; charset=UTF-8
     Server: cloudflare
     Date: Thu, 01 Feb 2024 13:50:53 GMT
 
-Plain `http` fails too, not surprised, not a bit, [made a copy in 2020](<<<assets - base url>>sicp-book/book.html>).
+Plain `http` fails too, not surprised, not a bit, [made a copy in 2020](<<assets - base url>>sicp-book/book.html).
 
 <h2>References</h2>
 
@@ -148,18 +148,14 @@ cat <<PRIMARY SOURCES>>
 <<gen: base url>>
 @
 
-<<function autoheader_and_autolink>>=
-autoheader_and_autolink(){ cat; }
-@
-
 <<update (or not) .index.html from primary sources>>=
 nofake --error -Rgenerate <<PRIMARY SOURCES>> | sh | gzip > .cache
-<<function autoheader_and_autolink>>
 (
     gzip -dc .cache
     printf '@<<body>>=\n'
     gzip -dc .cache | nofake --error -R'body in markdown' |
-        autoheader_and_autolink | <<assets - md.pl for pages>>
+        "<<TOP>>/bin/md-autoheader-autolink.pl" |
+        <<assets - md.pl for pages>>
     printf '@\n'
 ) | CHMOD='chmod 0444' nofake.sh --error -Rindex.html -o.index.html
 @
@@ -191,8 +187,3 @@ nofake --error -Rgenerate <<PRIMARY SOURCES>> | sh | gzip > .cache
 <<footer>>=
 <p> This <a href="README.txt">page</a> was last modified on <<LAST MODIFIED>>.
 @
-
-<<md prefix>>=
-2023/2023-10-19_21h40m15_perl·markdown·daringfireball.net/
-@
-
