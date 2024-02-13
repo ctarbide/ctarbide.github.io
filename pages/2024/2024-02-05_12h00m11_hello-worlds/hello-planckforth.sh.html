@@ -1,0 +1,274 @@
+<p><!DOCTYPE html>
+<html lang="en">
+<style>
+pre {
+    font-family: "Lucida Console", Courier, monospace;
+    font-size: 14pt;
+}
+code {
+    font-family: "Lucida Console", Courier, monospace;
+    font-size: 14pt;
+}
+body {
+    width: 90ch;
+    max-width: calc(100vw - 8ch);
+    margin: 3ch auto 6ch auto;
+    font-family: Georgia, "Bitstream Charter", serif;
+    font-size: 14pt;
+}
+</style></p>
+
+<h3><a href="index.html">index.html</a></h3>
+
+<h3><a href="README.txt">README.txt</a></h3>
+
+<h3>Code for <a href="hello-planckforth.sh"><code>hello-planckforth.sh</code></a>:</h3>
+
+<pre style="margin-left: 3ch;"><code>#!/bin/sh
+# https&colon;//ctarbide.github.io/pages/2024/2024-02-05_12h00m11_hello-worlds/
+# https&colon;//github.com/ctarbide/coolscripts/blob/master/bin/nofake-exec.nw
+set -eu; set -- "${0}" --ba-- "${0}" "$@" --ea--
+SH=${SH&colon;-sh}; export SH
+PERL=${PERL&colon;-perl}; export PERL
+exec nofake-exec.sh --error -Rmain "$@" -- "${SH}" -eu
+exit 1
+
+This is a live literate program.
+
+&lt;&lt;references>>=
+- https&colon;//github.com/nineties/planckforth
+
+&#x40;
+
+This is the "hello world!" plankforth program&colon;
+
+&lt;&lt;hello world!>>=
+khtketkltkltkotk tkwtkotkrtkltkdtk!tk&colon;k0-tk0k0-Q
+&#x40;
+
+After "compilation", 'file planck' should report something like this&colon;
+
+    ELF 32-bit LSB executable, Intel 80386, version 1 (SYSV),
+        statically linked, no section header
+
+It should work on any x86/x86_64 linux.
+
+&lt;&lt;"compile" planck>>=
+rm -f planck
+nofake --error -R'planck source' "${thisprog}" |
+    nofake-exec.sh --error -R'pack hex listing' "$@" -- perl -w > planck
+chmod a+x,a-w planck
+&#x40;
+
+Slightly modified format from the original, removed 'xxd's overlaps.
+
+&lt;&lt;planck source>>=
+00000000&colon; 7f45 4c46 0101 0100   # planckforth -
+00000008&colon; 0000 0000 0000 0000   # Copyright (C) 2021 nineties
+00000010&colon; 0200 0300 0100 0000   ET_EXEC,EM_386,EV_CURRENT
+00000018&colon; 7480 0408 3400 0000   e_entry=0x08048074,e_phoff=&lt;phdr>
+00000020&colon; 0000 0000 0000 0000   e_shoff,e_flags
+00000028&colon; 3400 2000 0100 0000   e_ehsize,e_phentsize,e_phnum,e_shentsize
+00000030&colon; 0000 0000 0100 0000   e_shnum,e_shstrndx,&lt;phdr>p_type=PT_LOAD
+00000038&colon; 0000 0000 0080 0408   p_offset,p_vaddr=0x08048000
+00000040&colon; 0000 0000 0004 0000   p_paddr,p_filesz
+00000048&colon; 0000 2000 0700 0000   p_memsz(128KB),p_flags=PF_X|PF_W|PF_R
+00000050&colon; 0010 0000 0084 0408   p_align, &lt;here>
+00000058&colon; 3882 0408 0000 0000   &lt;latest&colon;init="V">, &lt;sp0>
+00000060&colon; c080 0408 f080 0408   &lt;interpreter>key, find
+00000068&colon; fc80 0408 d880 0408   execute, jump
+00000070&colon; f0ff ffff be60 8004   -16, movl $interpreter, %esi
+00000078&colon; 08bd 0080 0608 8925   movl $0x08068000,%ebp; movl %esp,sp0;
+00000080&colon; 5c80 0408 adff 2000   next;
+00000088&colon; 0000 0000 0151 0000   Q&colon; quit
+00000090&colon; 4482 0408
+00000094&colon; 8880 0408 0143 0000   C&colon; cell
+0000009c&colon; 4c82 0408
+000000a0&colon; 9480 0408 0168 0000   h&colon; &amp;here
+000000a8&colon; 5182 0408
+000000ac&colon; a080 0408 016c 0000   l&colon; &amp;latest
+000000b4&colon; 5982 0408
+000000b8&colon; ac80 0408 016b 0000   k&colon; key
+000000c0&colon; 6182 0408
+000000c4&colon; b880 0408 0174 0000   t&colon; type
+000000cc&colon; 7b82 0408
+000000d0&colon; c480 0408 016a 0000   j&colon; branch
+000000d8&colon; 9182 0408
+000000dc&colon; d080 0408 014a 0000   J&colon; 0branch
+000000e4&colon; 9682 0408
+000000e8&colon; dc80 0408 0166 0000   f&colon; find
+000000f0&colon; 9f82 0408
+000000f4&colon; e880 0408 0178 0000   x&colon; execute
+000000fc&colon; bf82 0408
+00000100&colon; f480 0408 0140 0000   @&colon; fetch
+00000108&colon; c282 0408
+0000010c&colon; 0081 0408 0121 0000   !&colon; store
+00000114&colon; c982 0408
+00000118&colon; 0c81 0408 013f 0000   ?&colon; cfetch
+00000120&colon; d082 0408
+00000124&colon; 1881 0408 0124 0000   $&colon; cstore
+0000012c&colon; d882 0408
+00000130&colon; 2481 0408 0164 0000   d&colon; dfetch
+00000138&colon; df82 0408
+0000013c&colon; 3081 0408 0144 0000   D&colon; dstore
+00000144&colon; e382 0408
+00000148&colon; 3c81 0408 0172 0000   r&colon; rfetch
+00000150&colon; e782 0408
+00000154&colon; 4881 0408 0152 0000   R&colon; rstore
+0000015c&colon; eb82 0408
+00000160&colon; 5481 0408 0169 0000   i&colon; docol
+00000168&colon; fd82 0408
+0000016c&colon; 6081 0408 0165 0000   e&colon; exit
+00000174&colon; 0583 0408
+00000178&colon; 6c81 0408 014c 0000   L&colon; lit
+00000180&colon; 0e83 0408
+00000184&colon; 7881 0408 0153 0000   S&colon; litstring
+0000018c&colon; 1383 0408
+00000190&colon; 8481 0408 012b 0000   +&colon; add
+00000198&colon; 1c83 0408
+0000019c&colon; 9081 0408 012d 0000   -&colon; sub
+000001a4&colon; 2383 0408
+000001a8&colon; 9c81 0408 012a 0000   *&colon; mul
+000001b0&colon; 2a83 0408
+000001b4&colon; a881 0408 012f 0000   /&colon; divmod
+000001bc&colon; 3383 0408
+000001c0&colon; b481 0408 0126 0000   &amp;&colon; and
+000001c8&colon; 3e83 0408
+000001cc&colon; c081 0408 017c 0000   |&colon; or
+000001d4&colon; 4583 0408
+000001d8&colon; cc81 0408 015e 0000   ^&colon; xor
+000001e0&colon; 4c83 0408
+000001e4&colon; d881 0408 013c 0000   &lt;&colon; less
+000001ec&colon; 5383 0408
+000001f0&colon; e481 0408 0175 0000   u&colon; uless (unsigned less)
+000001f8&colon; 6183 0408
+000001fc&colon; f081 0408 013d 0000   =&colon; equal
+00000204&colon; 6f83 0408
+00000208&colon; fc81 0408 0128 0000   (&colon; shl
+00000210&colon; 7d83 0408
+00000214&colon; 0882 0408 0129 0000   )&colon; shr
+0000021c&colon; 8583 0408
+00000220&colon; 1482 0408 0125 0000   %&colon; sar
+00000228&colon; 8d83 0408
+0000022c&colon; 2082 0408 0176 0000   v&colon; argv
+00000234&colon; 9583 0408
+00000238&colon; 2c82 0408 0156 0000   V&colon; version
+00000240&colon; a483 0408
+00000244&colon; 5bb8 0100 0000 cd80   (quit) popl %ebx; mov $SYS_EXIT,%eax; inx $0x80
+0000024c&colon; 6a04 adff 20          (cell) pushl $4; next;
+00000251&colon; 6854 8004 08ad ff20   (&amp;here) pushl $here; next;
+00000259&colon; 6858 8004 08ad ff20   (&amp;latest) pushl $latest; next;
+00000261&colon; 31c0 50ba 0100 0000   (key) xorl %eax,%eax; pushl %eax; movl $1,%edx;
+00000269&colon; 89e1 31db b803 0000   movl %esp,%ecx; xorl %ebx,%ebx (STDIN=0);
+00000271&colon; 00cd 8085 c076 ccad   movl $SYS_READ,%eax; int $0x80; test %eax,%eax;
+00000279&colon; ff20                  jbe 0x08048244(-52); next;
+0000027b&colon; ba01 0000 0089 e189   (type) movl $1,%edx; movl %esp,%ecx;
+00000283&colon; d3b8 0400 0000 cd80   movl $1,%ebx (STDOUT=1);movl $SYS_WRITE,%eax;
+0000028b&colon; 83c4 04ad ff20        int $0x80; addl $4,%esp; next;
+00000291&colon; 0336 adff 20          (branch) addl (%esi),%esi; next;
+00000296&colon; 5885 c074 f6ad adff   (0branch) popl %eax; test %eax,%eax;
+0000029e&colon; 20                    je 0x08048292(-10); lodsl; next;
+0000029f&colon; 8a24 24b0 018b 0d58   (find) movb (%esp),%ah;movb $1,%al;
+000002a7&colon; 8004 088b 5904 6639   movl latest,%ecx;&lt;1>movl 4(%ecx),%ebx;
+000002af&colon; c374 048b 09eb f483   cmpw %ax,%bx;je 2f;movl (%ecx),%ecx
+000002b7&colon; c108 890c 24ad ff20   jmp 1b(-12);&lt;2>addl $8,%ecx;movl %ecx,(%esp); next;
+000002bf&colon; 58ff 20               (execute) popl %eax; jmp *(%eax)
+000002c2&colon; 588b 0050 adff 20     (fetch) popl %eax; movl (%eax),%eax;push %eax; next;
+000002c9&colon; 585b 8918 adff 20     (store) popl %eax; popl %ebx; movl %ebx,(%eax); next
+000002d0&colon; 580f be00 50ad ff20   (cfetch) popl %eax; movsbl (%eax),%eax; next;
+000002d8&colon; 585b 8818 adff 20     (cstore) popl %eax; popl %ebx; movb %bl,(%eax); next;
+000002df&colon; 54ad ff20             (dfetch) movl %esp,%eax; pushl %eax; next;
+000002e3&colon; 5cad ff20             (dstore) popl %eax; movl %eax,%esp; next;
+000002e7&colon; 55ad ff20             (rfetch) pushl %ebp; next;
+000002eb&colon; 5dad ff20             (rstore) popl %ebp; next;
+000002ef&colon; 8d6d fc89 7500 83c0   &lt;docol>rpush %esi; addl $4,%eax
+000002f7&colon; 0489 c6ad ff20        movl %eax,%esi; next;
+000002fd&colon; 68ef 8204 08ad ff20   (docol) pushl $docol; next;
+00000305&colon; 8b75 008d 6d04 adff   (exit) rpop %esi next;
+0000030d&colon; 20
+0000030e&colon; ad50 adff 20          (lit) lodsl; pushl %eax; next;
+00000313&colon; ad56 01c6 adff 2000   (litstring)lodsl; pushl %esi; addl %eax,%esi; next;
+0000031b&colon; 00
+0000031c&colon; 5801 0424 adff 20     (add) popl %eax; addl %eax,(%esp); next;
+00000323&colon; 5829 0424 adff 20     (sub) popl %eax; subl %eax,(%esp); next;
+0000032a&colon; 585b 0faf c350 adff   (mul) popl %eax; popl %ebx; imul %ebx,%eax
+00000332&colon; 20                    pushl %eax; next;
+00000333&colon; 31d2 5b58 f7fb 5250   (divmod) xorl %edx,%edx; popl %ebx; popl %eax
+0000033b&colon; adff 20               idiv %ebx; pushl %edx; pushl %eax; next;
+0000033e&colon; 5821 0424 adff 20     (and) popl %eax; andl %eax,(%esp); next;
+00000345&colon; 5809 0424 adff 20     (or) popl %eax; orl %eax,(%esp); next;
+0000034c&colon; 5831 0424 adff 20     (xor) popl %eax; andl %eax,(%esp); next;
+00000353&colon; 585b 39c3 0f9c c00f   (less) popl %eax; popl %ebx; cmpl %eax,%ebx
+0000035b&colon; b6c0 50ad ff20        setl %al; movzbl %al, %eax; pushl %eax; next;
+00000361&colon; 585b 39c3 0f92 c00f   (uless) popl %eax; popl %ebx; cmpl %eax,%ebx
+00000369&colon; b6c0 50ad ff20        setb %al; movzbl %al, %eax; pushl %eax; next;
+0000036f&colon; 585b 39c3 0f94 c00f   (equal) popl %eax; popl %ebx; cmpl %eax,%ebx
+00000377&colon; b6c0 50ad ff20        setl %al; movzbl %al, %eax; pushl %eax; next;
+0000037d&colon; 5958 d3e0 50ad ff20   (shl) popl %ecx; popl %eax; shll %cl,%eax;next;
+00000385&colon; 5958 d3e8 50ad ff20   (shr) popl %ecx; popl %eax; shrl %cl,%eax;next;
+0000038d&colon; 5958 d3f8 50ad ff20   (sar) popl %ecx; popl %eax; sarl %cl,%eax; next;
+00000395&colon; 8b05 5c80 0408 8d58   (argv) movl sp0,%eax; leal 4(%eax),%ebx
+0000039d&colon; 0453 ff30 adff 20     pushl %ebx; pushl (%eax); next;
+000003a4&colon; 68b0 8304 08ad ff20   (version) pushl $version; next
+000003ac&colon; 0000 0000             padding
+000003b0&colon; 6933 3836 2d6c 696e  i386-lin
+000003b8&colon; 7578 2d68 616e 6477  ux-handw
+000003c0&colon; 7269 7474 656e 3a43  ritten&colon;C
+000003c8&colon; 6f70 7972 6967 6874  opyright
+000003d0&colon; 2028 6329 2032 3032   (c) 202
+000003d8&colon; 3120 4b6f 6963 6869  1 Koichi
+000003e0&colon; 204e 616b 616d 7572   Nakamur
+000003e8&colon; 6120 3c6b 6f69 6368  a &lt;koich
+000003f0&colon; 6940 6964 6569 6e2e  i@idein.
+000003f8&colon; 6a70 3e00 0000 0000  jp>
+&#x40;
+
+&lt;&lt;main>>=
+thisprog=${1} # the initial script
+mainprog=${0}
+set -- "${thisprog}" --ba-- "${mainprog}" "$@" --ea--
+&lt;&lt;"compile" planck>>
+nofake --error -R'hello world!' "${thisprog}" | ./planck
+&#x40;
+
+Loosely mimics 'xxd -r'.
+
+&lt;&lt;pack hex listing>>=
+binmode STDOUT;
+my ($mainprog, $thisprog) = splice(@ARGV, 0, 2);
+while (&lt;STDIN>) {
+    chomp;
+    if ( m{^
+        ( [[&colon;xdigit&colon;]]{8} ) &colon;
+        \s+ ( [[&colon;xdigit&colon;]]{4} ) \s+ ( [[&colon;xdigit&colon;]]{4} )
+        \s+ ( [[&colon;xdigit&colon;]]{4} ) \s+ ( [[&colon;xdigit&colon;]]{4} | [[&colon;xdigit&colon;]]{2} )
+        ( \s+ .* | )
+        $}xi
+    ) {
+        print(pack(q{H*}, ${2} . ${3} . ${4} . ${5}));
+    } elsif ( m{^
+        ( [[&colon;xdigit&colon;]]{8} ) &colon;
+        \s+ ( [[&colon;xdigit&colon;]]{4} ) \s+ ( [[&colon;xdigit&colon;]]{4} )
+        \s+ ( [[&colon;xdigit&colon;]]{4} | [[&colon;xdigit&colon;]]{2} )
+        ( \s+ .* | )
+        $}xi
+    ) {
+        print(pack(q{H*}, ${2} . ${3} . ${4}));
+    } elsif ( m{^
+        ( [[&colon;xdigit&colon;]]{8} ) &colon;
+        \s+ ( [[&colon;xdigit&colon;]]{4} ) \s+ ( [[&colon;xdigit&colon;]]{4} | [[&colon;xdigit&colon;]]{2} )
+        ( \s+ .* | )
+        $}xi
+    ) {
+        print(pack(q{H*}, ${2} . ${3}));
+    } elsif ( m{^
+        ( [[&colon;xdigit&colon;]]{8} ) &colon;
+        \s+ ( [[&colon;xdigit&colon;]]{4} | [[&colon;xdigit&colon;]]{2} )
+        ( \s+ .* | )
+        $}xi
+    ) {
+        print(pack(q{H*}, ${2}));
+    }
+}
+&#x40;
+</code></pre>

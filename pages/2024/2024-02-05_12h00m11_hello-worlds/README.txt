@@ -96,7 +96,7 @@ set -eu
 
 <<print LAST MODIFIED>>=
 if [ -f .draft ]; then
-    last-modified.sh README.txt htmlify-all-hellos.sh | perl -MPOSIX=strftime \
+    last-modified.sh README.txt htmlify-all-hellos.sh hello-*.sh | perl -MPOSIX=strftime \
         -lne'print(strftime(qq{@<<LAST MODIFIED@>>=\n%B %e, %Y (DRAFT)\n@\n}, gmtime($_)))'
 else
     FORMAT='format:%B %e, %Y at %T UTC' git-last-modified.sh README.txt | perl \
