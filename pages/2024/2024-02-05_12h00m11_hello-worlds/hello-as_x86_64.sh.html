@@ -1,0 +1,56 @@
+<p><!DOCTYPE html></p>
+
+<h3><a href="index.html">index.html</a></h3>
+
+<h3><a href="README.txt">README.txt</a></h3>
+
+<h3>Code for <a href="hello-as_x86_64.sh"><code>hello-as_x86_64.sh</code></a>:</h3>
+
+<pre style="margin-left: 5ch;"><code>#!/bin/sh
+# https&colon;//ctarbide.github.io/pages/2024/2024-02-05_12h00m11_hello-worlds/
+# https&colon;//github.com/ctarbide/coolscripts/blob/master/bin/nofake-exec.nw
+set -eu; set -- "${0}" --ba-- "$@" --ea--
+set -- "$@" --tmp-- .o --tmp-- .out
+SH=${SH&colon;-sh}; export SH
+exec nofake-exec.sh --error -Rprog "$@" -- "${SH}" -eu -c '
+    as -march=generic64 -64 "${0}" -o "${0}.o"
+    ld -m elf_x86_64 "${0}.o" -o "${0}.out"
+    exec "${0}.out" "$@"
+'
+exit 1
+
+This is a live literate program.
+
+&lt;&lt;tested with versions>>=
+- GNU assembler (GNU Binutils) 2.39
+&#x40;
+
+&lt;&lt;references>>=
+- https&colon;//cs.lmu.edu/~ray/notes/gasexamples/
+
+- hello-nasm_x86_64.sh
+
+- hello-as_x86.sh
+
+&#x40;
+
+&lt;&lt;prog>>=
+.global  _start
+
+.data
+msg&colon;
+    .ascii "hello world!\n"
+    len = . - msg
+
+.text
+_start&colon;
+    mov $1, %rax      # write(
+    mov $1, %rdi      #   STDOUT_FILENO,
+    mov $msg, %rsi    #   "hello world!\n",
+    mov $len, %rdx    #   sizeof("Hello, world!\n")
+    syscall           # );
+
+    mov $60, %rax     # exit(
+    xor %rdi, %rdi    #   EXIT_SUCCESS
+    syscall           # );
+</code></pre>
