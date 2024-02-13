@@ -235,8 +235,8 @@ pages/<<md.pl from pages>>
 
 <<style - body>>=
 width: 90ch;
-max-width: calc(100vw - 4em);
-margin: 2em auto 0 auto;
+max-width: calc(100vw - 8ch);
+margin: 3ch auto 6ch auto;
 font-family: Georgia, "Bitstream Charter", serif;
 font-size: 14pt;
 @
@@ -250,11 +250,14 @@ font-size: 14pt;
 @<<style>>=
 <style>
 pre {
-<<style - monospace font>> }
+    <<style - monospace font>>
+}
 code {
-<<style - monospace font>> }
+    <<style - monospace font>>
+}
 body {
-<<style - body>> }
+    <<style - body>>
+}
 </style>
 @@
 @

@@ -16,7 +16,7 @@
 
 - [hello scheme, scheme48](hello-scheme-scheme48.sh.html)
 
-- [hello sh sh](hello-sh-sh.sh.html)
+- [hello sh perl](hello-sh-perl.sh.html)
 
 **************** hello pdf?
 
@@ -86,7 +86,7 @@ nofake --error -Rrender <<PRIMARY SOURCES>> | sh
 @
 
 <<TITLE>>=
-ctarbi.de - <<ITEM_ID>>
+ctarbi.de - hello worlds
 @
 
 <<sh preamble>>=
@@ -215,8 +215,3 @@ nofake --error -Rgenerate <<PRIMARY SOURCES>> | sh | gzip > .cache
 <<footer>>=
 <p> This <a href="README.txt">page</a> was last modified on <<LAST MODIFIED>>.
 @
-
-<<md prefix>>=
-2023/2023-10-19_21h40m15_perl·markdown·daringfireball.net/
-@
-

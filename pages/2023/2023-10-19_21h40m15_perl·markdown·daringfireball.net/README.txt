@@ -8,9 +8,9 @@ https://daringfireball.net/projects/downloads/Markdown_1.0.1.zip
 @
 
 <<references>>=
-- <<<md url>>>
+- [<<md url>>](<<md url>>)
 
-    - <<<md zip>>>
+    - [<<md zip>>](<<md zip>>)
 
 This uses a slightly modified version of [markdown v1.0.1](<<md zip>>)
 @

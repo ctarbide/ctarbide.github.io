@@ -1,0 +1,71 @@
+<p><!DOCTYPE html>
+<html lang="en">
+<style>
+pre {
+    font-family: "Lucida Console", Courier, monospace;
+    font-size: 14pt;
+}
+code {
+    font-family: "Lucida Console", Courier, monospace;
+    font-size: 14pt;
+}
+body {
+    width: 90ch;
+    max-width: calc(100vw - 8ch);
+    margin: 3ch auto 6ch auto;
+    font-family: Georgia, "Bitstream Charter", serif;
+    font-size: 14pt;
+}
+</style></p>
+
+<h3><a href="index.html">index.html</a></h3>
+
+<h3><a href="README.txt">README.txt</a></h3>
+
+<h3>Code for <a href="hello-sh-perl.sh"><code>hello-sh-perl.sh</code></a>:</h3>
+
+<pre style="margin-left: 3ch;"><code>#!/bin/sh
+# https&colon;//ctarbide.github.io/pages/2024/2024-02-05_12h00m11_hello-worlds/
+# https&colon;//github.com/ctarbide/coolscripts/blob/master/bin/nofake-exec.nw
+set -eu; set -- "${0}" --ba-- "${0}" "$@" --ea--
+SH=${SH&colon;-sh}; export SH
+PERL=${PERL&colon;-perl}; export PERL
+printf -- '[%s]\n' "${0}"
+exec nofake-exec.sh --error -Rmain "$@" -- "${SH}" -eu
+exit 1
+
+This is a live literate program.
+
+&lt;&lt;try this>>=
+seq 3 | ./hello-sh-perl.sh a 'b c' ' ${d} '
+&#x40;
+
+&lt;&lt;data>>=
+hello world!
+&#x40;
+
+&lt;&lt;main>>=
+thisprog=${1} # the initial script
+mainprog=${0}
+set -- "${thisprog}" --ba-- "${mainprog}" "$@" --ea--
+printf -- '[%s] -> [%s]\n' "${thisprog}" "${mainprog}"
+[ -t 0 ] || nofake-exec.sh -R'stdin is non-tty' "${thisprog}" -- perl -wl
+nofake --error -Rdata "${thisprog}" | nofake-exec.sh --error -Rperl "$@" -- perl -w
+&#x40;
+
+&lt;&lt;perl>>=
+my ($mainprog, $thisprog) = splice(@ARGV, 0, 2);
+my $perlprog = $0;
+print("[${thisprog}] -> [${mainprog}] -> [${perlprog}]\n");
+print(do{local$/;&lt;STDIN>});
+print("args&colon; '" . join("' '", @ARGV) . "'\n") if @ARGV;
+&#x40;
+
+&lt;&lt;stdin is non-tty>>=
+while (&lt;>) {
+    chomp;
+    s,^,STDIN&colon; ,;
+    print;
+}
+&#x40;
+</code></pre>

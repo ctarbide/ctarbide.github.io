@@ -1,4 +1,22 @@
-<p><!DOCTYPE html></p>
+<p><!DOCTYPE html>
+<html lang="en">
+<style>
+pre {
+    font-family: "Lucida Console", Courier, monospace;
+    font-size: 14pt;
+}
+code {
+    font-family: "Lucida Console", Courier, monospace;
+    font-size: 14pt;
+}
+body {
+    width: 90ch;
+    max-width: calc(100vw - 8ch);
+    margin: 3ch auto 6ch auto;
+    font-family: Georgia, "Bitstream Charter", serif;
+    font-size: 14pt;
+}
+</style></p>
 
 <h3><a href="index.html">index.html</a></h3>
 
@@ -6,37 +24,53 @@
 
 <h3>Code for <a href="htmlify-all-hellos.sh"><code>htmlify-all-hellos.sh</code></a>:</h3>
 
-<pre style="margin-left: 5ch;"><code>#!/bin/sh
+<pre style="margin-left: 3ch;"><code>#!/bin/sh
 # https&colon;//ctarbide.github.io/pages/2024/2024-02-05_12h00m11_hello-worlds/
 # https&colon;//github.com/ctarbide/coolscripts/blob/master/bin/nofake-exec.nw
 set -eu; set -- "${0}" --ba-- "${0}" "$@" --ea--
 SH=${SH&colon;-sh}; export SH
-primsrcs=`nofake -R'PRIMARY SOURCES' README.txt`
-exec nofake-exec.sh --error -R'prog htmlify-all-hellos.sh and self' \
-    ${primsrcs} "$@" -- "${SH}" -eu
+exec nofake-exec.sh --error -Rmain "$@" -- "${SH}" -eu
 exit 1
 
 This is a live literate program.
 
-&lt;&lt;htmlify "${i}">>=
-printf -- '&lt;!DOCTYPE html>\n\n'
-test -f index.html &amp;&amp; printf -- '### [index.html](index.html)\n\n'
-test -f README.txt &amp;&amp; printf -- '### [README.txt](README.txt)\n\n'
-test -f README.html &amp;&amp; printf -- '### [README.html](README.html)\n\n'
-printf '**** Code for [`%s`](%s)&colon;\n\n' "${i}" "${i}"
-printf '&lt;pre style="margin-left&colon; 5ch;">&lt;code>'
-escape "${i}"
-printf '&lt;/code>&lt;/pre>\n'
+'main' is just a gathering stage, it adds 'PRIMARY SOURCES' from README.txt to
+the processing then goes to 'htmlify all hellos and thisprog'
+
+&lt;&lt;main>>=
+thisprog=${1} # the initial script
+mainprog=${0}
+primsrcs=`nofake --error -R'PRIMARY SOURCES' README.txt`
+set -- "${thisprog}" ${primsrcs} --ba-- "$@" ${primsrcs} --ea--
+nofake-exec.sh --error -R'htmlify all hellos and thisprog' "$@" -- "${SH}" -eu
 &#x40;
 
-&lt;&lt;prog htmlify-all-hellos.sh and self>>=
+&lt;&lt;htmlify all hellos and thisprog>>=
+thisprog=${1} # the initial script
 &lt;&lt;asset - function escape>>
-for i in "${1}" hello-*.sh; do
+for i in "${thisprog}" hello-*.sh; do
     i=${i#./}
     if [ ! -e "${i}.html" -o "${i}" -nt "${i}.html" ]; then
         ( &lt;&lt;htmlify "${i}">> ) | &lt;&lt;md-autoheader-autolink.pl>> |
             &lt;&lt;assets - md.pl for pages>> >"${i}.html"
     fi
 done
+&#x40;
+
+&lt;&lt;htmlify "${i}">>=
+nofake --error -R'html preamble' "$@"
+test -f index.html &amp;&amp; printf -- '### [index.html](index.html)\n\n'
+test -f README.txt &amp;&amp; printf -- '### [README.txt](README.txt)\n\n'
+test -f README.html &amp;&amp; printf -- '### [README.html](README.html)\n\n'
+printf '**** Code for [`%s`](%s)&colon;\n\n' "${i}" "${i}"
+printf '&lt;pre style="margin-left&colon; 3ch;">&lt;code>'
+escape "${i}"
+printf '&lt;/code>&lt;/pre>\n'
+&#x40;
+
+&lt;&lt;html preamble>>=
+&lt;!DOCTYPE html>
+&lt;html lang="en">
+&lt;&lt;style>>
 &#x40;
 </code></pre>
