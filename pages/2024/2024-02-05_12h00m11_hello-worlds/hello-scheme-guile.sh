@@ -9,6 +9,7 @@ This is a live literate program.
 
 <<tested with versions>>=
 - guile (GNU Guile) 2.2.7
+- Guile 1.8.8 (remove --no-auto-compile option above)
 @
 
 <<references>>=

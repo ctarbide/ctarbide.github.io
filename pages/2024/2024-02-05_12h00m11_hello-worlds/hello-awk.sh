@@ -6,7 +6,7 @@ SH=${SH:-sh}; export SH
 AWK=${AWK:-awk}; export AWK
 exec nofake-exec.sh --error -Rprog "$@" -- "${SH}" -eu -c '
     [ -t 0 ] && exec </dev/null
-    exec "${awk}" -f "${0}" "$@"
+    exec "${AWK}" -f "${0}" "$@"
 '
 exit 1
 
