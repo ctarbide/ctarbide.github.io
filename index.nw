@@ -118,7 +118,7 @@ find pages/ -mindepth 3 -maxdepth 3 -name .draft -type f
         next if -f qq{${_}/.hidden};
         next unless m{^( pages/ [12]\d{3} / ) (.*)$}xi;
         my ($date, $item) = ($1, $2);
-        print(qq{<li><a href="${_}/">${item}</a></li>});
+        print(qq{<li><p><a href="${_}/">${item}</a></p></li>});
     }
     printf(qq{</ul>\n});
     printf(qq{@\n});'
