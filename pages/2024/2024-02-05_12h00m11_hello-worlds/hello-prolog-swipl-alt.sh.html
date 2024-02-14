@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<style>
+pre {
+    font-family: "Lucida Console", Courier, monospace;
+    font-size: 14pt;
+}
+code {
+    font-family: "Lucida Console", Courier, monospace;
+    font-size: 14pt;
+}
+body {
+    width: 90ch;
+    max-width: calc(100vw - 8ch);
+    margin: 3ch auto 6ch auto;
+    font-family: Georgia, "Bitstream Charter", serif;
+    font-size: 14pt;
+}
+</style>
+<h3><a href="index.html">index.html</a></h3>
+
+<h3><a href="README.txt">README.txt</a></h3>
+
+<h3>Code for <a href="hello-prolog-swipl-alt.sh"><code>hello-prolog-swipl-alt.sh</code></a>:</h3>
+
+<pre style="margin-left: 3ch;"><code>#!/bin/sh
+# https&colon;//ctarbide.github.io/pages/2024/2024-02-05_12h00m11_hello-worlds/
+# https&colon;//github.com/ctarbide/coolscripts/blob/master/bin/nofake-exec.nw
+set -eu; set -- "${0}" --ba-- "$@" --ea--
+exec nofake-exec.sh --error -Rprog "$@" -- swipl -q -t hello_world -s
+exit 1
+
+This is a live literate program.
+
+&lt;&lt;tested with versions>>=
+- SWI-Prolog version 9.1.21
+&#x40;
+
+&lt;&lt;references>>=
+- https&colon;//stackoverflow.com/questions/3576166/hello-world-in-prolog
+
+&#x40;
+
+&lt;&lt;prog>>=
+hello_world &colon;-
+    write('hello world!'), nl.
+</code></pre>
