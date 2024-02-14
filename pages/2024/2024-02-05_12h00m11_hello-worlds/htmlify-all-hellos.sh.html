@@ -1,4 +1,4 @@
-<p><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <style>
 pre {
@@ -16,8 +16,7 @@ body {
     font-family: Georgia, "Bitstream Charter", serif;
     font-size: 14pt;
 }
-</style></p>
-
+</style>
 <h3><a href="index.html">index.html</a></h3>
 
 <h3><a href="README.txt">README.txt</a></h3>
@@ -51,14 +50,14 @@ thisprog=${1} # the initial script
 for i in "${thisprog}" hello-*.sh; do
     i=${i#./}
     if [ ! -e "${i}.html" -o "${i}" -nt "${i}.html" ]; then
+        nofake --error -R'html preamble' "$@" >"${i}.html"
         ( &lt;&lt;htmlify "${i}">> ) | &lt;&lt;md-autoheader-autolink.pl>> |
-            &lt;&lt;assets - md.pl for pages>> >"${i}.html"
+            &lt;&lt;assets - md.pl for pages>> >>"${i}.html"
     fi
 done
 &#x40;
 
 &lt;&lt;htmlify "${i}">>=
-nofake --error -R'html preamble' "$@"
 test -f index.html &amp;&amp; printf -- '### [index.html](index.html)\n\n'
 test -f README.txt &amp;&amp; printf -- '### [README.txt](README.txt)\n\n'
 test -f README.html &amp;&amp; printf -- '### [README.html](README.html)\n\n'

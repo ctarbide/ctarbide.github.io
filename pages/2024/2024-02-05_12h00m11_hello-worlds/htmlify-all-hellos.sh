@@ -25,14 +25,14 @@ thisprog=${1} # the initial script
 for i in "${thisprog}" hello-*.sh; do
     i=${i#./}
     if [ ! -e "${i}.html" -o "${i}" -nt "${i}.html" ]; then
+        nofake --error -R'html preamble' "$@" >"${i}.html"
         ( <<htmlify "${i}">> ) | <<md-autoheader-autolink.pl>> |
-            <<assets - md.pl for pages>> >"${i}.html"
+            <<assets - md.pl for pages>> >>"${i}.html"
     fi
 done
 @
 
 <<htmlify "${i}">>=
-nofake --error -R'html preamble' "$@"
 test -f index.html && printf -- '### [index.html](index.html)\n\n'
 test -f README.txt && printf -- '### [README.txt](README.txt)\n\n'
 test -f README.html && printf -- '### [README.html](README.html)\n\n'
