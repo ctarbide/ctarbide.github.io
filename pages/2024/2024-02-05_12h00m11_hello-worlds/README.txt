@@ -74,7 +74,7 @@ fi
 nofake --error -Rrender <<PRIMARY SOURCES>> | sh
 @
 <<PRIMARY SOURCES>>=
-<<TOP>>/assets.nw README.txt
+<<TOP>>/assets.nw README.txt hello-*.sh htmlify-all-hellos.sh
 @
 
 <<TOP>>=
@@ -96,11 +96,12 @@ set -eu
 
 <<print LAST MODIFIED>>=
 if [ -f .draft ]; then
-    last-modified.sh README.txt htmlify-all-hellos.sh hello-*.sh | perl -MPOSIX=strftime \
+    last-modified.sh <<PRIMARY SOURCES>> | perl -MPOSIX=strftime \
         -lne'print(strftime(qq{@<<LAST MODIFIED@>>=\n%B %e, %Y (DRAFT)\n@\n}, gmtime($_)))'
 else
-    FORMAT='format:%B %e, %Y at %T UTC' git-last-modified.sh README.txt | perl \
-        -lne'print(qq{@<<LAST MODIFIED@>>=\n${_}\n@\n})'
+    FORMAT='format:%s %B %e, %Y at %T UTC' git-last-modified.sh <<PRIMARY SOURCES>> |
+        LC_ALL=C sort -nr | head -n1 | perl \
+        -lne's,^\d+ ,,; print(qq{@<<LAST MODIFIED@>>=\n${_}\n@\n})'
 fi
 @
 

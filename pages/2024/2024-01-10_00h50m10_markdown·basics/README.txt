@@ -68,11 +68,12 @@ set -eu
 
 <<print LAST MODIFIED>>=
 if [ -f .draft ]; then
-    last-modified.sh README.txt | perl -MPOSIX=strftime \
+    last-modified.sh <<PRIMARY SOURCES>> | perl -MPOSIX=strftime \
         -lne'print(strftime(qq{@<<LAST MODIFIED@>>=\n%B %e, %Y (DRAFT)\n@\n}, gmtime($_)))'
 else
-    FORMAT='format:%B %e, %Y at %T UTC' git-last-modified.sh README.txt | perl \
-        -lne'print(qq{@<<LAST MODIFIED@>>=\n${_}\n@\n})'
+    FORMAT='format:%s %B %e, %Y at %T UTC' git-last-modified.sh <<PRIMARY SOURCES>> |
+        LC_ALL=C sort -nr | head -n1 | perl \
+        -lne's,^\d+ ,,; print(qq{@<<LAST MODIFIED@>>=\n${_}\n@\n})'
 fi
 @
 
