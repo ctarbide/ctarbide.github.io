@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<title>ctarbi.de - ieee754·aka_floats_and_doubles</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=0.6">
+<link rel="canonical" href="https://ctarbide.github.io/pages/2024/2024-02-15_15h49m59_ieee754·aka_floats_and_doubles/index.html">
+<link rel="icon" href="../../../favicon.ico" type="image/x-icon">
+<style>
+pre {
+    font-family: "Lucida Console", Courier, monospace;
+    font-size: 14pt;
+}
+code {
+    font-family: "Lucida Console", Courier, monospace;
+    font-size: 14pt;
+}
+body {
+    width: 90ch;
+    max-width: calc(100vw - 8ch);
+    margin: 3ch auto 6ch auto;
+    font-family: Georgia, "Bitstream Charter", serif;
+    font-size: 14pt;
+}
+</style>
+<h1>ctarbi.de - ieee754·aka_floats_and_doubles</h1>
+
+<p><code>main</code> function from <a href="main.nw">main.nw</a>:</p>
+
+<pre><code>int
+main(int argc, char **argv)
+{
+    double one = 1;
+    double m1 = -1;
+    double zero = 0.0;
+    double inf1 = one / zero;
+    double nan1 = sqrt(-1);
+    double nan2 = fmod(INFINITY, one);
+    double nan3 = fmod(one, zero);
+
+    show_double("-1", m1);
+    show_double("1 / 0", inf1);
+    show_double("sqrt(-1)", nan1);
+    show_double("inf % 1", nan2);
+    show_double("1 % 0", nan3);
+
+    show_created_double("0", 0, 0, 0, 0);
+    show_created_double("1", 0, DBLEXP(0), 0, 0);
+    show_created_double("-1", 1, DBLEXP(0), 0, 0);
+
+    /* 2047 = bias(1024) = 0x7ff = 0b11111111111 = all 11 biased-exponent
+     * bits set
+     */
+    show_created_double("inf", 0, DBLEXP(1024), 0, 0);
+    show_created_double("-inf", 1, DBLEXP(1024), 0, 0);
+
+    /* sNaN, signaling NaN (sign is indifferent) */
+    show_created_double("first +sNaN", 0, DBLEXP(1024), 0, 1);
+    show_created_double("last +sNaN", 0, DBLEXP(1024), 0x7ffff, (uint32_t)~0);
+
+    /* qNaN, quiet NaN (sign is indifferent) */
+    show_created_double("first +qNaN", 0, DBLEXP(1024), 0x80000, 0);
+    show_created_double("last +qNaN", 0, DBLEXP(1024), 0xfffff, (uint32_t)~0);
+
+
+    show_created_double("1 * 2^0", 0, DBLEXP(0), 0, 0);
+    show_created_double("1 * 2^1", 0, DBLEXP(1), 0, 0);
+    show_created_double("1 * 2^2", 0, DBLEXP(2), 0, 0);
+    show_created_double("1 * 2^3", 0, DBLEXP(3), 0, 0);
+    show_created_double("1 * 2^4", 0, DBLEXP(4), 0, 0);
+    show_created_double("1 * 2^5", 0, DBLEXP(5), 0, 0);
+    show_created_double("1 * 2^6", 0, DBLEXP(6), 0, 0);
+    show_created_double("1 * 2^7", 0, DBLEXP(7), 0, 0);
+
+    show_created_double("1 / 2^1", 0, DBLEXP(-1), 0, 0);
+    show_created_double("1 / 2^2", 0, DBLEXP(-2), 0, 0);
+    show_created_double("1 / 2^3", 0, DBLEXP(-3), 0, 0);
+    show_created_double("1 / 2^4", 0, DBLEXP(-4), 0, 0);
+    show_created_double("1 / 2^5", 0, DBLEXP(-5), 0, 0);
+    show_created_double("1 / 2^6", 0, DBLEXP(-6), 0, 0);
+    show_created_double("1 / 2^7", 0, DBLEXP(-7), 0, 0);
+
+    printf("%15.15s -&gt; %.1f (maximum integer before skipping occurs)\n",
+        "2^53", create_double(0, DBLEXP(53), 0, 0));
+
+    printf("%15.15s -&gt; %.1f (smallest number greater than 2^53, skipped)\n",
+        "...", create_double(0, DBLEXP(53), 0, 1));
+
+    printf("%15.15s -&gt; %e (formal machine epsilon, lapack)\n",
+        "2^-53", create_double(0, DBLEXP(-53), 0, 0));
+
+    printf("%15.15s -&gt; %e (machine epsilon, iso c std, mathematica, matlab)\n",
+        "2^-52", create_double(0, DBLEXP(-52), 0, 0));
+
+    printf("%15.15s -&gt; %e (machine_epsilon(1.0))\n",
+        "2^-52", machine_epsilon(1.0));
+
+    printf("%15.15s -&gt; %e (machine_epsilon(-1.0))\n",
+        "2^-52", machine_epsilon(-1.0));
+
+    printf("%15.15s -&gt; %.2f (machine_epsilon(2^51))\n",
+        "0.5", machine_epsilon(create_double(0, DBLEXP(51), 0, 0)));
+
+    printf("%15.15s -&gt; %.2f (machine_epsilon(2^52))\n",
+        "1.0", machine_epsilon(create_double(0, DBLEXP(52), 0, 0)));
+
+    printf("%15.15s -&gt; %.2f (machine_epsilon(2^53), greater than unit, will skip)\n",
+        "2.0", machine_epsilon(create_double(0, DBLEXP(53), 0, 0)));
+
+    return 0;
+}
+</code></pre>
+
+<p><a href="output.nw">Output</a>:</p>
+
+<pre><code>             -1 -&gt;      -1.00      (sign: 1, bexp: 3ff 00000 00000000, bytes: 000000000000f0bf)
+          1 / 0 -&gt;        inf      (sign: 0, bexp: 7ff 00000 00000000, bytes: 000000000000f07f)
+       sqrt(-1) -&gt;       -nan      (sign: 1, bexp: 7ff 80000 00000000, bytes: 000000000000f8ff)
+        inf % 1 -&gt;       -nan      (sign: 1, bexp: 7ff 80000 00000000, bytes: 000000000000f8ff)
+          1 % 0 -&gt;       -nan      (sign: 1, bexp: 7ff 80000 00000000, bytes: 000000000000f8ff)
+              0 -&gt;       0.00      (sign: 0, bexp:   0 00000 00000000, bytes: 0000000000000000)
+              1 -&gt;       1.00      (sign: 0, bexp: 3ff 00000 00000000, bytes: 000000000000f03f)
+             -1 -&gt;      -1.00      (sign: 1, bexp: 3ff 00000 00000000, bytes: 000000000000f0bf)
+            inf -&gt;        inf      (sign: 0, bexp: 7ff 00000 00000000, bytes: 000000000000f07f)
+           -inf -&gt;       -inf      (sign: 1, bexp: 7ff 00000 00000000, bytes: 000000000000f0ff)
+    first +sNaN -&gt;        nan      (sign: 0, bexp: 7ff 00000 00000001, bytes: 010000000000f07f)
+     last +sNaN -&gt;        nan      (sign: 0, bexp: 7ff 7ffff ffffffff, bytes: fffffffffffff77f)
+    first +qNaN -&gt;        nan      (sign: 0, bexp: 7ff 80000 00000000, bytes: 000000000000f87f)
+     last +qNaN -&gt;        nan      (sign: 0, bexp: 7ff fffff ffffffff, bytes: ffffffffffffff7f)
+        1 * 2^0 -&gt;       1.00      (sign: 0, bexp: 3ff 00000 00000000, bytes: 000000000000f03f)
+        1 * 2^1 -&gt;       2.00      (sign: 0, bexp: 400 00000 00000000, bytes: 0000000000000040)
+        1 * 2^2 -&gt;       4.00      (sign: 0, bexp: 401 00000 00000000, bytes: 0000000000001040)
+        1 * 2^3 -&gt;       8.00      (sign: 0, bexp: 402 00000 00000000, bytes: 0000000000002040)
+        1 * 2^4 -&gt;      16.00      (sign: 0, bexp: 403 00000 00000000, bytes: 0000000000003040)
+        1 * 2^5 -&gt;      32.00      (sign: 0, bexp: 404 00000 00000000, bytes: 0000000000004040)
+        1 * 2^6 -&gt;      64.00      (sign: 0, bexp: 405 00000 00000000, bytes: 0000000000005040)
+        1 * 2^7 -&gt;     128.00      (sign: 0, bexp: 406 00000 00000000, bytes: 0000000000006040)
+        1 / 2^1 -&gt;  0.5000000      (sign: 0, bexp: 3fe 00000 00000000, bytes: 000000000000e03f)
+        1 / 2^2 -&gt;  0.2500000      (sign: 0, bexp: 3fd 00000 00000000, bytes: 000000000000d03f)
+        1 / 2^3 -&gt;  0.1250000      (sign: 0, bexp: 3fc 00000 00000000, bytes: 000000000000c03f)
+        1 / 2^4 -&gt;  0.0625000      (sign: 0, bexp: 3fb 00000 00000000, bytes: 000000000000b03f)
+        1 / 2^5 -&gt;  0.0312500      (sign: 0, bexp: 3fa 00000 00000000, bytes: 000000000000a03f)
+        1 / 2^6 -&gt;  0.0156250      (sign: 0, bexp: 3f9 00000 00000000, bytes: 000000000000903f)
+        1 / 2^7 -&gt;  0.0078125      (sign: 0, bexp: 3f8 00000 00000000, bytes: 000000000000803f)
+           2^53 -&gt; 9007199254740992.0 (maximum integer before skipping occurs)
+            ... -&gt; 9007199254740994.0 (smallest number greater than 2^53, skipped)
+          2^-53 -&gt; 1.110223e-16 (formal machine epsilon, lapack)
+          2^-52 -&gt; 2.220446e-16 (machine epsilon, iso c std, mathematica, matlab)
+          2^-52 -&gt; 2.220446e-16 (machine_epsilon(1.0))
+          2^-52 -&gt; 2.220446e-16 (machine_epsilon(-1.0))
+            0.5 -&gt; 0.50 (machine_epsilon(2^51))
+            1.0 -&gt; 1.00 (machine_epsilon(2^52))
+            2.0 -&gt; 2.00 (machine_epsilon(2^53), greater than unit, will skip)
+</code></pre>
+
+<h3>Other sources</h3>
+
+<ul>
+<li><p><a href="doit.sh">doit.sh</a></p></li>
+<li><p><a href="plumbing.nw">plumbing.nw</a></p></li>
+</ul>
+
+<h2>References</h2>
+
+<ul>
+<li><p><a href="https://www.amazon.com/Numerical-Computing-Floating-Point-Arithmetic/dp/0898714826">Numerical Computing with IEEE Floating Point Arithmetic</a></p></li>
+<li><p><a href="https://en.wikipedia.org/wiki/Machine_epsilon">https://en.wikipedia.org/wiki/Machine_epsilon</a></p></li>
+</ul>
+
+<p>More details in the link below.</p>
+<p> This <a href="README.txt">page</a> was last modified on February 16, 2024 at 18:07:46 UTC.
+
+<!-- Generated in 0.070 seconds on February 16, 2024 at 18:08:00 UTC. -->
