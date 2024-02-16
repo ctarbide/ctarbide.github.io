@@ -84,10 +84,10 @@ set -eu
 
 <<print LAST MODIFIED>>=
 if [ -f .draft ]; then
-    last-modified.sh README.txt | perl -MPOSIX=strftime \
+    last-modified.sh <<PRIMARY SOURCES>> | perl -MPOSIX=strftime \
         -lne'print(strftime(qq{@<<LAST MODIFIED@>>=\n%B %e, %Y (DRAFT)\n@\n}, gmtime($_)))'
 else
-    FORMAT='format:%B %e, %Y at %T UTC' git-last-modified.sh README.txt | perl \
+    FORMAT='format:%B %e, %Y at %T UTC' git-last-modified.sh <<PRIMARY SOURCES>> | perl \
         -lne'print(qq{@<<LAST MODIFIED@>>=\n${_}\n@\n})'
 fi
 @
@@ -179,7 +179,7 @@ nofake --error -Rgenerate <<PRIMARY SOURCES>> | sh | gzip > .cache
 
 <<*>>=
 <<sh preamble>>
-if git-file-is-pristine.sh README.txt; then
+if git-file-is-pristine.sh <<PRIMARY SOURCES>>; then
     rm -f .draft
 else
     date '+%Y-%m-%d_%Hh%Mm%S' > .draft

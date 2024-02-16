@@ -1,5 +1,72 @@
+
+<<references>>=
+- [Numerical Computing with IEEE Floating Point Arithmetic](https://www.amazon.com/Numerical-Computing-Floating-Point-Arithmetic/dp/0898714826)
+
+- https://en.wikipedia.org/wiki/Machine_epsilon
+
+@
+
+<<body in markdown>>=
+
+<h1><<TITLE>></h1>
+
+`main` function from [main.nw](main.nw):
+
+    <<int main()>>
+
+[Output](output.nw):
+
+    <<output>>
+
+**** Other sources
+
+- [doit.sh](doit.sh)
+
+- [plumbing.nw](plumbing.nw)
+
+<h2>References</h2>
+
+<<references>>
+
+More details in the link below.
+@
+
+<<YEAR>>=
+2024
+@
+
+<<STAMP>>=
+2024-02-15_15h49m59
+@
+
+<<ITEM_ID>>=
+ieee754·aka_floats_and_doubles
+@
+
+<<PAGE DIR>>=
+pages/<<YEAR>>/<<STAMP>>_<<ITEM_ID>>
+@
+
+<<URL PREFIX>>=
+<<assets - base url>><<PAGE DIR>>
+@
+
+<<CANONICAL URL>>=
+<<URL PREFIX>>/index.html
+@
+
+<<*>>=
+<<sh preamble>>
+if git-file-is-pristine.sh <<PRIMARY SOURCES>>; then
+    rm -f .draft
+else
+    date '+%Y-%m-%d_%Hh%Mm%S' > .draft
+    git reset --quiet -- index.html
+fi
+nofake --error -Rrender <<PRIMARY SOURCES>> | sh
+@
 <<PRIMARY SOURCES>>=
-<<TOP>>/assets.nw README.txt
+<<TOP>>/assets.nw README.txt main.nw output.nw
 @
 
 <<TOP>>=
