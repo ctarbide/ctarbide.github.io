@@ -2,8 +2,6 @@
 <<references>>=
 - http://quantum-mirror.hu/mirrors/pub/slackware/slackware-iso/slackware64-13.37-iso/
 
-- http://www.literateprogramming.com/
-
 @
 
 <<body in markdown>>=
@@ -12,11 +10,15 @@
 
 How to install x86_64 version of Slackware Linux version 13.37 from 2011.
 
+Some [tips](#tips) below.
+
 The `slack64.sh` that follows is a live literate program [1].
 
 <<htmlified slack64.sh>>
 
-[1]: literate program ready for execution, i.e. self-tangling
+[1]: [literate][lit] program ready for execution, i.e. self-tangling
+
+[lit]: http://www.literateprogramming.com/
 
 **************** Screenshots
 
@@ -54,6 +56,10 @@ The `slack64.sh` that follows is a live literate program [1].
 
 ![13-00-18](13-00-18.png "13-00-18")
 
+
+**************** <span id="tips">Tips</span>
+
+<<tips>>
 
 **************** References
 

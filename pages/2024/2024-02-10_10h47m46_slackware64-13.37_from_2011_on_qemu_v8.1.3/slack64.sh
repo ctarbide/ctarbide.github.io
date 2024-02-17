@@ -67,8 +67,16 @@ if [ ! -f '<<backed image>>' ]; then
 fi
 @
 
+hostfwd=[tcp|udp]:[hostaddr]:hostport-[guestaddr]:guestport
+
+<<user mode network with hostfw>>=
+-netdev user,id=netid0,hostfwd=tcp::6422-:22 \
+-device e1000,netdev=netid0
+@
+
 <<step 4 - first run>>=
 qemu-system-x86_64 -m 4096 -enable-kvm \
+    <<user mode network with hostfw>> \
     -monitor stdio \
     -hda '<<backed image>>'
 @
@@ -81,7 +89,19 @@ time_delta(){
 
 <<tips>>=
 
-**** ssh connection to guest from host
+**** add a new "slack" user to the system
+
+The command below suggests the appropriate groups:
+
+    adduser slack
+
+**** ssh connection to guest from host using qemu's port forward
+
+in host:
+
+    TERM=screen ssh -p6422 slack@127.0.0.1
+
+**** ssh connection to guest from host using ssh port forward
 
 in guest:
 
