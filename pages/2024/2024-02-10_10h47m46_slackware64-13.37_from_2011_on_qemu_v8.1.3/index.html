@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
-<title>ctarbi.de - slackware64-13.37 from 2011 on qemu_v8.1.3</title>
+<title>ctarbi.de - slackware64 13.37 from 2011 on qemu v8.1.3</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=0.6">
-<link rel="canonical" href="https://ctarbide.github.io/pages/2024/2024-02-10_10h47m46_slackware64-13.37 from 2011 on qemu_v8.1.3/index.html">
+<link rel="canonical" href="https://ctarbide.github.io/pages/2024/2024-02-10_10h47m46_slackware64-13.37_from_2011_on_qemu_v8.1.3/index.html">
 <link rel="icon" href="../../../favicon.ico" type="image/x-icon">
 <style>
 pre {
@@ -22,9 +22,12 @@ body {
     font-size: 14pt;
 }
 </style>
-<h1>ctarbi.de - slackware64-13.37 from 2011 on qemu_v8.1.3</h1>
+<h1>ctarbi.de - slackware64 13.37 from 2011 on qemu v8.1.3</h1>
 
-<p>How to install x86_64 version of Slackware Linux version 13.37 from 2011.</p>
+<p>How to install x86_64 (and <a href="slack32.sh">x86</a> too) version of Slackware Linux
+version 13.37 from 2011.</p>
+
+<p>Some <a href="#tips">tips</a> below.</p>
 
 <p>The <code>slack64.sh</code> that follows is a live literate program [1].</p>
 
@@ -99,8 +102,16 @@ if [ ! -f '&lt;&lt;backed image>>' ]; then
 fi
 &#x40;
 
+hostfwd=[tcp|udp]&colon;[hostaddr]&colon;hostport-[guestaddr]&colon;guestport
+
+&lt;&lt;user mode network with hostfw>>=
+-netdev user,id=netid0,hostfwd=tcp&colon;&colon;6422-&colon;22 \
+-device e1000,netdev=netid0
+&#x40;
+
 &lt;&lt;step 4 - first run>>=
 qemu-system-x86_64 -m 4096 -enable-kvm \
+    &lt;&lt;user mode network with hostfw>> \
     -monitor stdio \
     -hda '&lt;&lt;backed image>>'
 &#x40;
@@ -113,7 +124,19 @@ time_delta(){
 
 &lt;&lt;tips>>=
 
-### ssh connection to guest from host
+### add a new "slack" user to the system
+
+The command below suggests the appropriate groups&colon;
+
+    adduser slack
+
+### ssh connection to guest from host using qemu's port forward
+
+in host&colon;
+
+    TERM=screen ssh -p6422 slack@127.0.0.1
+
+### ssh connection to guest from host using ssh port forward
 
 in guest&colon;
 
@@ -132,11 +155,17 @@ rm -fv '&lt;&lt;base image>>' '&lt;&lt;base image created>>' '&lt;&lt;backed ima
 &#x40;
 </code></pre>
 
-<p>[1]: literate program ready for execution, i.e. self-tangling</p>
+<p>[1]: <a href="http://www.literateprogramming.com/">literate</a> program ready for execution, i.e. self-tangling</p>
 
 <h2>Screenshots</h2>
 
 <p><img src="12-11-28.png" alt="12-11-28" title="12-11-28"></p>
+
+<p>Choose <code>sda2</code> for <code>/</code> (root) and <code>sda1</code> for <code>/boot</code>, format both as <code>ext4</code>,
+install everything ("full" installation).</p>
+
+<p>Installation will take some minutes, progress will be shown and these were
+the final dialogs:</p>
 
 <p><img src="12-19-21.png" alt="12-19-21" title="12-19-21"></p>
 
@@ -170,14 +199,44 @@ rm -fv '&lt;&lt;base image>>' '&lt;&lt;base image created>>' '&lt;&lt;backed ima
 
 <p><img src="13-00-18.png" alt="13-00-18" title="13-00-18"></p>
 
+<h2><span id="tips">Tips</span></h2>
+
+<h3>add a new "slack" user to the system</h3>
+
+<p>The command below suggests the appropriate groups:</p>
+
+<pre><code>adduser slack
+</code></pre>
+
+<h3>ssh connection to guest from host using qemu's port forward</h3>
+
+<p>in host:</p>
+
+<pre><code>TERM=screen ssh -p6422 slack@127.0.0.1
+</code></pre>
+
+<h3>ssh connection to guest from host using ssh port forward</h3>
+
+<p>in guest:</p>
+
+<pre><code>ssh -R2223:127.0.0.1:22 hostuser@10.0.2.2 'while date; do sleep 30; done'
+</code></pre>
+
+<p>in host:</p>
+
+<pre><code>TERM=screen ssh -p2223 slack@127.0.0.1
+</code></pre>
+
+<p>Later on I made a <a href="slack32.sh">32-bit version too</a>, instructions inside.</p>
+
 <h2>References</h2>
 
 <ul>
 <li><p><a href="http://quantum-mirror.hu/mirrors/pub/slackware/slackware-iso/slackware64-13.37-iso/">http://quantum-mirror.hu/mirrors/pub/slackware/slackware-iso/slackware64-13.37-iso/</a></p></li>
-<li><p><a href="http://www.literateprogramming.com/">http://www.literateprogramming.com/</a></p></li>
+<li><p><a href="http://quantum-mirror.hu/mirrors/pub/slackware/slackware-iso/slackware-13.37-iso/">http://quantum-mirror.hu/mirrors/pub/slackware/slackware-iso/slackware-13.37-iso/</a></p></li>
 </ul>
 
 <p>More details in the link below.</p>
-<p> This <a href="README.txt">page</a> was last modified on February 16, 2024 at 18:07:46 UTC.
+<p> This <a href="README.txt">page</a> was last modified on February 17, 2024 at 14:24:13 UTC.
 
-<!-- Generated in 0.069 seconds on February 16, 2024 at 18:08:00 UTC. -->
+<!-- Generated in 0.070 seconds on February 17, 2024 at 14:24:21 UTC. -->
