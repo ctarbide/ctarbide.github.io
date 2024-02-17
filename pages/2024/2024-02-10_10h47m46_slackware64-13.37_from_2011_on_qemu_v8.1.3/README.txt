@@ -2,13 +2,16 @@
 <<references>>=
 - http://quantum-mirror.hu/mirrors/pub/slackware/slackware-iso/slackware64-13.37-iso/
 
+- http://quantum-mirror.hu/mirrors/pub/slackware/slackware-iso/slackware-13.37-iso/
+
 @
 
 <<body in markdown>>=
 
 **************************************************************** <<TITLE>>
 
-How to install x86_64 version of Slackware Linux version 13.37 from 2011.
+How to install x86_64 (and [x86](slack32.sh) too) version of Slackware Linux
+version 13.37 from 2011.
 
 Some [tips](#tips) below.
 
@@ -23,6 +26,12 @@ The `slack64.sh` that follows is a live literate program [1].
 **************** Screenshots
 
 ![12-11-28](12-11-28.png "12-11-28")
+
+Choose `sda2` for `/` (root) and `sda1` for `/boot`, format both as `ext4`,
+install everything ("full" installation).
+
+Installation will take some minutes, progress will be shown and these were
+the final dialogs:
 
 ![12-19-21](12-19-21.png "12-19-21")
 
@@ -61,6 +70,8 @@ The `slack64.sh` that follows is a live literate program [1].
 
 <<tips>>
 
+Later on I made a [32-bit version too](slack32.sh), instructions inside.
+
 **************** References
 
 <<references>>
@@ -77,7 +88,7 @@ More details in the link below.
 @
 
 <<ITEM_ID>>=
-slackware64-13.37 from 2011 on qemu_v8.1.3
+slackware64-13.37_from_2011_on_qemu_v8.1.3
 @
 
 <<PAGE DIR>>=
@@ -115,7 +126,7 @@ nofake --error -Rrender <<PRIMARY SOURCES>> | sh
 @
 
 <<TITLE>>=
-ctarbi.de - <<ITEM_ID>>
+ctarbi.de - slackware64 13.37 from 2011 on qemu v8.1.3
 @
 
 <<sh preamble>>=
