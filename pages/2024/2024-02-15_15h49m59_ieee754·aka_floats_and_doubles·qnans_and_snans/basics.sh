@@ -6,35 +6,40 @@ SH=${SH:-sh}; export SH
 CC=${CC:-gcc}; export CC
 CFLAGS=${CFLAGS:-"-Wall -O2 -ansi"}; export CFLAGS
 LDFLAGS=${LDFLAGS:-}; export LDFLAGS
-exec nofake-exec.sh --error -Rmain "$@" -- "${SH}" -eu
+exec nofake-exec.sh --error -Rbasics "$@" -- "${SH}" -eu
 exit 1
 
 This is a live literate program.
 
-<<doit.c>>=
+<<basics.c>>=
 <<c standards>>
 <<includes>>
 <<definitions>>
 <<unions>>
 <<protos>>
 <<impl>>
-<<int main()>>
+int
+main(int argc, char **argv)
+{
+    basics();
+    return 0;
+}
 @
 
-<<main>>=
+<<basics>>=
 thisprog=${1}; shift # the initial script
 <<call compiler>>
-rm -f output.nw
-printf -- '@<<output>>=\n' > output.nw
-./doit | tee -a output.nw
-printf -- '@\n' >> output.nw
+rm -f basics_out.nw
+printf -- '@<<basics output>>=\n' > basics_out.nw
+./basics | tee -a basics_out.nw
+printf -- '@\n' >> basics_out.nw
 make # update index.html
 @
 
 <<call compiler>>=
-eval "set -- ${CC} ${CFLAGS} ${LDFLAGS} -odoit"
-nofake-exec.sh --error -L -Rdoit.c -odoit.c \
-  "${thisprog}" plumbing.nw main.nw -- "$@"
+eval "set -- ${CC} ${CFLAGS} ${LDFLAGS} -obasics"
+nofake-exec.sh --error -L -Rbasics.c -obasics.c \
+  "${thisprog}" plumbing.nw basics.nw -- "$@"
 @
 
 <<pedantic CFLAGS options for gcc>>=
@@ -48,7 +53,7 @@ set -- "$@" -Werror -fmax-errors=5
 <<pedantic>>=
 #!/bin/sh
 set -eu
-thisprog=doit.sh
+thisprog=basics.sh
 CC=gcc
 LDFLAGS=
 set --
@@ -57,8 +62,8 @@ CFLAGS=`for arg; do printf -- " '%s'" "${arg}"; done`
 <<call compiler>>
 @
 
-nofake doit.sh | sh | sh && ./doit
+nofake basics.sh | sh | sh && ./basics
 
 <<*>>=
-nofake --error -Rpedantic doit.sh plumbing.nw main.nw
+nofake --error -Rpedantic basics.sh plumbing.nw basics.nw
 @

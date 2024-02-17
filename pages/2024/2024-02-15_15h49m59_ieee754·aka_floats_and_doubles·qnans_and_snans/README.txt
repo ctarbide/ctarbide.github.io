@@ -6,29 +6,66 @@
 
 @
 
-<<body in markdown>>=
+<<TOC>>=
+**************** Table Of Contents
 
-<h1><<TITLE>></h1>
+- [Basics](#basics)
 
-`main` function from [main.nw](main.nw):
+<<Section Basics>>=
+**************** <span id="basics">Basics</span>
 
-    <<int main()>>
+`basics` function from [basics.nw](basics.nw):
 
-[Output](output.nw):
+    <<void basics(void)>>
 
-    <<output>>
+`basics` [output](basics_out.nw):
 
-**** Other sources
+    <<basics output>>
 
-- [doit.sh](doit.sh)
+<<TOC>>=
+- [Other sources](#other)
+
+<<Section Other Sources>>=
+**************** <span id="other">Other sources</span>
 
 - [plumbing.nw](plumbing.nw)
+
+- [basics.sh](basics.sh)
+
+<<TOC>>=
+- [Notes](#notes)
+
+<<Section Notes>>=
+**************** <span id="notes">Notes</span>
+
+- The `double` type of the C language is known as `binary64` in the IEEE 754
+  Standard.
+
+- The same principles shown for `binary64` also applies to `binary32` (c's
+  `float` type).
+
+- Subnormals were not addressed.
+
+<<body in markdown>>=
+<h1><<TITLE>></h1>
+
+<<TOC>>
+
+<<Section Basics>>
+
+<<Section Other Sources>>
+
+<<Section Notes>>
 
 <h2>References</h2>
 
 <<references>>
 
 More details in the link below.
+@
+
+<<PRIMARY SOURCES>>=
+<<TOP>>/assets.nw README.txt basics.nw basics_out.nw
 @
 
 <<YEAR>>=
@@ -65,9 +102,6 @@ else
 fi
 nofake --error -Rrender <<PRIMARY SOURCES>> | sh
 @
-<<PRIMARY SOURCES>>=
-<<TOP>>/assets.nw README.txt main.nw output.nw
-@
 
 <<TOP>>=
 ../../..
@@ -78,7 +112,7 @@ nofake --error -Rrender <<PRIMARY SOURCES>> | sh
 @
 
 <<TITLE>>=
-ctarbi.de - <<ITEM_ID>>
+ctarbi.de - ieee754 · aka floats and doubles · qnans and snans
 @
 
 <<sh preamble>>=
