@@ -28,7 +28,7 @@ main(int argc, char **argv)
 
 <<basics>>=
 thisprog=${1}; shift # the initial script
-<<call compiler>>
+<<compile basics>>
 rm -f basics_out.nw
 printf -- '@<<basics output>>=\n' > basics_out.nw
 ./basics | tee -a basics_out.nw
@@ -36,10 +36,11 @@ printf -- '@\n' >> basics_out.nw
 make # update index.html
 @
 
-<<call compiler>>=
-eval "set -- ${CC} ${CFLAGS} ${LDFLAGS} -obasics"
+<<compile basics>>=
+set -- config.nw plumbing.nw basics.nw
+eval "set -- "'"$@"'" -- ${CC} ${CFLAGS} ${LDFLAGS} -obasics"
 nofake-exec.sh --error -L -Rbasics.c -obasics.c \
-  "${thisprog}" plumbing.nw basics.nw -- "$@"
+  "${thisprog}" "$@"
 @
 
 <<pedantic CFLAGS options for gcc>>=
@@ -59,7 +60,7 @@ LDFLAGS=
 set --
 <<pedantic CFLAGS options for gcc>>
 CFLAGS=`for arg; do printf -- " '%s'" "${arg}"; done`
-<<call compiler>>
+<<compile basics>>
 @
 
 nofake basics.sh | sh | sh && ./basics

@@ -28,6 +28,8 @@
 <<Section Other Sources>>=
 **************** <span id="other">Other sources</span>
 
+- [config.nw](config.nw)
+
 - [plumbing.nw](plumbing.nw)
 
 - [basics.sh](basics.sh)
@@ -46,6 +48,9 @@
 
 - Subnormals were not addressed.
 
+<<TOC>>=
+- [References](#references)
+
 <<body in markdown>>=
 <h1><<TITLE>></h1>
 
@@ -57,7 +62,7 @@
 
 <<Section Notes>>
 
-<h2>References</h2>
+<h2 id="references">References</h2>
 
 <<references>>
 
@@ -65,7 +70,7 @@ More details in the link below.
 @
 
 <<PRIMARY SOURCES>>=
-<<TOP>>/assets.nw README.txt basics.nw basics_out.nw
+<<TOP>>/assets.nw README.txt config.nw basics.nw basics_out.nw
 @
 
 <<YEAR>>=

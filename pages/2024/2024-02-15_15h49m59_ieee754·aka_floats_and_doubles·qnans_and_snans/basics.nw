@@ -3,7 +3,7 @@ hi20 and lo32: normalized mantissa
 
 bexp: biased exponent
 
-<<double parts big endian>>=
+<<double parts - big endian>>=
 struct {
     unsigned int sign:1;
     unsigned int bexp:11;
@@ -12,7 +12,7 @@ struct {
 } parts;
 @
 
-<<double parts little endian>>=
+<<double parts - little endian>>=
 struct {
     uint32_t lo32;
     unsigned int hi20:20;
@@ -23,7 +23,7 @@ struct {
 
 <<unions>>=
 union double_value {
-    <<double parts little endian>>
+    <<double parts>>
     unsigned char o[8]; /* octets */
     double d;
     int64_t i;
