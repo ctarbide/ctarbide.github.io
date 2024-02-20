@@ -50,7 +50,7 @@
 
 - [plumbing.nw](plumbing.nw)
 
-- [common.nw][common.nw]
+- [common.nw](common.nw)
 
 - [basics.sh](basics.sh)
 
