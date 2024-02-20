@@ -111,7 +111,6 @@ bits(void)
 #line 80 "common.nw"
     show_long_bits("last subnormal", create_double(0, 0, 0xfffff, 0xffffffff));
     show_long_bits("first normal", create_double(0, 1, 0, 0));
-    show_long_bits("first normal", create_double(0, 1, 0, 1));
     show_long_bits("2^(-53)", create_double(0, DBLEXP(-53), 0, 0));
     show_long_bits("one", create_double(0, DBLEXP(0), 0, 0));
     show_long_bits("2^(+53)", create_double(0, DBLEXP(+53), 0, 0));
