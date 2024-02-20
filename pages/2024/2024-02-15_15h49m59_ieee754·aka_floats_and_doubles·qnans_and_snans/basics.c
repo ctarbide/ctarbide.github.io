@@ -20,47 +20,47 @@
 #include <math.h>
 /* #include <fcntl.h> */
 /* #include <unistd.h> */
-#line 37 "basics.nw"
+#line 37 "common.nw"
 #define DBLEXP(x) (1023+(x))
 #define DBLEXP_NORMALIZE(x) ((x)-1023)
-#line 25 "basics.nw"
+#line 25 "common.nw"
 union double_value {
-#line 16 "basics.nw"
+#line 16 "common.nw"
     struct {
         uint32_t lo32;
         unsigned int hi20:20;
         unsigned int bexp:11;
         unsigned int sign:1;
     } parts;
-#line 27 "basics.nw"
+#line 27 "common.nw"
     unsigned char o[8]; /* octets */
     double d;
     int64_t i;
     uint64_t u;
 };
-#line 42 "basics.nw"
+#line 42 "common.nw"
 double
 create_double(unsigned sign, unsigned bexp, uint32_t hi20, uint32_t lo32);
-#line 62 "basics.nw"
+#line 62 "common.nw"
+double
+machine_epsilon(double x);
+#line 3 "basics.nw"
 void
 show_double(char *label, double x);
-#line 95 "basics.nw"
+#line 36 "basics.nw"
 void
 show_long_bits(char *label, double x);
-#line 113 "basics.nw"
+#line 54 "basics.nw"
 void
 show_bytes(char *label, double x);
-#line 130 "basics.nw"
+#line 71 "basics.nw"
 void
 show_created_double(char *label, unsigned sign, unsigned bexp,
     uint32_t hi20, uint32_t lo32);
-#line 144 "basics.nw"
-double
-machine_epsilon(double x);
-#line 162 "basics.nw"
+#line 85 "basics.nw"
 void
 basics(void);
-#line 49 "basics.nw"
+#line 49 "common.nw"
 double
 create_double(unsigned sign, unsigned bexp, uint32_t hi20, uint32_t lo32)
 {
@@ -71,7 +71,18 @@ create_double(unsigned sign, unsigned bexp, uint32_t hi20, uint32_t lo32)
     x.parts.lo32 = lo32;
     return x.d;
 }
-#line 67 "basics.nw"
+#line 67 "common.nw"
+double
+machine_epsilon(double x)
+{
+    union double_value v;
+    v.d = x;
+    /* v.parts.lo32++; */
+    /* return v.parts.sign ? x - v.d : v.d - x; */
+    v.i++;
+    return v.i < 0 ? x - v.d : v.d - x;
+}
+#line 8 "basics.nw"
 void
 show_double(char *label, double x)
 {
@@ -88,26 +99,26 @@ show_double(char *label, double x)
         snprintf(buf, sizeof buf, "%.2f", dv.d);
     }
     if (x) {
-        printf("%15.15s -> %18.18s (%c1.%05x_%08x * 2 ^ unbias(%3x))\n",
+        printf("%12.12s -> %20.20s (%c1.%05x_%08x * 2 ^ unbias(%3x))\n",
             label, buf, dv.parts.sign ? '-' : '+',
             dv.parts.hi20, dv.parts.lo32, dv.parts.bexp);
     } else {
-        printf("%15.15s -> %18.18s (%c1.%05x_%08x * 2 ^ %x)\n",
+        printf("%12.12s -> %20.20s (%c1.%05x_%08x * 2 ^ %x)\n",
             label, buf, dv.parts.sign ? '-' : '+',
             dv.parts.hi20, dv.parts.lo32, dv.parts.bexp);
     }
 }
-#line 100 "basics.nw"
+#line 41 "basics.nw"
 void
 show_long_bits(char *label, double x)
 {
     union double_value dv;
     dv.d = x;
-    printf("%15.15s -> 0x%.016" PRIx64 " (%c1.%05x_%08x * 2 ^ unbias(%3x))\n",
+    printf("%12.12s ->   0x%.016" PRIx64 " (%c1.%05x_%08x * 2 ^ unbias(%3x))\n",
         label, dv.u, dv.parts.sign ? '-' : '+',
         dv.parts.hi20, dv.parts.lo32, dv.parts.bexp);
 }
-#line 118 "basics.nw"
+#line 59 "basics.nw"
 void
 show_bytes(char *label, double x)
 {
@@ -117,24 +128,13 @@ show_bytes(char *label, double x)
         label, dv.o[0], dv.o[1], dv.o[2], dv.o[3], dv.o[4], dv.o[5], dv.o[6],
         dv.o[7]);
 }
-#line 136 "basics.nw"
+#line 77 "basics.nw"
 void show_created_double(char *label, unsigned sign, unsigned bexp,
     uint32_t hi20, uint32_t lo32)
 {
     show_double(label, create_double(sign, bexp, hi20, lo32));
 }
-#line 149 "basics.nw"
-double
-machine_epsilon(double x)
-{
-    union double_value v;
-    v.d = x;
-    /* v.parts.lo32++; */
-    /* return v.parts.sign ? x - v.d : v.d - x; */
-    v.i++;
-    return v.i < 0 ? x - v.d : v.d - x;
-}
-#line 171 "basics.nw"
+#line 94 "basics.nw"
 void
 basics(void)
 {
@@ -179,12 +179,16 @@ basics(void)
     show_double("1 % 0", nan3);
 
     /* sNaN, signaling NaN (sign is indifferent) */
+#line 88 "common.nw"
     show_created_double("first +sNaN", 0, DBLEXP(1024), 0, 1);
-    show_created_double("last +sNaN", 0, DBLEXP(1024), 0x7ffff, (uint32_t)~0);
+#line 92 "common.nw"
+    show_created_double("last +sNaN", 0, DBLEXP(1024), 0x7ffff, 0xffffffff);
 
     /* qNaN, quiet NaN (sign is indifferent) */
+#line 96 "common.nw"
     show_created_double("first +qNaN", 0, DBLEXP(1024), 0x80000, 0);
-    show_created_double("last +qNaN", 0, DBLEXP(1024), 0xfffff, (uint32_t)~0);
+#line 80 "common.nw"
+    show_created_double("last +qNaN", 0, DBLEXP(1024), 0xfffff, 0xffffffff);
 
     show_created_double("1 / 2^7", 0, DBLEXP(-7), 0, 0);
     show_created_double("1 / 2^6", 0, DBLEXP(-6), 0, 0);

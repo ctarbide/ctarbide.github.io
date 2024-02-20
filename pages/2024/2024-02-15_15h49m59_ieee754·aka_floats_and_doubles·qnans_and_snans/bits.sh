@@ -6,12 +6,12 @@ SH=${SH:-sh}; export SH
 CC=${CC:-gcc}; export CC
 CFLAGS=${CFLAGS:-"-Wall -O2 -ansi"}; export CFLAGS
 LDFLAGS=${LDFLAGS:-}; export LDFLAGS
-exec nofake-exec.sh --error -Rbasics "$@" -- "${SH}" -eu
+exec nofake-exec.sh --error -Rbits "$@" -- "${SH}" -eu
 exit 1
 
 This is a live literate program.
 
-<<basics.c>>=
+<<bits.c>>=
 <<c standards>>
 <<includes>>
 <<definitions>>
@@ -21,25 +21,25 @@ This is a live literate program.
 int
 main(int argc, char **argv)
 {
-    basics();
+    bits();
     return 0;
 }
 @
 
-<<basics>>=
+<<bits>>=
 thisprog=${1}; shift # the initial script
-<<compile basics>>
-rm -f basics_out.nw
-printf -- '@<<basics output>>=\n' > basics_out.nw
-./basics | tee -a basics_out.nw
-printf -- '@\n' >> basics_out.nw
+<<compile bits>>
+rm -f bits_out.nw
+printf -- '@<<bits output>>=\n' > bits_out.nw
+./bits | tee -a bits_out.nw
+printf -- '@\n' >> bits_out.nw
 make # update index.html
 @
 
-<<compile basics>>=
-set -- config.nw plumbing.nw common.nw basics.nw
-eval "set -- "'"$@"'" -- ${CC} ${CFLAGS} ${LDFLAGS} -obasics"
-nofake-exec.sh --error -L -Rbasics.c -obasics.c \
+<<compile bits>>=
+set -- config.nw plumbing.nw common.nw bits.nw
+eval "set -- "'"$@"'" -- ${CC} ${CFLAGS} ${LDFLAGS} -obits"
+nofake-exec.sh --error -L -Rbits.c -obits.c \
   "${thisprog}" "$@"
 @
 
@@ -54,17 +54,17 @@ set -- "$@" -Werror -fmax-errors=5
 <<pedantic>>=
 #!/bin/sh
 set -eu
-thisprog=./basics.sh
+thisprog=./bits.sh
 CC=gcc
 LDFLAGS=
 set --
 <<pedantic CFLAGS options for gcc>>
 CFLAGS=`for arg; do printf -- " '%s'" "${arg}"; done`
-<<compile basics>>
+<<compile bits>>
 @
 
-nofake basics.sh | sh | sh && ./basics
+nofake bits.sh | sh | sh && ./bits
 
 <<*>>=
-nofake --error -Rpedantic basics.sh plumbing.nw common.nw basics.nw
+nofake --error -Rpedantic bits.sh plumbing.nw common.nw bits.nw
 @

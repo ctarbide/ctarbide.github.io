@@ -1,0 +1,72 @@
+
+<<protos>>=
+void
+show_long_bits(char *label, double x);
+@
+
+<<impl>>=
+void
+show_long_bits(char *label, double x)
+{
+    char exp[64];
+    union double_value dv;
+    dv.d = x;
+    if (dv.parts.bexp == 0) {
+        snprintf(exp, sizeof exp, "(special)");
+    } else {
+        snprintf(exp, sizeof exp, "* 2 ^ unbias(%3x)", dv.parts.bexp);
+    }
+    printf("%16.16s  ->  0x%.016"PRIx64"  "
+        "%c1.%05x_%08x  %-18.18s  %e\n",
+        label, dv.u, dv.parts.sign ? '-' : '+',
+        dv.parts.hi20, dv.parts.lo32, exp, dv.d);
+}
+@
+
+
+<<protos>>=
+void
+show_bytes(char *label, double x);
+@
+
+<<impl>>=
+void
+show_bytes(char *label, double x)
+{
+    union double_value dv;
+    dv.d = x;
+    printf("%15.15s ->   %02x%02x%02x%02x%02x%02x%02x%02x (octets/bytes)\n",
+        label, dv.o[0], dv.o[1], dv.o[2], dv.o[3], dv.o[4], dv.o[5], dv.o[6],
+        dv.o[7]);
+}
+@
+
+<<protos>>=
+void
+bits(void);
+@
+
+<<impl>>=
+<<void bits(void)>>
+@
+
+<<void bits(void)>>=
+void
+bits(void)
+{
+    show_long_bits("zero", create_double(0, 0, 0, 0));
+    show_long_bits("first subnormal", create_double(0, 0, 0, 1));
+    show_long_bits("last subnormal", create_double(0, 0, <<all 52 set>>));
+    show_long_bits("first normal", create_double(0, 1, 0, 1));
+    show_long_bits("2^(-53)", create_double(0, DBLEXP(-53), 0, 0));
+    show_long_bits("one", create_double(0, DBLEXP(0), 0, 0));
+    show_long_bits("2^(+53)", create_double(0, DBLEXP(+53), 0, 0));
+    show_long_bits("last normal", create_double(0, <<largest double>>));
+    show_long_bits("infinite", create_double(0, DBLEXP(1024), 0, 0));
+    show_long_bits("first snan", create_double(0, <<first snan>>));
+    show_long_bits("last snan", create_double(0, <<last snan>>));
+    show_long_bits("first qnan", create_double(0, <<first qnan>>));
+    show_long_bits("last qnan", create_double(0, <<last qnan>>));
+    show_long_bits("(-) last qnan", create_double(1, <<last qnan>>));
+}
+@

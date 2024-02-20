@@ -1,0 +1,101 @@
+
+hi20 and lo32: normalized mantissa
+
+bexp: biased exponent
+
+<<double parts - big endian>>=
+struct {
+    unsigned int sign:1;
+    unsigned int bexp:11;
+    unsigned int hi20:20;
+    uint32_t lo32;
+} parts;
+@
+
+<<double parts - little endian>>=
+struct {
+    uint32_t lo32;
+    unsigned int hi20:20;
+    unsigned int bexp:11;
+    unsigned int sign:1;
+} parts;
+@
+
+<<unions>>=
+union double_value {
+    <<double parts>>
+    unsigned char o[8]; /* octets */
+    double d;
+    int64_t i;
+    uint64_t u;
+};
+@
+
+The exponent is biased, must denormalize it with DBLEXP to create a double.
+
+<<definitions>>=
+#define DBLEXP(x) (1023+(x))
+#define DBLEXP_NORMALIZE(x) ((x)-1023)
+@
+
+<<protos>>=
+double
+create_double(unsigned sign, unsigned bexp, uint32_t hi20, uint32_t lo32);
+@
+
+The bitwise 'and' serves to silence compiler warnings.
+
+<<impl>>=
+double
+create_double(unsigned sign, unsigned bexp, uint32_t hi20, uint32_t lo32)
+{
+    union double_value x;
+    x.parts.sign = sign & 0x1;
+    x.parts.bexp = bexp & 0x7ff;
+    x.parts.hi20 = hi20 & 0xfffff;
+    x.parts.lo32 = lo32;
+    return x.d;
+}
+@
+
+<<protos>>=
+double
+machine_epsilon(double x);
+@
+
+<<impl>>=
+double
+machine_epsilon(double x)
+{
+    union double_value v;
+    v.d = x;
+    /* v.parts.lo32++; */
+    /* return v.parts.sign ? x - v.d : v.d - x; */
+    v.i++;
+    return v.i < 0 ? x - v.d : v.d - x;
+}
+@
+
+<<all 52 set>>=
+0xfffff, 0xffffffff
+@
+
+<<largest double>>=
+DBLEXP(1023), <<all 52 set>>
+@
+
+<<first snan>>=
+DBLEXP(1024), 0, 1
+@
+
+<<last snan>>=
+DBLEXP(1024), 0x7ffff, 0xffffffff
+@
+
+<<first qnan>>=
+DBLEXP(1024), 0x80000, 0
+@
+
+<<last qnan>>=
+DBLEXP(1024), <<all 52 set>>
+@

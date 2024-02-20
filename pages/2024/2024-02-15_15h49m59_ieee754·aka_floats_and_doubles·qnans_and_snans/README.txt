@@ -11,6 +11,8 @@
 
 - [Basics](#basics)
 
+    - [Output](#basics_output)
+
 <<Section Basics>>=
 **************** <span id="basics">Basics</span>
 
@@ -18,9 +20,25 @@
 
     <<void basics(void)>>
 
-`basics` [output](basics_out.nw):
+`basics` [<span id="basics_output">output</span>](basics_out.nw):
 
     <<basics output>>
+
+<<TOC>>=
+- [Bit Patterns](#bits)
+
+    - [Output](#bits_output)
+
+<<Section Bit Patterns>>=
+**************** <span id="bits">Bit Patterns</span>
+
+`bits` function from [bits.nw](bits.nw):
+
+    <<void bits(void)>>
+
+`bits` [<span id="bits_output">output</span>](bits_out.nw):
+
+    <<bits output>>
 
 <<TOC>>=
 - [Other sources](#other)
@@ -32,7 +50,11 @@
 
 - [plumbing.nw](plumbing.nw)
 
+- [common.nw][common.nw]
+
 - [basics.sh](basics.sh)
+
+- [bits.sh](bits.sh)
 
 <<TOC>>=
 - [Notes](#notes)
@@ -46,8 +68,6 @@
 - The same principles shown for `binary64` also applies to `binary32` (c's
   `float` type).
 
-- Subnormals were not addressed.
-
 <<TOC>>=
 - [References](#references)
 
@@ -57,6 +77,8 @@
 <<TOC>>
 
 <<Section Basics>>
+
+<<Section Bit Patterns>>
 
 <<Section Other Sources>>
 
@@ -70,7 +92,7 @@ More details in the link below.
 @
 
 <<PRIMARY SOURCES>>=
-<<TOP>>/assets.nw README.txt config.nw basics.nw basics_out.nw
+<<TOP>>/assets.nw README.txt config.nw plumbing.nw common.nw basics.nw basics_out.nw bits.nw bits_out.nw
 @
 
 <<YEAR>>=

@@ -23,8 +23,8 @@ thisprog=${1} # the initial script
 mainprog=${0}
 set -- "${thisprog}" --ba-- "${mainprog}" "$@" --ea--
 printf -- '[%s] -> [%s]\n' "${thisprog}" "${mainprog}"
-[ -t 0 ] || nofake-exec.sh -R'stdin is non-tty' "${thisprog}" -- perl -wl
-nofake --error -Rdata "${thisprog}" | nofake-exec.sh --error -Rperl "$@" -- perl -w
+[ -t 0 ] || nofake-exec.sh -R'stdin is non-tty' "${thisprog}" -- "${PERL}" -wl
+nofake --error -Rdata "${thisprog}" | nofake-exec.sh --error -Rperl "$@" -- "${PERL}" -w
 @
 
 <<perl>>=
