@@ -202,7 +202,7 @@ bits(void)
     show_long_bits("zero", create_double(0, 0, 0, 0));
     show_long_bits("first subnormal", create_double(0, 0, 0, 1));
     show_long_bits("last subnormal", create_double(0, 0, 0xfffff, 0xffffffff));
-    show_long_bits("first normal", create_double(0, 1, 0, 1));
+    show_long_bits("first normal", create_double(0, 1, 0, 0));
     show_long_bits("2^(-53)", create_double(0, DBLEXP(-53), 0, 0));
     show_long_bits("one", create_double(0, DBLEXP(0), 0, 0));
     show_long_bits("2^(+53)", create_double(0, DBLEXP(+53), 0, 0));
@@ -221,6 +221,7 @@ bits(void)
 <pre><code>            zero  -&gt;  0x0000000000000000  +1.00000_00000000  (special)           0.000000e+00
  first subnormal  -&gt;  0x0000000000000001  +1.00000_00000001  (special)           4.940656e-324
   last subnormal  -&gt;  0x000fffffffffffff  +1.fffff_ffffffff  (special)           2.225074e-308
+    first normal  -&gt;  0x0010000000000000  +1.00000_00000000  * 2 ^ unbias(  1)   2.225074e-308
     first normal  -&gt;  0x0010000000000001  +1.00000_00000001  * 2 ^ unbias(  1)   2.225074e-308
          2^(-53)  -&gt;  0x3ca0000000000000  +1.00000_00000000  * 2 ^ unbias(3ca)   1.110223e-16
              one  -&gt;  0x3ff0000000000000  +1.00000_00000000  * 2 ^ unbias(3ff)   1.000000e+00
@@ -261,6 +262,6 @@ Standard.</p></li>
 </ul>
 
 <p>More details in the link below.</p>
-<p> This <a href="README.txt">page</a> was last modified on February 20, 2024 at 14:48:27 UTC.
+<p> This <a href="README.txt">page</a> was last modified on February 20, 2024 at 14:53:59 UTC.
 
-<!-- Generated in 0.094 seconds on February 20, 2024 at 14:48:32 UTC. -->
+<!-- Generated in 0.095 seconds on February 20, 2024 at 14:54:03 UTC. -->
