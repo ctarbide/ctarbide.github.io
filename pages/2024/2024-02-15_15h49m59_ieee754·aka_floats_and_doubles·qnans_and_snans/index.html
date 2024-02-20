@@ -27,7 +27,16 @@ body {
 <h2>Table Of Contents</h2>
 
 <ul>
-<li><p><a href="#basics">Basics</a></p></li>
+<li><p><a href="#basics">Basics</a></p>
+
+<ul>
+<li><a href="#basics_output">Output</a></li>
+</ul></li>
+<li><p><a href="#bits">Bit Patterns</a></p>
+
+<ul>
+<li><a href="#bits_output">Output</a></li>
+</ul></li>
 <li><p><a href="#other">Other sources</a></p></li>
 <li><p><a href="#notes">Notes</a></p></li>
 <li><p><a href="#references">References</a></p></li>
@@ -82,11 +91,11 @@ basics(void)
 
     /* sNaN, signaling NaN (sign is indifferent) */
     show_created_double("first +sNaN", 0, DBLEXP(1024), 0, 1);
-    show_created_double("last +sNaN", 0, DBLEXP(1024), 0x7ffff, (uint32_t)~0);
+    show_created_double("last +sNaN", 0, DBLEXP(1024), 0x7ffff, 0xffffffff);
 
     /* qNaN, quiet NaN (sign is indifferent) */
     show_created_double("first +qNaN", 0, DBLEXP(1024), 0x80000, 0);
-    show_created_double("last +qNaN", 0, DBLEXP(1024), 0xfffff, (uint32_t)~0);
+    show_created_double("last +qNaN", 0, DBLEXP(1024), 0xfffff, 0xffffffff);
 
     show_created_double("1 / 2^7", 0, DBLEXP(-7), 0, 0);
     show_created_double("1 / 2^6", 0, DBLEXP(-6), 0, 0);
@@ -134,44 +143,44 @@ basics(void)
 }
 </code></pre>
 
-<p><code>basics</code> <a href="basics_out.nw">output</a>:</p>
+<p><code>basics</code> <a href="basics_out.nw"><span id="basics_output">output</span></a>:</p>
 
-<pre><code>              0 -&gt;      (special) 0.0 (+1.00000_00000000 * 2 ^ 0)
-              0 -&gt;      (special) 0.0 (+1.00000_00000000 * 2 ^ 0)
-             -0 -&gt;      (special) 0.0 (-1.00000_00000000 * 2 ^ 0)
-      Planck eV -&gt;  4.13566769600e-15 (+1.2a019_a830a613 * 2 ^ unbias(3cf))
-      Planck eV -&gt;  4.13566769600e-15 (+1.2a019_a830a613 * 2 ^ unbias(3cf))
-      Planck eV -&gt; 0x3cf2a019a830a613 (+1.2a019_a830a613 * 2 ^ unbias(3cf))
+<pre><code>           0 -&gt;        (special) 0.0 (+1.00000_00000000 * 2 ^ 0)
+           0 -&gt;        (special) 0.0 (+1.00000_00000000 * 2 ^ 0)
+          -0 -&gt;        (special) 0.0 (-1.00000_00000000 * 2 ^ 0)
+   Planck eV -&gt;    4.13566769600e-15 (+1.2a019_a830a613 * 2 ^ unbias(3cf))
+   Planck eV -&gt;    4.13566769600e-15 (+1.2a019_a830a613 * 2 ^ unbias(3cf))
+   Planck eV -&gt;   0x3cf2a019a830a613 (+1.2a019_a830a613 * 2 ^ unbias(3cf))
       Planck eV -&gt;   13a630a819a0f23c (octets/bytes)
-              1 -&gt;               1.00 (+1.00000_00000000 * 2 ^ unbias(3ff))
-              1 -&gt;               1.00 (+1.00000_00000000 * 2 ^ unbias(3ff))
-             -1 -&gt;              -1.00 (-1.00000_00000000 * 2 ^ unbias(3ff))
-             -1 -&gt;              -1.00 (-1.00000_00000000 * 2 ^ unbias(3ff))
-           -inf -&gt;               -inf (-1.00000_00000000 * 2 ^ unbias(7ff))
-            inf -&gt;                inf (+1.00000_00000000 * 2 ^ unbias(7ff))
-          1 / 0 -&gt;                inf (+1.00000_00000000 * 2 ^ unbias(7ff))
-       sqrt(-1) -&gt;               -nan (-1.80000_00000000 * 2 ^ unbias(7ff))
-        inf % 1 -&gt;               -nan (-1.80000_00000000 * 2 ^ unbias(7ff))
-          1 % 0 -&gt;               -nan (-1.80000_00000000 * 2 ^ unbias(7ff))
-    first +sNaN -&gt;                nan (+1.00000_00000001 * 2 ^ unbias(7ff))
-     last +sNaN -&gt;                nan (+1.7ffff_ffffffff * 2 ^ unbias(7ff))
-    first +qNaN -&gt;                nan (+1.80000_00000000 * 2 ^ unbias(7ff))
-     last +qNaN -&gt;                nan (+1.fffff_ffffffff * 2 ^ unbias(7ff))
-        1 / 2^7 -&gt;          0.0078125 (+1.00000_00000000 * 2 ^ unbias(3f8))
-        1 / 2^6 -&gt;          0.0156250 (+1.00000_00000000 * 2 ^ unbias(3f9))
-        1 / 2^5 -&gt;          0.0312500 (+1.00000_00000000 * 2 ^ unbias(3fa))
-        1 / 2^4 -&gt;          0.0625000 (+1.00000_00000000 * 2 ^ unbias(3fb))
-        1 / 2^3 -&gt;          0.1250000 (+1.00000_00000000 * 2 ^ unbias(3fc))
-        1 / 2^2 -&gt;          0.2500000 (+1.00000_00000000 * 2 ^ unbias(3fd))
-        1 / 2^1 -&gt;          0.5000000 (+1.00000_00000000 * 2 ^ unbias(3fe))
-        1 * 2^0 -&gt;               1.00 (+1.00000_00000000 * 2 ^ unbias(3ff))
-        1 * 2^1 -&gt;               2.00 (+1.00000_00000000 * 2 ^ unbias(400))
-        1 * 2^2 -&gt;               4.00 (+1.00000_00000000 * 2 ^ unbias(401))
-        1 * 2^3 -&gt;               8.00 (+1.00000_00000000 * 2 ^ unbias(402))
-        1 * 2^4 -&gt;              16.00 (+1.00000_00000000 * 2 ^ unbias(403))
-        1 * 2^5 -&gt;              32.00 (+1.00000_00000000 * 2 ^ unbias(404))
-        1 * 2^6 -&gt;              64.00 (+1.00000_00000000 * 2 ^ unbias(405))
-        1 * 2^7 -&gt;             128.00 (+1.00000_00000000 * 2 ^ unbias(406))
+           1 -&gt;                 1.00 (+1.00000_00000000 * 2 ^ unbias(3ff))
+           1 -&gt;                 1.00 (+1.00000_00000000 * 2 ^ unbias(3ff))
+          -1 -&gt;                -1.00 (-1.00000_00000000 * 2 ^ unbias(3ff))
+          -1 -&gt;                -1.00 (-1.00000_00000000 * 2 ^ unbias(3ff))
+        -inf -&gt;                 -inf (-1.00000_00000000 * 2 ^ unbias(7ff))
+         inf -&gt;                  inf (+1.00000_00000000 * 2 ^ unbias(7ff))
+       1 / 0 -&gt;                  inf (+1.00000_00000000 * 2 ^ unbias(7ff))
+    sqrt(-1) -&gt;                 -nan (-1.80000_00000000 * 2 ^ unbias(7ff))
+     inf % 1 -&gt;                 -nan (-1.80000_00000000 * 2 ^ unbias(7ff))
+       1 % 0 -&gt;                 -nan (-1.80000_00000000 * 2 ^ unbias(7ff))
+ first +sNaN -&gt;                  nan (+1.00000_00000001 * 2 ^ unbias(7ff))
+  last +sNaN -&gt;                  nan (+1.7ffff_ffffffff * 2 ^ unbias(7ff))
+ first +qNaN -&gt;                  nan (+1.80000_00000000 * 2 ^ unbias(7ff))
+  last +qNaN -&gt;                  nan (+1.fffff_ffffffff * 2 ^ unbias(7ff))
+     1 / 2^7 -&gt;            0.0078125 (+1.00000_00000000 * 2 ^ unbias(3f8))
+     1 / 2^6 -&gt;            0.0156250 (+1.00000_00000000 * 2 ^ unbias(3f9))
+     1 / 2^5 -&gt;            0.0312500 (+1.00000_00000000 * 2 ^ unbias(3fa))
+     1 / 2^4 -&gt;            0.0625000 (+1.00000_00000000 * 2 ^ unbias(3fb))
+     1 / 2^3 -&gt;            0.1250000 (+1.00000_00000000 * 2 ^ unbias(3fc))
+     1 / 2^2 -&gt;            0.2500000 (+1.00000_00000000 * 2 ^ unbias(3fd))
+     1 / 2^1 -&gt;            0.5000000 (+1.00000_00000000 * 2 ^ unbias(3fe))
+     1 * 2^0 -&gt;                 1.00 (+1.00000_00000000 * 2 ^ unbias(3ff))
+     1 * 2^1 -&gt;                 2.00 (+1.00000_00000000 * 2 ^ unbias(400))
+     1 * 2^2 -&gt;                 4.00 (+1.00000_00000000 * 2 ^ unbias(401))
+     1 * 2^3 -&gt;                 8.00 (+1.00000_00000000 * 2 ^ unbias(402))
+     1 * 2^4 -&gt;                16.00 (+1.00000_00000000 * 2 ^ unbias(403))
+     1 * 2^5 -&gt;                32.00 (+1.00000_00000000 * 2 ^ unbias(404))
+     1 * 2^6 -&gt;                64.00 (+1.00000_00000000 * 2 ^ unbias(405))
+     1 * 2^7 -&gt;               128.00 (+1.00000_00000000 * 2 ^ unbias(406))
           2^-53 -&gt; 1.110223e-16 (formal machine epsilon, lapack)
           2^-52 -&gt; 2.220446e-16 (machine epsilon, iso c std, mathematica, matlab)
           2^-52 -&gt; 2.220446e-16 (machine_epsilon(1.0))
@@ -183,12 +192,56 @@ basics(void)
             ... -&gt; 9007199254740994.0 (smallest number greater than 2^53)
 </code></pre>
 
+<h2><span id="bits">Bit Patterns</span></h2>
+
+<p><code>bits</code> function from <a href="bits.nw">bits.nw</a>:</p>
+
+<pre><code>void
+bits(void)
+{
+    show_long_bits("zero", create_double(0, 0, 0, 0));
+    show_long_bits("first subnormal", create_double(0, 0, 0, 1));
+    show_long_bits("last subnormal", create_double(0, 0, 0xfffff, 0xffffffff));
+    show_long_bits("first normal", create_double(0, 1, 0, 1));
+    show_long_bits("2^(-53)", create_double(0, DBLEXP(-53), 0, 0));
+    show_long_bits("one", create_double(0, DBLEXP(0), 0, 0));
+    show_long_bits("2^(+53)", create_double(0, DBLEXP(+53), 0, 0));
+    show_long_bits("last normal", create_double(0, DBLEXP(1023), 0xfffff, 0xffffffff));
+    show_long_bits("infinite", create_double(0, DBLEXP(1024), 0, 0));
+    show_long_bits("first snan", create_double(0, DBLEXP(1024), 0, 1));
+    show_long_bits("last snan", create_double(0, DBLEXP(1024), 0x7ffff, 0xffffffff));
+    show_long_bits("first qnan", create_double(0, DBLEXP(1024), 0x80000, 0));
+    show_long_bits("last qnan", create_double(0, DBLEXP(1024), 0xfffff, 0xffffffff));
+    show_long_bits("(-) last qnan", create_double(1, DBLEXP(1024), 0xfffff, 0xffffffff));
+}
+</code></pre>
+
+<p><code>bits</code> <a href="bits_out.nw"><span id="bits_output">output</span></a>:</p>
+
+<pre><code>            zero  -&gt;  0x0000000000000000  +1.00000_00000000  (special)           0.000000e+00
+ first subnormal  -&gt;  0x0000000000000001  +1.00000_00000001  (special)           4.940656e-324
+  last subnormal  -&gt;  0x000fffffffffffff  +1.fffff_ffffffff  (special)           2.225074e-308
+    first normal  -&gt;  0x0010000000000001  +1.00000_00000001  * 2 ^ unbias(  1)   2.225074e-308
+         2^(-53)  -&gt;  0x3ca0000000000000  +1.00000_00000000  * 2 ^ unbias(3ca)   1.110223e-16
+             one  -&gt;  0x3ff0000000000000  +1.00000_00000000  * 2 ^ unbias(3ff)   1.000000e+00
+         2^(+53)  -&gt;  0x4340000000000000  +1.00000_00000000  * 2 ^ unbias(434)   9.007199e+15
+     last normal  -&gt;  0x7fefffffffffffff  +1.fffff_ffffffff  * 2 ^ unbias(7fe)   1.797693e+308
+        infinite  -&gt;  0x7ff0000000000000  +1.00000_00000000  * 2 ^ unbias(7ff)   inf
+      first snan  -&gt;  0x7ff0000000000001  +1.00000_00000001  * 2 ^ unbias(7ff)   nan
+       last snan  -&gt;  0x7ff7ffffffffffff  +1.7ffff_ffffffff  * 2 ^ unbias(7ff)   nan
+      first qnan  -&gt;  0x7ff8000000000000  +1.80000_00000000  * 2 ^ unbias(7ff)   nan
+       last qnan  -&gt;  0x7fffffffffffffff  +1.fffff_ffffffff  * 2 ^ unbias(7ff)   nan
+   (-) last qnan  -&gt;  0xffffffffffffffff  -1.fffff_ffffffff  * 2 ^ unbias(7ff)   -nan
+</code></pre>
+
 <h2><span id="other">Other sources</span></h2>
 
 <ul>
 <li><p><a href="config.nw">config.nw</a></p></li>
 <li><p><a href="plumbing.nw">plumbing.nw</a></p></li>
+<li><p>[common.nw][common.nw]</p></li>
 <li><p><a href="basics.sh">basics.sh</a></p></li>
+<li><p><a href="bits.sh">bits.sh</a></p></li>
 </ul>
 
 <h2><span id="notes">Notes</span></h2>
@@ -198,7 +251,6 @@ basics(void)
 Standard.</p></li>
 <li><p>The same principles shown for <code>binary64</code> also applies to <code>binary32</code> (c's
 <code>float</code> type).</p></li>
-<li><p>Subnormals were not addressed.</p></li>
 </ul>
 
 <h2 id="references">References</h2>
@@ -209,6 +261,6 @@ Standard.</p></li>
 </ul>
 
 <p>More details in the link below.</p>
-<p> This <a href="README.txt">page</a> was last modified on February 17, 2024 at 10:37:32 UTC.
+<p> This <a href="README.txt">page</a> was last modified on February 20, 2024 at 14:37:51 UTC.
 
-<!-- Generated in 0.078 seconds on February 17, 2024 at 14:20:49 UTC. -->
+<!-- Generated in 0.090 seconds on February 20, 2024 at 14:37:54 UTC. -->
