@@ -125,6 +125,11 @@ bits(void)
     show_long_bits("first qnan", create_double(0, DBLEXP(1024), 0x80000, 0));
 #line 80 "common.nw"
     show_long_bits("last qnan", create_double(0, DBLEXP(1024), 0xfffff, 0xffffffff));
+    show_long_bits("(-) first subnormal", create_double(1, 0, 0, 1));
+#line 80 "common.nw"
+    show_long_bits("(-) last subnormal", create_double(1, 0, 0xfffff, 0xffffffff));
+    show_long_bits("(-) one", create_double(1, DBLEXP(0), 0, 0));
+    show_long_bits("(-) infinite", create_double(1, DBLEXP(1024), 0, 0));
 #line 80 "common.nw"
     show_long_bits("(-) last qnan", create_double(1, DBLEXP(1024), 0xfffff, 0xffffffff));
 }
