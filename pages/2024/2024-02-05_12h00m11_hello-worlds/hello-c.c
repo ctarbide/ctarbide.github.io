@@ -1,4 +1,4 @@
-#line 78 "./hello-c.sh"
+#line 92 "hello-c.sh"
 #ifndef _BSD_SOURCE
 #define _BSD_SOURCE
 #endif
@@ -11,7 +11,7 @@
 #ifndef _POSIX_C_SOURCE
 #define _POSIX_C_SOURCE		200112L
 #endif
-#line 93 "./hello-c.sh"
+#line 107 "hello-c.sh"
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -19,12 +19,18 @@
 #include <string.h>
 #include <fcntl.h>
 #include <unistd.h>
-#line 25 "./hello-c.sh"
+#line 29 "hello-c.sh"
 int
 main(int argc, char **argv)
 {
     int i = 0;
-    for (; i < argc; i++) {
+    while (fgetc(stdin) != EOF) {
+        i++;
+    }
+    if (i) {
+        printf("got %d bytes on standard input\n", i);
+    }
+    for (i=0; i < argc; i++) {
         fprintf(stdout, "[%d:%s]\n", i, argv[i]);
     }
     puts("hello world!");

@@ -11,11 +11,15 @@ exit 1
 
 This is a live literate program.
 
+<<$0>>=
+hello-c
+@
+
 <<try this>>=
 ./hello-c.sh a 'b c' ' ${d} '
 @
 
-<<hello-c.c>>=
+<<$0.c>>=
 <<c standards>>
 <<includes>>
 <<int main()>>
@@ -26,7 +30,13 @@ int
 main(int argc, char **argv)
 {
     int i = 0;
-    for (; i < argc; i++) {
+    while (fgetc(stdin) != EOF) {
+        i++;
+    }
+    if (i) {
+        printf("got %d bytes on standard input\n", i);
+    }
+    for (i=0; i < argc; i++) {
         fprintf(stdout, "[%d:%s]\n", i, argv[i]);
     }
     puts("hello world!");
@@ -36,15 +46,21 @@ main(int argc, char **argv)
 
 <<prog>>=
 thisprog=${1}; shift # the initial script
+thisprefix=${thisprog%.sh};
+if [ "x${thisprefix##*/}" != x'<<$0>>' ]; then
+    echo 'Error, fix @<<$0>>.' 1>&2
+    exit 1
+fi
 saveargs=`for arg; do printf -- " '%s'" "${arg}"; done`
 <<call compiler>>
 eval "set -- ${saveargs}"
-./hello-c "$@"
+[ -t 0 ] && exec 0>&-
+"${thisprefix}" "$@"
 @
 
 <<call compiler>>=
-eval "set -- ${CC} ${CFLAGS} ${LDFLAGS} -ohello-c"
-nofake-exec.sh --error -L -Rhello-c.c -ohello-c.c \
+eval "set -- ${CC} ${CFLAGS} ${LDFLAGS} -o'<<$0>>'"
+nofake-exec.sh --error -L -R'$0.c' -o'<<$0>>.c' \
     "${thisprog}" -- "$@"
 @
 
@@ -59,7 +75,7 @@ set -- "$@" -Werror -fmax-errors=5
 <<pedantic>>=
 #!/bin/sh
 set -eu
-thisprog=hello-c.sh
+thisprog='<<$0>>.sh'
 CC=gcc
 LDFLAGS=
 set --
@@ -68,10 +84,8 @@ CFLAGS=`for arg; do printf -- " '%s'" "${arg}"; done`
 <<call compiler>>
 @
 
-nofake hello-c.sh | sh | sh && ./hello-c a 'b c' ' ${d} '
-
 <<*>>=
-nofake --error -Rpedantic hello-c.sh
+nofake --error -Rpedantic '<<$0>>.sh' | sh && seq 10 | ./'<<$0>>' a 'b c' ' ${d} '
 @
 
 <<c standards>>=
