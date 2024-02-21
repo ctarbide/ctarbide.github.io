@@ -212,6 +212,10 @@ bits(void)
     show_long_bits("last snan", create_double(0, DBLEXP(1024), 0x7ffff, 0xffffffff));
     show_long_bits("first qnan", create_double(0, DBLEXP(1024), 0x80000, 0));
     show_long_bits("last qnan", create_double(0, DBLEXP(1024), 0xfffff, 0xffffffff));
+    show_long_bits("(-) first subnormal", create_double(1, 0, 0, 1));
+    show_long_bits("(-) last subnormal", create_double(1, 0, 0xfffff, 0xffffffff));
+    show_long_bits("(-) one", create_double(1, DBLEXP(0), 0, 0));
+    show_long_bits("(-) infinite", create_double(1, DBLEXP(1024), 0, 0));
     show_long_bits("(-) last qnan", create_double(1, DBLEXP(1024), 0xfffff, 0xffffffff));
 }
 </code></pre>
@@ -231,6 +235,10 @@ bits(void)
        last snan  -&gt;  0x7ff7ffffffffffff  +1.7ffff_ffffffff  * 2 ^ unbias(7ff)   nan
       first qnan  -&gt;  0x7ff8000000000000  +1.80000_00000000  * 2 ^ unbias(7ff)   nan
        last qnan  -&gt;  0x7fffffffffffffff  +1.fffff_ffffffff  * 2 ^ unbias(7ff)   nan
+(-) first subnor  -&gt;  0x8000000000000001  -1.00000_00000001  (special)           -4.940656e-324
+(-) last subnorm  -&gt;  0x800fffffffffffff  -1.fffff_ffffffff  (special)           -2.225074e-308
+         (-) one  -&gt;  0xbff0000000000000  -1.00000_00000000  * 2 ^ unbias(3ff)   -1.000000e+00
+    (-) infinite  -&gt;  0xfff0000000000000  -1.00000_00000000  * 2 ^ unbias(7ff)   -inf
    (-) last qnan  -&gt;  0xffffffffffffffff  -1.fffff_ffffffff  * 2 ^ unbias(7ff)   -nan
 </code></pre>
 
@@ -261,6 +269,6 @@ Standard.</p></li>
 </ul>
 
 <p>More details in the link below.</p>
-<p> This <a href="README.txt">page</a> was last modified on February 20, 2024 at 15:18:04 UTC.
+<p> This <a href="README.txt">page</a> was last modified on February 20, 2024 at 18:59:16 UTC.
 
-<!-- Generated in 0.093 seconds on February 20, 2024 at 15:18:10 UTC. -->
+<!-- Generated in 0.094 seconds on February 20, 2024 at 19:21:46 UTC. -->
