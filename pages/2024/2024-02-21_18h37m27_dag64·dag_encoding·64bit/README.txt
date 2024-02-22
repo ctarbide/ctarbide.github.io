@@ -20,8 +20,7 @@
 *Denormals Are Gone* encoding for IEEE754 doubles, because they, the
 subnormals, are [not good](#references) anyway.
 
-This is the product of a [detailed observation][FAD] of
-IEEE754 format.
+This is the product of a [detailed observation][FAD] of the IEEE754 format.
 
 [FAD]: <<link to floats and doubles>>
 
