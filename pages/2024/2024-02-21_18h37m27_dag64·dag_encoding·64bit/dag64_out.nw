@@ -1,0 +1,15 @@
+<<dag64 output>>=
+            zero -> 0x0000000000000000 -> 0.000000e+00 (int) 0
+               1 -> 0x0000000000000001 -> 1.000000e+00 (int) 1
+        2^51 - 1 -> 0x0007ffffffffffff -> 2.251800e+15 (int) 2251799813685247
+        2^52 - 1 -> 0x000fffffffffffff -> -1.000000e+00 (int) 4503599627370495 or -1
+        custom 1 -> 0x0011111111111111 -> -nan (custom 1) 0x1111111111111
+(+) first normal -> 0x0020000000000000 -> 2.225074e-308 (normal)
+ (+) last normal -> 0x7fffffffffffffff -> 1.797693e+308 (normal)
+(-) first normal -> 0x8000000000000000 -> -2.225074e-308 (normal)
+ (-) last normal -> 0xffdfffffffffffff -> -1.797693e+308 (normal)
+        custom 2 -> 0xffe2222222222222 -> -nan (custom 2) 0x2222222222222
+            dnan -> 0xfff0000000000000 -> -nan (special 0: -nan)
+            +inf -> 0xfff0000000000001 -> inf (special 1: inf)
+            -inf -> 0xfff0000000000002 -> -inf (special 2: -inf)
+@

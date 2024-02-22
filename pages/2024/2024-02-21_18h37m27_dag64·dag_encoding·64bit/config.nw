@@ -1,0 +1,24 @@
+
+<<double parts>>=
+<<double parts - little endian>>
+@
+
+<<static initialized default nan>>=
+<<static initialized default nan - little endian>>
+@
+
+<<static initialized +inf>>=
+<<static initialized +inf - little endian>>
+@
+
+<<static initialized -inf>>=
+<<static initialized -inf - little endian>>
+@
+
+<<u32 parts>>=
+<<u32 parts - little endian>>
+@
+
+<<normal parts>>=
+<<normal parts - little endian>>
+@

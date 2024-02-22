@@ -1,0 +1,292 @@
+
+<<definitions>>=
+#define HI12_MASK 0xfff00000
+#define LO52_MASK 0x000fffffffffffff
+#define BIT_52_SET ((uint64_t)1 << (52 - 1))
+@
+
+<<definitions>>=
+#define SPECIALS_ARRAY_MASK 0x3
+@
+
+<<impl>>=
+union double_value specials[SPECIALS_ARRAY_MASK + 1] = {
+    {{ <<static initialized default nan>> }},
+    {{ <<static initialized +inf>> }},
+    {{ <<static initialized -inf>> }},
+    {{ <<static initialized default nan>> }}
+};
+@
+
+<<protos>>=
+void
+show_long_bits(char *label, double x);
+@
+
+<<show_long_bits()>>=
+void
+show_long_bits(char *label, double x)
+{
+    char buf[100];
+    union double_value dv;
+    uint32_t hi12;
+
+    dv.d = x;
+    hi12 = dv.u32.hi & HI12_MASK;
+
+    snprintf(buf, sizeof buf, "exhaustion");
+
+    if (hi12 == 0) {
+        int64_t i = (int64_t)((dv.u ^ BIT_52_SET) - BIT_52_SET);
+        if (i < 0) {
+            snprintf(buf, sizeof buf, "(int) %"PRId64" or %"PRId64, dv.i, i);
+        } else {
+            snprintf(buf, sizeof buf, "(int) %"PRId64, i);
+        }
+    } else if (hi12 == ((uint32_t)EAS_CUSTOM_1 << 20)) {
+        uint64_t payload = dv.u & LO52_MASK;
+        snprintf(buf, sizeof buf, "(custom 1) 0x%013"PRIx64, payload);
+    } else if (hi12 == ((uint32_t)EAS_SPECIAL << 20)) {
+        unsigned idx = dv.u32.lo & SPECIALS_ARRAY_MASK;
+        snprintf(buf, sizeof buf, "(special %d: %f)", idx, specials[idx].d);
+    } else if (hi12 == ((uint32_t)EAS_CUSTOM_2 << 20)) {
+        uint64_t payload = dv.u & LO52_MASK;
+        snprintf(buf, sizeof buf, "(custom 2) 0x%013"PRIx64, payload);
+    } else {
+        snprintf(buf, sizeof buf, "(normal)");
+    }
+
+    printf("%16.16s -> 0x%.016"PRIx64" -> %e %s\n",
+        label, dv.u, as_double(dv.d), buf);
+}
+@
+
+<<impl>>=
+<<show_long_bits()>>
+@
+
+<<protos>>=
+double
+as_double(double);
+@
+
+<<impl>>=
+double
+as_double(double x)
+{
+    union double_value dv, out;
+    uint32_t hi12;
+
+    out.d = dv.d = x;
+    hi12 = dv.u32.hi & HI12_MASK;
+
+    if (hi12 == 0) {
+        int64_t i = (int64_t)((dv.u ^ BIT_52_SET) - BIT_52_SET);
+        out.d = (double)i;
+        /* out.d = (double)dv.u; */
+    } else if (hi12 == ((uint32_t)EAS_CUSTOM_1 << 20)) {
+        out = dnan;
+        out.u32.lo = 1;
+    } else if (hi12 == ((uint32_t)EAS_SPECIAL << 20)) {
+        unsigned idx = dv.u32.lo & SPECIALS_ARRAY_MASK;
+        out = specials[idx];
+    } else if (hi12 == ((uint32_t)EAS_CUSTOM_2 << 20)) {
+        out = dnan;
+        out.u32.lo = 2;
+    } else {
+        /* a normal, restore IEEE754 biased exponent */
+        unsigned int eas = dv.normal.eas;
+        unsigned int bexp = eas - E_BIAS_START + 1 -
+            ((unsigned)E_RANGE_PER_SIGNAL * dv.parts.sign);
+        out.parts.bexp = bexp & 0x7ff;
+    }
+
+    return out.d;
+}
+@
+
+<<protos>>=
+union double_value
+create_normal(unsigned sign, int exp, uint32_t hi20, uint32_t lo32);
+@
+
+The bitwise 'and' serves to silence compiler warnings.
+
+from the spec:
+
+    e_min = 1 - e_max
+
+<<definitions>>=
+#define E_BITS 11
+#define E_MAX ((1<<(E_BITS-1))-1)
+#define E_MIN (1 - E_MAX)
+#define E_RANGE_PER_SIGNAL (E_MAX - E_MIN + 1)
+#define E_BIAS_START 0x002
+#define E_BIAS_END (E_RANGE_PER_SIGNAL * 2 - 1 + E_BIAS_START)
+@
+
+<<impl>>=
+union double_value
+create_normal(unsigned sign, int exp, uint32_t hi20, uint32_t lo32)
+{
+    union double_value x;
+    if (exp >= E_MIN && exp <= E_MAX) {
+        x.normal.eas = (
+                (unsigned)(exp - E_MIN + E_BIAS_START) +
+                ((unsigned)E_RANGE_PER_SIGNAL * sign)
+            ) & 0xfff;
+        x.normal.hi20 = hi20 & 0xfffff;
+        x.normal.lo32 = lo32;
+    } else {
+        x = dnan;
+    }
+    return x;
+}
+@
+
+<<protos>>=
+union double_value
+create_special(uint32_t hi20, uint32_t lo32);
+union double_value
+create_custom_1(uint32_t hi20, uint32_t lo32);
+union double_value
+create_custom_2(uint32_t hi20, uint32_t lo32);
+@
+
+E_BIAS_START and E_BIAS_END are symmetric with the center in (0x7ff and 0x800),
+i.e., last positive exponent and first negative exponent, this leaves these
+exponents available:
+
+    - 0x000: integers
+
+    - 0x001: custom values
+
+    - 0x002 - 0xffd: normal values
+
+    - 0xffe: custom values
+
+    - 0xfff: special values (dnan, +inf, -inf)
+
+<<definitions>>=
+#define EAS_CUSTOM_1 0x001
+#define EAS_CUSTOM_2 0xffe
+#define EAS_SPECIAL 0xfff
+#define SPECIAL_DNAN 0, 0
+#define SPECIAL_P_INF 0, 1
+#define SPECIAL_N_INF 0, 2
+@
+
+<<impl>>=
+union double_value
+create_special(uint32_t hi20, uint32_t lo32)
+{
+    union double_value x;
+    x.normal.eas = EAS_SPECIAL;
+    x.normal.hi20 = hi20 & 0xfffff;
+    x.normal.lo32 = lo32;
+    return x;
+}
+union double_value
+create_custom_1(uint32_t hi20, uint32_t lo32)
+{
+    union double_value x;
+    x.normal.eas = EAS_CUSTOM_1;
+    x.normal.hi20 = hi20 & 0xfffff;
+    x.normal.lo32 = lo32;
+    return x;
+}
+union double_value
+create_custom_2(uint32_t hi20, uint32_t lo32)
+{
+    union double_value x;
+    x.normal.eas = EAS_CUSTOM_2;
+    x.normal.hi20 = hi20 & 0xfffff;
+    x.normal.lo32 = lo32;
+    return x;
+}
+@
+
+<<comparison against original format>>=
+- only positive zero was maintained
+
+    - negative zero is also gone
+
+- integers took place of subnormals
+
+- normals exponents are rebiased and are now contiguous in the whole range
+
+- `+infinity` and `-ininity` become a special value instead of having a
+  dedicated exponent
+
+- all `NaN`s that existed sharing the same exponent of `infinity` are gone and
+  there is only one `NaN` represented as a special value `dnan`
+
+@
+
+<<glossary>>=
+- `normal`: nonzero floating point numbers using normalized mantissa
+
+- `custom 1`: custom values with exponent `0x001` with all the `0..(2^52-1)`
+  range available
+
+- `custom 2`: custom values with exponent `0xffe` with all the `0..(2^52-1)`
+  range available
+
+- `dnan`: default system `NaN`, usually `-qNaN`, i.e.,
+  `0xfff8000000000000`, configurable
+
+- `+inf`: positive infinity
+
+- `-inf`: negative infinity
+
+- `special`: enumerated values using exponent `0xfff`, holds at least
+  `+inf`, `-inf` and `dnan` for equivalency with other important IEEE754
+  standard values
+
+    - can be used to represent true, false, nil, undefined variables, built-in
+      subroutines, low-level/system exceptions etc
+
+@
+
+<<features>>=
+
+- verbatim 52-bits integers, trivial to implement a two's complement system
+
+    - demonstrated in the `2^52 - 1` case above
+
+- specific double values (including `sNaN`s) can be produced from special values
+
+@
+
+<<protos>>=
+void
+dag64(void);
+@
+
+<<dag64()>>=
+void
+dag64(void)
+{
+    show_long_bits("zero", create_double(0, 0, 0, 0));
+    show_long_bits("1", create_double(0, 0, 0, 1));
+    show_long_bits("2^51 - 1", create_double(0, 0, <<lower 51 set>>));
+    show_long_bits("2^52 - 1", create_double(0, 0, <<all 52 set>>));
+
+    show_long_bits("custom 1", create_custom_1(0x11111, 0x11111111).d);
+
+    show_long_bits("(+) first normal", create_normal(0, E_MIN, 0, 0).d);
+    show_long_bits("(+) last normal",  create_normal(0, E_MAX, <<all 52 set>>).d);
+    show_long_bits("(-) first normal", create_normal(1, E_MIN, 0, 0).d);
+    show_long_bits("(-) last normal",  create_normal(1, E_MAX, <<all 52 set>>).d);
+
+    show_long_bits("custom 2", create_custom_2(0x22222, 0x22222222).d);
+
+    show_long_bits("dnan", create_special(SPECIAL_DNAN).d);
+    show_long_bits("+inf", create_special(SPECIAL_P_INF).d);
+    show_long_bits("-inf", create_special(SPECIAL_N_INF).d);
+}
+@
+
+<<impl>>=
+<<dag64()>>
+@
