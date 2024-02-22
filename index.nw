@@ -90,7 +90,7 @@ nofake -Rgenerate index.nw | sh | CHMOD='chmod 0444' nofake.sh --error -Rindex.h
 
 <<*>>=
 <<sh preamble>>
-if git-file-is-pristine.sh index.nw; then
+if git-file-is-pristine.sh index.nw pages.nw Makefile; then
     rm -f .draft
 else
     date '+%Y-%m-%d_%Hh%Mm%S' > .draft

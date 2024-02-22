@@ -89,9 +89,10 @@ main(int argc, char **argv)
 &#x40;
 
 &lt;&lt;prog>>=
-thisprog=${1}; shift # the initial script
+progid='&lt;&lt;$0>>'
+thisprog=${1}; shift # progid with called path
 thisprefix=${thisprog%.sh};
-if [ "x${thisprefix##*/}" != x'&lt;&lt;$0>>' ]; then
+if [ "x${thisprefix##*/}" != "x${progid}" ]; then
     echo 'Error, fix @&lt;&lt;$0>>.' 1>&amp;2
     exit 1
 fi
@@ -103,9 +104,9 @@ eval "set -- ${saveargs}"
 &#x40;
 
 &lt;&lt;call compiler>>=
-eval "set -- ${CC} ${CFLAGS} ${LDFLAGS} -o'&lt;&lt;$0>>'"
-nofake-exec.sh --error -L -R'$0.c' -o'&lt;&lt;$0>>.c' \
-    "${thisprog}" -- "$@"
+set -- "${thisprog}"
+eval "set -- "'"$@"'" -- ${CC} ${CFLAGS} ${LDFLAGS} -o'${progid}'"
+nofake-exec.sh --error -L -R'$0.c' -o"${progid}.c" "$@"
 &#x40;
 
 &lt;&lt;pedantic CFLAGS options for gcc>>=
@@ -119,7 +120,8 @@ set -- "$@" -Werror -fmax-errors=5
 &lt;&lt;pedantic>>=
 #!/bin/sh
 set -eu
-thisprog='&lt;&lt;$0>>.sh'
+progid='&lt;&lt;$0>>'
+thisprog="${progid}.sh"
 CC=gcc
 LDFLAGS=
 set --
@@ -211,9 +213,10 @@ main(int argc, char **argv)
 &#x40;
 
 &lt;&lt;prog>>=
-thisprog=${1}; shift # the initial script
+progid='&lt;&lt;$0>>'
+thisprog=${1}; shift # progid with called path
 thisprefix=${thisprog%.sh};
-if [ "x${thisprefix##*/}" != x'&lt;&lt;$0>>' ]; then
+if [ "x${thisprefix##*/}" != "x${progid}" ]; then
     echo 'Error, fix @&lt;&lt;$0>>.' 1>&amp;2
     exit 1
 fi
@@ -225,9 +228,9 @@ eval "set -- ${saveargs}"
 &#x40;
 
 &lt;&lt;call compiler>>=
-eval "set -- ${CC} ${CFLAGS} ${LDFLAGS} -o'&lt;&lt;$0>>'"
-nofake-exec.sh --error -L -R'$0.c' -o'&lt;&lt;$0>>.c' \
-    "${thisprog}" -- "$@"
+set -- "${thisprog}"
+eval "set -- "'"$@"'" -- ${CC} ${CFLAGS} ${LDFLAGS} -o'${progid}'"
+nofake-exec.sh --error -L -R'$0.c' -o"${progid}.c" "$@"
 &#x40;
 
 &lt;&lt;pedantic CFLAGS options for gcc>>=
@@ -241,7 +244,8 @@ set -- "$@" -Werror -fmax-errors=5
 &lt;&lt;pedantic>>=
 #!/bin/sh
 set -eu
-thisprog='&lt;&lt;$0>>.sh'
+progid='&lt;&lt;$0>>'
+thisprog="${progid}.sh"
 CC=gcc
 LDFLAGS=
 set --

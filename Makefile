@@ -28,3 +28,4 @@ pages: unlink-draft-pages
 	$(MAKE) -C 'pages/2024/2024-02-05_12h00m11_hello-worlds'
 	$(MAKE) -C 'pages/2024/2024-02-10_10h47m46_slackware64-13.37_from_2011_on_qemu_v8.1.3'
 	$(MAKE) -C 'pages/2024/2024-02-15_15h49m59_ieee754·aka_floats_and_doubles·qnans_and_snans'
+	$(MAKE) -C 'pages/2024/2024-02-21_18h37m27_dag64·dag_encoding·64bit'

@@ -45,9 +45,10 @@ main(int argc, char **argv)
 @
 
 <<prog>>=
-thisprog=${1}; shift # the initial script
+progid='<<$0>>'
+thisprog=${1}; shift # progid with called path
 thisprefix=${thisprog%.sh};
-if [ "x${thisprefix##*/}" != x'<<$0>>' ]; then
+if [ "x${thisprefix##*/}" != "x${progid}" ]; then
     echo 'Error, fix @<<$0>>.' 1>&2
     exit 1
 fi
@@ -59,9 +60,9 @@ eval "set -- ${saveargs}"
 @
 
 <<call compiler>>=
-eval "set -- ${CC} ${CFLAGS} ${LDFLAGS} -o'<<$0>>'"
-nofake-exec.sh --error -L -R'$0.c' -o'<<$0>>.c' \
-    "${thisprog}" -- "$@"
+set -- "${thisprog}"
+eval "set -- "'"$@"'" -- ${CC} ${CFLAGS} ${LDFLAGS} -o'${progid}'"
+nofake-exec.sh --error -L -R'$0.c' -o"${progid}.c" "$@"
 @
 
 <<pedantic CFLAGS options for gcc>>=
@@ -75,7 +76,8 @@ set -- "$@" -Werror -fmax-errors=5
 <<pedantic>>=
 #!/bin/sh
 set -eu
-thisprog='<<$0>>.sh'
+progid='<<$0>>'
+thisprog="${progid}.sh"
 CC=gcc
 LDFLAGS=
 set --
