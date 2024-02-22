@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<title>ctarbi.de - dag64 · dag encoding · 64bit</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=0.6">
+<link rel="canonical" href="https://ctarbide.github.io/pages/2024/2024-02-21_18h37m27_dag64·dag_encoding·64bit/index.html">
+<link rel="icon" href="../../../favicon.ico" type="image/x-icon">
+<style>
+pre {
+    font-family: "Lucida Console", Courier, monospace;
+    font-size: 14pt;
+}
+code {
+    font-family: "Lucida Console", Courier, monospace;
+    font-size: 14pt;
+}
+body {
+    width: 90ch;
+    max-width: calc(100vw - 8ch);
+    margin: 3ch auto 6ch auto;
+    font-family: Georgia, "Bitstream Charter", serif;
+    font-size: 14pt;
+}
+</style>
+<h1>ctarbi.de - dag64 · dag encoding · 64bit</h1>
+
+<p><em>Denormals Are Gone</em> encoding for IEEE754 doubles, because they, the
+subnormals, are <a href="#references">not good</a> anyway.</p>
+
+<p>This is the product of a <a href="../../2024/2024-02-15_15h49m59_ieee754·aka_floats_and_doubles·qnans_and_snans/">detailed observation</a> of
+IEEE754 format.</p>
+
+<h2>Remapped Ranges</h2>
+
+<pre><code>            zero -&gt; 0x0000000000000000 -&gt; 0.000000e+00 (int) 0
+               1 -&gt; 0x0000000000000001 -&gt; 1.000000e+00 (int) 1
+        2^51 - 1 -&gt; 0x0007ffffffffffff -&gt; 2.251800e+15 (int) 2251799813685247
+        2^52 - 1 -&gt; 0x000fffffffffffff -&gt; -1.000000e+00 (int) 4503599627370495 or -1
+        custom 1 -&gt; 0x0011111111111111 -&gt; -nan (custom 1) 0x1111111111111
+(+) first normal -&gt; 0x0020000000000000 -&gt; 2.225074e-308 (normal)
+ (+) last normal -&gt; 0x7fffffffffffffff -&gt; 1.797693e+308 (normal)
+(-) first normal -&gt; 0x8000000000000000 -&gt; -2.225074e-308 (normal)
+ (-) last normal -&gt; 0xffdfffffffffffff -&gt; -1.797693e+308 (normal)
+        custom 2 -&gt; 0xffe2222222222222 -&gt; -nan (custom 2) 0x2222222222222
+            dnan -&gt; 0xfff0000000000000 -&gt; -nan (special 0: -nan)
+            +inf -&gt; 0xfff0000000000001 -&gt; inf (special 1: inf)
+            -inf -&gt; 0xfff0000000000002 -&gt; -inf (special 2: -inf)
+</code></pre>
+
+<h2>Glossary</h2>
+
+<ul>
+<li><p><code>normal</code>: nonzero floating point numbers using normalized mantissa</p></li>
+<li><p><code>custom 1</code>: custom values with exponent <code>0x001</code> with all the <code>0..(2^52-1)</code>
+range available</p></li>
+<li><p><code>custom 2</code>: custom values with exponent <code>0xffe</code> with all the <code>0..(2^52-1)</code>
+range available</p></li>
+<li><p><code>dnan</code>: default system <code>NaN</code>, usually <code>-qNaN</code>, i.e.,
+<code>0xfff8000000000000</code>, configurable</p></li>
+<li><p><code>+inf</code>: positive infinity</p></li>
+<li><p><code>-inf</code>: negative infinity</p></li>
+<li><p><code>special</code>: enumerated values using exponent <code>0xfff</code>, holds at least
+<code>+inf</code>, <code>-inf</code> and <code>dnan</code> for equivalency with other important IEEE754
+standard values</p>
+
+<ul>
+<li>can be used to represent true, false, nil, undefined variables, built-in
+subroutines, low-level/system exceptions etc</li>
+</ul></li>
+</ul>
+
+<h2>Comparing against original format</h2>
+
+<ul>
+<li><p>only positive zero was maintained</p>
+
+<ul>
+<li>negative zero is also gone</li>
+</ul></li>
+<li><p>integers took place of subnormals</p></li>
+<li><p>normals exponents are rebiased and are now contiguous in the whole range</p></li>
+<li><p><code>+infinity</code> and <code>-ininity</code> become a special value instead of having a
+dedicated exponent</p></li>
+<li><p>all <code>NaN</code>s that existed sharing the same exponent of <code>infinity</code> are gone and
+there is only one <code>NaN</code> represented as a special value <code>dnan</code></p></li>
+</ul>
+
+<h2>Features</h2>
+
+<ul>
+<li><p>verbatim 52-bits integers, trivial to implement a two's complement system</p>
+
+<ul>
+<li>demonstrated in the <code>2^52 - 1</code> case above</li>
+</ul></li>
+<li><p>specific double values (including <code>sNaN</code>s) can be produced from special values</p></li>
+</ul>
+
+<h2>Key Functions</h2>
+
+<h3><code>dag64</code></h3>
+
+<pre><code>void
+dag64(void)
+{
+    show_long_bits("zero", create_double(0, 0, 0, 0));
+    show_long_bits("1", create_double(0, 0, 0, 1));
+    show_long_bits("2^51 - 1", create_double(0, 0, 0x7ffff, 0xffffffff));
+    show_long_bits("2^52 - 1", create_double(0, 0, 0xfffff, 0xffffffff));
+
+    show_long_bits("custom 1", create_custom_1(0x11111, 0x11111111).d);
+
+    show_long_bits("(+) first normal", create_normal(0, E_MIN, 0, 0).d);
+    show_long_bits("(+) last normal",  create_normal(0, E_MAX, 0xfffff, 0xffffffff).d);
+    show_long_bits("(-) first normal", create_normal(1, E_MIN, 0, 0).d);
+    show_long_bits("(-) last normal",  create_normal(1, E_MAX, 0xfffff, 0xffffffff).d);
+
+    show_long_bits("custom 2", create_custom_2(0x22222, 0x22222222).d);
+
+    show_long_bits("dnan", create_special(SPECIAL_DNAN).d);
+    show_long_bits("+inf", create_special(SPECIAL_P_INF).d);
+    show_long_bits("-inf", create_special(SPECIAL_N_INF).d);
+}
+</code></pre>
+
+<h3><code>show_long_bits</code></h3>
+
+<pre><code>void
+show_long_bits(char *label, double x)
+{
+    char buf[100];
+    union double_value dv;
+    uint32_t hi12;
+
+    dv.d = x;
+    hi12 = dv.u32.hi &amp; HI12_MASK;
+
+    snprintf(buf, sizeof buf, "exhaustion");
+
+    if (hi12 == 0) {
+        int64_t i = (int64_t)((dv.u ^ BIT_52_SET) - BIT_52_SET);
+        if (i &lt; 0) {
+            snprintf(buf, sizeof buf, "(int) %"PRId64" or %"PRId64, dv.i, i);
+        } else {
+            snprintf(buf, sizeof buf, "(int) %"PRId64, i);
+        }
+    } else if (hi12 == ((uint32_t)EAS_CUSTOM_1 &lt;&lt; 20)) {
+        uint64_t payload = dv.u &amp; LO52_MASK;
+        snprintf(buf, sizeof buf, "(custom 1) 0x%013"PRIx64, payload);
+    } else if (hi12 == ((uint32_t)EAS_SPECIAL &lt;&lt; 20)) {
+        unsigned idx = dv.u32.lo &amp; SPECIALS_ARRAY_MASK;
+        snprintf(buf, sizeof buf, "(special %d: %f)", idx, specials[idx].d);
+    } else if (hi12 == ((uint32_t)EAS_CUSTOM_2 &lt;&lt; 20)) {
+        uint64_t payload = dv.u &amp; LO52_MASK;
+        snprintf(buf, sizeof buf, "(custom 2) 0x%013"PRIx64, payload);
+    } else {
+        snprintf(buf, sizeof buf, "(normal)");
+    }
+
+    printf("%16.16s -&gt; 0x%.016"PRIx64" -&gt; %e %s\n",
+        label, dv.u, as_double(dv.d), buf);
+}
+</code></pre>
+
+<h2>Sources Listing</h2>
+
+<ul>
+<li><p><a href="config.nw">config.nw</a></p></li>
+<li><p><a href="plumbing.nw">plumbing.nw</a></p></li>
+<li><p><a href="common.nw">common.nw</a></p></li>
+<li><p><a href="dag64.nw">dag64.nw</a></p></li>
+<li><p><a href="dag64_out.nw">dag64_out.nw</a></p></li>
+<li><p><a href="dag64.sh">dag64.sh</a></p></li>
+<li><p><a href="dag64.c">dag64.c</a></p></li>
+</ul>
+
+<h2 id="references">References</h2>
+
+<ul>
+<li><p><em>On Subnormal Floating Point and Abnormal Timing</em></p>
+
+<ul>
+<li><p>Andrysco, Marc and Kohlbrenner, David and Mowery, Keaton and Jhala,
+Ranjit and Lerner, Sorin and Shacham, Hovav.</p></li>
+<li><p>2015 IEEE Symposium on Security and Privacy</p></li>
+<li><p><a href="https://homes.cs.washington.edu/~dkohlbre/papers/subnormal-slides.pdf">https://homes.cs.washington.edu/~dkohlbre/papers/subnormal-slides.pdf</a></p></li>
+<li><p><a href="https://homes.cs.washington.edu/~dkohlbre/papers/subnormal.pdf">https://homes.cs.washington.edu/~dkohlbre/papers/subnormal.pdf</a></p></li>
+</ul></li>
+</ul>
+
+<p>More details in the link below.</p>
+<p> This <a href="README.txt">page</a> was last modified on February 22, 2024 at 02:10:28 UTC.
+
+<!-- Generated in 0.118 seconds on February 22, 2024 at 02:10:50 UTC. -->
