@@ -16,26 +16,11 @@ dag64
 @
 
 <<sources>>=
-config.nw plumbing.nw common.nw dag64.nw
+<<$0>>.sh <<$0>>.nw config.nw plumbing.nw common.nw
 @
 
 <<try this>>=
 ./hello-c.sh a 'b c' ' ${d} '
-@
-
-<<$0.c>>=
-<<c standards>>
-<<includes>>
-<<definitions>>
-<<unions>>
-<<protos>>
-<<impl>>
-int
-main(int argc, char **argv)
-{
-    dag64();
-    return 0;
-}
 @
 
 <<prog>>=
@@ -58,8 +43,7 @@ make # update index.html
 @
 
 <<call compiler>>=
-set -- "${thisprog}" <<sources>>
-eval "set -- "'"$@"'" -- ${CC} ${CFLAGS} ${LDFLAGS} -o'<<$0>>'"
+eval "set -- <<sources>> -- ${CC} ${CFLAGS} ${LDFLAGS} -o'<<$0>>'"
 nofake-exec.sh --error -L -R'$0.c' -o'<<$0>>.c' "$@"
 @
 
@@ -84,6 +68,6 @@ CFLAGS=`for arg; do printf -- " '%s'" "${arg}"; done`
 @
 
 <<*>>=
-nofake --error -Rpedantic '<<$0>>.sh' <<sources>> | sh &&
+nofake --error -Rpedantic <<sources>> | sh &&
     ./'<<$0>>'
 @

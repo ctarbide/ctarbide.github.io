@@ -15,8 +15,12 @@ This is a live literate program.
 hello-c
 @
 
+<<sources>>=
+<<$0>>.sh
+@
+
 <<try this>>=
-./hello-c.sh a 'b c' ' ${d} '
+./<<$0>>.sh a 'b c' ' ${d} '
 @
 
 <<$0.c>>=
@@ -34,7 +38,7 @@ main(int argc, char **argv)
         i++;
     }
     if (i) {
-        printf("got %d bytes on standard input\n", i);
+        printf("got %d bytes from standard input\n", i);
     }
     for (i=0; i < argc; i++) {
         fprintf(stdout, "[%d:%s]\n", i, argv[i]);
@@ -60,8 +64,7 @@ eval "set -- ${saveargs}"
 @
 
 <<call compiler>>=
-set -- "${thisprog}"
-eval "set -- "'"$@"'" -- ${CC} ${CFLAGS} ${LDFLAGS} -o'${progid}'"
+eval "set -- <<sources>> -- ${CC} ${CFLAGS} ${LDFLAGS} -o'${progid}'"
 nofake-exec.sh --error -L -R'$0.c' -o"${progid}.c" "$@"
 @
 
@@ -87,7 +90,7 @@ CFLAGS=`for arg; do printf -- " '%s'" "${arg}"; done`
 @
 
 <<*>>=
-nofake --error -Rpedantic '<<$0>>.sh' | sh && seq 10 | ./'<<$0>>' a 'b c' ' ${d} '
+nofake --error -Rpedantic <<sources>> | sh && seq 10 | ./'<<$0>>' a 'b c' ' ${d} '
 @
 
 <<c standards>>=

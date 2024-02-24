@@ -20,29 +20,29 @@
 #include <math.h>
 /* #include <fcntl.h> */
 /* #include <unistd.h> */
-#line 101 "common.nw"
-#define DBLEXP(x) (1023+(x))
-#define DBLEXP_NORMALIZE(x) ((x)-1023)
-#line 3 "dag64.nw"
+#line 19 "dag64.nw"
 #define HI12_MASK 0xfff00000
 #define LO52_MASK 0x000fffffffffffff
 #define BIT_52_SET ((uint64_t)1 << (52 - 1))
-#line 9 "dag64.nw"
+#line 25 "dag64.nw"
 #define SPECIALS_ARRAY_MASK 0x3
-#line 120 "dag64.nw"
+#line 136 "dag64.nw"
 #define E_BITS 11
 #define E_MAX ((1<<(E_BITS-1))-1)
 #define E_MIN (1 - E_MAX)
 #define E_RANGE_PER_SIGNAL (E_MAX - E_MIN + 1)
 #define E_BIAS_START 0x002
 #define E_BIAS_END (E_RANGE_PER_SIGNAL * 2 - 1 + E_BIAS_START)
-#line 171 "dag64.nw"
+#line 187 "dag64.nw"
 #define EAS_CUSTOM_1 0x001
 #define EAS_CUSTOM_2 0xffe
 #define EAS_SPECIAL 0xfff
 #define SPECIAL_DNAN 0, 0
 #define SPECIAL_P_INF 0, 1
 #define SPECIAL_N_INF 0, 2
+#line 101 "common.nw"
+#define DBLEXP(x) (1023+(x))
+#define DBLEXP_NORMALIZE(x) ((x)-1023)
 #line 59 "common.nw"
 union double_value {
 #line 16 "common.nw"
@@ -69,56 +69,34 @@ union double_value {
     int64_t i;
     uint64_t u;
 };
-#line 106 "common.nw"
-double
-create_double(unsigned sign, unsigned bexp, uint32_t hi20, uint32_t lo32);
-#line 126 "common.nw"
-double
-machine_epsilon(double x);
-#line 22 "dag64.nw"
+#line 38 "dag64.nw"
 void
 show_long_bits(char *label, double x);
-#line 69 "dag64.nw"
+#line 85 "dag64.nw"
 double
 as_double(double);
-#line 109 "dag64.nw"
+#line 125 "dag64.nw"
 union double_value
 create_normal(unsigned sign, int exp, uint32_t hi20, uint32_t lo32);
-#line 148 "dag64.nw"
+#line 164 "dag64.nw"
 union double_value
 create_special(uint32_t hi20, uint32_t lo32);
 union double_value
 create_custom_1(uint32_t hi20, uint32_t lo32);
 union double_value
 create_custom_2(uint32_t hi20, uint32_t lo32);
-#line 262 "dag64.nw"
+#line 278 "dag64.nw"
 void
 dag64(void);
+#line 106 "common.nw"
+double
+create_double(unsigned sign, unsigned bexp, uint32_t hi20, uint32_t lo32);
+#line 126 "common.nw"
+double
+machine_epsilon(double x);
 #line 75 "common.nw"
 union double_value dnan = {{ 0, 0x80000, DBLEXP(1024), 1 }};
-#line 113 "common.nw"
-double
-create_double(unsigned sign, unsigned bexp, uint32_t hi20, uint32_t lo32)
-{
-    union double_value x;
-    x.parts.sign = sign & 0x1;
-    x.parts.bexp = bexp & 0x7ff;
-    x.parts.hi20 = hi20 & 0xfffff;
-    x.parts.lo32 = lo32;
-    return x.d;
-}
-#line 131 "common.nw"
-double
-machine_epsilon(double x)
-{
-    union double_value v;
-    v.d = x;
-    /* v.parts.lo32++; */
-    /* return v.parts.sign ? x - v.d : v.d - x; */
-    v.i++;
-    return v.i < 0 ? x - v.d : v.d - x;
-}
-#line 13 "dag64.nw"
+#line 29 "dag64.nw"
 union double_value specials[SPECIALS_ARRAY_MASK + 1] = {
 #line 75 "common.nw"
     {{ 0, 0x80000, DBLEXP(1024), 1 }},
@@ -129,7 +107,7 @@ union double_value specials[SPECIALS_ARRAY_MASK + 1] = {
 #line 75 "common.nw"
     {{ 0, 0x80000, DBLEXP(1024), 1 }}
 };
-#line 27 "dag64.nw"
+#line 43 "dag64.nw"
 void
 show_long_bits(char *label, double x)
 {
@@ -165,7 +143,7 @@ show_long_bits(char *label, double x)
     printf("%16.16s -> 0x%.016"PRIx64" -> %e %s\n",
         label, dv.u, as_double(dv.d), buf);
 }
-#line 74 "dag64.nw"
+#line 90 "dag64.nw"
 double
 as_double(double x)
 {
@@ -198,7 +176,7 @@ as_double(double x)
 
     return out.d;
 }
-#line 129 "dag64.nw"
+#line 145 "dag64.nw"
 union double_value
 create_normal(unsigned sign, int exp, uint32_t hi20, uint32_t lo32)
 {
@@ -215,7 +193,7 @@ create_normal(unsigned sign, int exp, uint32_t hi20, uint32_t lo32)
     }
     return x;
 }
-#line 180 "dag64.nw"
+#line 196 "dag64.nw"
 union double_value
 create_special(uint32_t hi20, uint32_t lo32)
 {
@@ -243,7 +221,7 @@ create_custom_2(uint32_t hi20, uint32_t lo32)
     x.normal.lo32 = lo32;
     return x;
 }
-#line 267 "dag64.nw"
+#line 283 "dag64.nw"
 void
 dag64(void)
 {
@@ -269,7 +247,29 @@ dag64(void)
     show_long_bits("+inf", create_special(SPECIAL_P_INF).d);
     show_long_bits("-inf", create_special(SPECIAL_N_INF).d);
 }
-#line 33 "./dag64.sh"
+#line 113 "common.nw"
+double
+create_double(unsigned sign, unsigned bexp, uint32_t hi20, uint32_t lo32)
+{
+    union double_value x;
+    x.parts.sign = sign & 0x1;
+    x.parts.bexp = bexp & 0x7ff;
+    x.parts.hi20 = hi20 & 0xfffff;
+    x.parts.lo32 = lo32;
+    return x.d;
+}
+#line 131 "common.nw"
+double
+machine_epsilon(double x)
+{
+    union double_value v;
+    v.d = x;
+    /* v.parts.lo32++; */
+    /* return v.parts.sign ? x - v.d : v.d - x; */
+    v.i++;
+    return v.i < 0 ? x - v.d : v.d - x;
+}
+#line 10 "dag64.nw"
 int
 main(int argc, char **argv)
 {

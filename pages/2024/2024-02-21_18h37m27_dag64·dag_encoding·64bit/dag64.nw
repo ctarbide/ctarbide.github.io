@@ -1,4 +1,20 @@
 
+<<$0.c>>=
+<<c standards>>
+<<includes>>
+<<definitions>>
+<<unions>>
+<<protos>>
+<<globals>>
+<<impl>>
+int
+main(int argc, char **argv)
+{
+    dag64();
+    return 0;
+}
+@
+
 <<definitions>>=
 #define HI12_MASK 0xfff00000
 #define LO52_MASK 0x000fffffffffffff

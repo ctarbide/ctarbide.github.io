@@ -91,7 +91,7 @@ union double_value {
 0, 0, DBLEXP(1024), 1
 @
 
-<<impl>>=
+<<globals>>=
 union double_value dnan = {{ <<static initialized default nan>> }};
 @
 
