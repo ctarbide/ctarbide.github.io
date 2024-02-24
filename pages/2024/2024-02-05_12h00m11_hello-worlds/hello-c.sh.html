@@ -59,8 +59,12 @@ This is a live literate program.
 hello-c
 &#x40;
 
+&lt;&lt;sources>>=
+&lt;&lt;$0>>.sh
+&#x40;
+
 &lt;&lt;try this>>=
-./hello-c.sh a 'b c' ' ${d} '
+./&lt;&lt;$0>>.sh a 'b c' ' ${d} '
 &#x40;
 
 &lt;&lt;$0.c>>=
@@ -78,7 +82,7 @@ main(int argc, char **argv)
         i++;
     }
     if (i) {
-        printf("got %d bytes on standard input\n", i);
+        printf("got %d bytes from standard input\n", i);
     }
     for (i=0; i &lt; argc; i++) {
         fprintf(stdout, "[%d&colon;%s]\n", i, argv[i]);
@@ -104,8 +108,7 @@ eval "set -- ${saveargs}"
 &#x40;
 
 &lt;&lt;call compiler>>=
-set -- "${thisprog}"
-eval "set -- "'"$@"'" -- ${CC} ${CFLAGS} ${LDFLAGS} -o'${progid}'"
+eval "set -- &lt;&lt;sources>> -- ${CC} ${CFLAGS} ${LDFLAGS} -o'${progid}'"
 nofake-exec.sh --error -L -R'$0.c' -o"${progid}.c" "$@"
 &#x40;
 
@@ -131,7 +134,7 @@ CFLAGS=`for arg; do printf -- " '%s'" "${arg}"; done`
 &#x40;
 
 &lt;&lt;*>>=
-nofake --error -Rpedantic '&lt;&lt;$0>>.sh' | sh &amp;&amp; seq 10 | ./'&lt;&lt;$0>>' a 'b c' ' ${d} '
+nofake --error -Rpedantic &lt;&lt;sources>> | sh &amp;&amp; seq 10 | ./'&lt;&lt;$0>>' a 'b c' ' ${d} '
 &#x40;
 
 &lt;&lt;c standards>>=
@@ -183,8 +186,12 @@ This is a live literate program.
 hello-c
 &#x40;
 
+&lt;&lt;sources>>=
+&lt;&lt;$0>>.sh
+&#x40;
+
 &lt;&lt;try this>>=
-./hello-c.sh a 'b c' ' ${d} '
+./&lt;&lt;$0>>.sh a 'b c' ' ${d} '
 &#x40;
 
 &lt;&lt;$0.c>>=
@@ -202,7 +209,7 @@ main(int argc, char **argv)
         i++;
     }
     if (i) {
-        printf("got %d bytes on standard input\n", i);
+        printf("got %d bytes from standard input\n", i);
     }
     for (i=0; i &lt; argc; i++) {
         fprintf(stdout, "[%d&colon;%s]\n", i, argv[i]);
@@ -228,8 +235,7 @@ eval "set -- ${saveargs}"
 &#x40;
 
 &lt;&lt;call compiler>>=
-set -- "${thisprog}"
-eval "set -- "'"$@"'" -- ${CC} ${CFLAGS} ${LDFLAGS} -o'${progid}'"
+eval "set -- &lt;&lt;sources>> -- ${CC} ${CFLAGS} ${LDFLAGS} -o'${progid}'"
 nofake-exec.sh --error -L -R'$0.c' -o"${progid}.c" "$@"
 &#x40;
 
@@ -255,7 +261,7 @@ CFLAGS=`for arg; do printf -- " '%s'" "${arg}"; done`
 &#x40;
 
 &lt;&lt;*>>=
-nofake --error -Rpedantic '&lt;&lt;$0>>.sh' | sh &amp;&amp; seq 10 | ./'&lt;&lt;$0>>' a 'b c' ' ${d} '
+nofake --error -Rpedantic &lt;&lt;sources>> | sh &amp;&amp; seq 10 | ./'&lt;&lt;$0>>' a 'b c' ' ${d} '
 &#x40;
 
 &lt;&lt;c standards>>=
