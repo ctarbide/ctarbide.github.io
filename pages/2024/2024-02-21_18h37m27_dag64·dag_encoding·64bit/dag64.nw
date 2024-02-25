@@ -39,7 +39,7 @@ void
 show_long_bits(char *label, double x);
 @
 
-<<show_long_bits()>>=
+<<show_long_bits() - version 2024-02-22 - original version>>=
 void
 show_long_bits(char *label, double x)
 {
@@ -68,6 +68,63 @@ show_long_bits(char *label, double x)
     } else if (hi12 == ((uint32_t)EAS_CUSTOM_2 << 20)) {
         uint64_t payload = dv.u & LO52_MASK;
         snprintf(buf, sizeof buf, "(custom 2) 0x%013"PRIx64, payload);
+    } else {
+        snprintf(buf, sizeof buf, "(normal)");
+    }
+
+    printf("%16.16s -> 0x%.016"PRIx64" -> %e %s\n",
+        label, dv.u, as_double(dv.d), buf);
+}
+@
+
+I am doing this version in the hope that the modern c compiler will generate
+the jump tables for the exhaustive, sequential/continuous/dense, well behaved
+and bounded switch case below.
+
+And, for the record, jump tables [are fast][FAST].
+
+[FAST]: https://github.com/ctarbide/computed-gotos
+
+<<show_long_bits()>>=
+void
+show_long_bits(char *label, double x)
+{
+    char buf[100];
+    union double_value dv;
+    uint32_t type;
+
+    dv.d = x;
+    type = (dv.u32.hi + 0x00200000u) >> 20u;
+
+    if (type < 4u) {
+        /* type in [0,3], right? */
+        enum { CUSTOM_2, SPECIAL, INTEGER, CUSTOM_1 } type_e = type;
+        switch (type_e) {
+        case INTEGER: {
+                int64_t i = (int64_t)((dv.u ^ BIT_52_SET) - BIT_52_SET);
+                if (i < 0) {
+                    snprintf(buf, sizeof buf, "(int) %"PRId64" or %"PRId64, dv.i, i);
+                } else {
+                    snprintf(buf, sizeof buf, "(int) %"PRId64, i);
+                }
+            }
+            break;
+        case CUSTOM_1: {
+                uint64_t payload = dv.u & LO52_MASK;
+                snprintf(buf, sizeof buf, "(custom 1) 0x%013"PRIx64, payload);
+            }
+            break;
+        case CUSTOM_2: {
+                uint64_t payload = dv.u & LO52_MASK;
+                snprintf(buf, sizeof buf, "(custom 2) 0x%013"PRIx64, payload);
+            }
+            break;
+        case SPECIAL: {
+                unsigned idx = dv.u32.lo & SPECIALS_ARRAY_MASK;
+                snprintf(buf, sizeof buf, "(special %d: %f)", idx, specials[idx].d);
+            }
+            break;
+        }
     } else {
         snprintf(buf, sizeof buf, "(normal)");
     }

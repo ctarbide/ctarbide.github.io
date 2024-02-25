@@ -26,14 +26,14 @@
 #define BIT_52_SET ((uint64_t)1 << (52 - 1))
 #line 25 "dag64.nw"
 #define SPECIALS_ARRAY_MASK 0x3
-#line 136 "dag64.nw"
+#line 193 "dag64.nw"
 #define E_BITS 11
 #define E_MAX ((1<<(E_BITS-1))-1)
 #define E_MIN (1 - E_MAX)
 #define E_RANGE_PER_SIGNAL (E_MAX - E_MIN + 1)
 #define E_BIAS_START 0x002
 #define E_BIAS_END (E_RANGE_PER_SIGNAL * 2 - 1 + E_BIAS_START)
-#line 187 "dag64.nw"
+#line 244 "dag64.nw"
 #define EAS_CUSTOM_1 0x001
 #define EAS_CUSTOM_2 0xffe
 #define EAS_SPECIAL 0xfff
@@ -72,20 +72,20 @@ union double_value {
 #line 38 "dag64.nw"
 void
 show_long_bits(char *label, double x);
-#line 85 "dag64.nw"
+#line 142 "dag64.nw"
 double
 as_double(double);
-#line 125 "dag64.nw"
+#line 182 "dag64.nw"
 union double_value
 create_normal(unsigned sign, int exp, uint32_t hi20, uint32_t lo32);
-#line 164 "dag64.nw"
+#line 221 "dag64.nw"
 union double_value
 create_special(uint32_t hi20, uint32_t lo32);
 union double_value
 create_custom_1(uint32_t hi20, uint32_t lo32);
 union double_value
 create_custom_2(uint32_t hi20, uint32_t lo32);
-#line 278 "dag64.nw"
+#line 335 "dag64.nw"
 void
 dag64(void);
 #line 106 "common.nw"
@@ -107,35 +107,46 @@ union double_value specials[SPECIALS_ARRAY_MASK + 1] = {
 #line 75 "common.nw"
     {{ 0, 0x80000, DBLEXP(1024), 1 }}
 };
-#line 43 "dag64.nw"
+#line 89 "dag64.nw"
 void
 show_long_bits(char *label, double x)
 {
     char buf[100];
     union double_value dv;
-    uint32_t hi12;
+    uint32_t type;
 
     dv.d = x;
-    hi12 = dv.u32.hi & HI12_MASK;
+    type = (dv.u32.hi + 0x00200000u) >> 20u;
 
-    snprintf(buf, sizeof buf, "exhaustion");
-
-    if (hi12 == 0) {
-        int64_t i = (int64_t)((dv.u ^ BIT_52_SET) - BIT_52_SET);
-        if (i < 0) {
-            snprintf(buf, sizeof buf, "(int) %"PRId64" or %"PRId64, dv.i, i);
-        } else {
-            snprintf(buf, sizeof buf, "(int) %"PRId64, i);
+    if (type < 4u) {
+        /* type in [0,3], right? */
+        enum { CUSTOM_2, SPECIAL, INTEGER, CUSTOM_1 } type_e = type;
+        switch (type_e) {
+        case INTEGER: {
+                int64_t i = (int64_t)((dv.u ^ BIT_52_SET) - BIT_52_SET);
+                if (i < 0) {
+                    snprintf(buf, sizeof buf, "(int) %"PRId64" or %"PRId64, dv.i, i);
+                } else {
+                    snprintf(buf, sizeof buf, "(int) %"PRId64, i);
+                }
+            }
+            break;
+        case CUSTOM_1: {
+                uint64_t payload = dv.u & LO52_MASK;
+                snprintf(buf, sizeof buf, "(custom 1) 0x%013"PRIx64, payload);
+            }
+            break;
+        case CUSTOM_2: {
+                uint64_t payload = dv.u & LO52_MASK;
+                snprintf(buf, sizeof buf, "(custom 2) 0x%013"PRIx64, payload);
+            }
+            break;
+        case SPECIAL: {
+                unsigned idx = dv.u32.lo & SPECIALS_ARRAY_MASK;
+                snprintf(buf, sizeof buf, "(special %d: %f)", idx, specials[idx].d);
+            }
+            break;
         }
-    } else if (hi12 == ((uint32_t)EAS_CUSTOM_1 << 20)) {
-        uint64_t payload = dv.u & LO52_MASK;
-        snprintf(buf, sizeof buf, "(custom 1) 0x%013"PRIx64, payload);
-    } else if (hi12 == ((uint32_t)EAS_SPECIAL << 20)) {
-        unsigned idx = dv.u32.lo & SPECIALS_ARRAY_MASK;
-        snprintf(buf, sizeof buf, "(special %d: %f)", idx, specials[idx].d);
-    } else if (hi12 == ((uint32_t)EAS_CUSTOM_2 << 20)) {
-        uint64_t payload = dv.u & LO52_MASK;
-        snprintf(buf, sizeof buf, "(custom 2) 0x%013"PRIx64, payload);
     } else {
         snprintf(buf, sizeof buf, "(normal)");
     }
@@ -143,7 +154,7 @@ show_long_bits(char *label, double x)
     printf("%16.16s -> 0x%.016"PRIx64" -> %e %s\n",
         label, dv.u, as_double(dv.d), buf);
 }
-#line 90 "dag64.nw"
+#line 147 "dag64.nw"
 double
 as_double(double x)
 {
@@ -176,7 +187,7 @@ as_double(double x)
 
     return out.d;
 }
-#line 145 "dag64.nw"
+#line 202 "dag64.nw"
 union double_value
 create_normal(unsigned sign, int exp, uint32_t hi20, uint32_t lo32)
 {
@@ -193,7 +204,7 @@ create_normal(unsigned sign, int exp, uint32_t hi20, uint32_t lo32)
     }
     return x;
 }
-#line 196 "dag64.nw"
+#line 253 "dag64.nw"
 union double_value
 create_special(uint32_t hi20, uint32_t lo32)
 {
@@ -221,7 +232,7 @@ create_custom_2(uint32_t hi20, uint32_t lo32)
     x.normal.lo32 = lo32;
     return x;
 }
-#line 283 "dag64.nw"
+#line 340 "dag64.nw"
 void
 dag64(void)
 {

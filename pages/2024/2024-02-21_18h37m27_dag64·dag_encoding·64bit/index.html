@@ -129,29 +129,40 @@ show_long_bits(char *label, double x)
 {
     char buf[100];
     union double_value dv;
-    uint32_t hi12;
+    uint32_t type;
 
     dv.d = x;
-    hi12 = dv.u32.hi &amp; HI12_MASK;
+    type = (dv.u32.hi + 0x00200000u) &gt;&gt; 20u;
 
-    snprintf(buf, sizeof buf, "exhaustion");
-
-    if (hi12 == 0) {
-        int64_t i = (int64_t)((dv.u ^ BIT_52_SET) - BIT_52_SET);
-        if (i &lt; 0) {
-            snprintf(buf, sizeof buf, "(int) %"PRId64" or %"PRId64, dv.i, i);
-        } else {
-            snprintf(buf, sizeof buf, "(int) %"PRId64, i);
+    if (type &lt; 4u) {
+        /* type in [0,3], right? */
+        enum { CUSTOM_2, SPECIAL, INTEGER, CUSTOM_1 } type_e = type;
+        switch (type_e) {
+        case INTEGER: {
+                int64_t i = (int64_t)((dv.u ^ BIT_52_SET) - BIT_52_SET);
+                if (i &lt; 0) {
+                    snprintf(buf, sizeof buf, "(int) %"PRId64" or %"PRId64, dv.i, i);
+                } else {
+                    snprintf(buf, sizeof buf, "(int) %"PRId64, i);
+                }
+            }
+            break;
+        case CUSTOM_1: {
+                uint64_t payload = dv.u &amp; LO52_MASK;
+                snprintf(buf, sizeof buf, "(custom 1) 0x%013"PRIx64, payload);
+            }
+            break;
+        case CUSTOM_2: {
+                uint64_t payload = dv.u &amp; LO52_MASK;
+                snprintf(buf, sizeof buf, "(custom 2) 0x%013"PRIx64, payload);
+            }
+            break;
+        case SPECIAL: {
+                unsigned idx = dv.u32.lo &amp; SPECIALS_ARRAY_MASK;
+                snprintf(buf, sizeof buf, "(special %d: %f)", idx, specials[idx].d);
+            }
+            break;
         }
-    } else if (hi12 == ((uint32_t)EAS_CUSTOM_1 &lt;&lt; 20)) {
-        uint64_t payload = dv.u &amp; LO52_MASK;
-        snprintf(buf, sizeof buf, "(custom 1) 0x%013"PRIx64, payload);
-    } else if (hi12 == ((uint32_t)EAS_SPECIAL &lt;&lt; 20)) {
-        unsigned idx = dv.u32.lo &amp; SPECIALS_ARRAY_MASK;
-        snprintf(buf, sizeof buf, "(special %d: %f)", idx, specials[idx].d);
-    } else if (hi12 == ((uint32_t)EAS_CUSTOM_2 &lt;&lt; 20)) {
-        uint64_t payload = dv.u &amp; LO52_MASK;
-        snprintf(buf, sizeof buf, "(custom 2) 0x%013"PRIx64, payload);
     } else {
         snprintf(buf, sizeof buf, "(normal)");
     }
@@ -190,4 +201,4 @@ Ranjit and Lerner, Sorin and Shacham, Hovav.</p></li>
 <p>More details in the link below.</p>
 <p> This <a href="README.txt">page</a> was last modified on February 24, 2024 at 18:37:42 UTC.
 
-<!-- Generated in 0.119 seconds on February 24, 2024 at 18:37:46 UTC. -->
+<!-- Generated in 0.121 seconds on February 25, 2024 at 15:51:42 UTC. -->
