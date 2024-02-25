@@ -23,6 +23,7 @@ done
 
 STAMP=${stamp}
 ITEM_ID=${item_id}
+ITEM_URI=`perl -MURI::Escape -sle'print uri_escape($n)' -- -n="${ITEM_ID}"`
 DOC_ID=${stamp}_${item_id}
 DOCRELDIR=${year}/${DOC_ID}
 DOCABSDIR=${kbdir}/${DOCRELDIR}
@@ -71,12 +72,20 @@ ${STAMP}
 ${ITEM_ID}
 @
 
+<<ITEM_URI>>=
+${ITEM_URI}
+@
+
 <<PAGE DIR>>=
 ${kbdir_ftl}/<<YEAR>>/<<STAMP>>_<<ITEM_ID>>
 @
 
+<<PAGE URI>>=
+${kbdir_ftl}/<<YEAR>>/<<STAMP>>_<<ITEM_URI>>
+@
+
 <<URL PREFIX>>=
-<<assets - base url>><<PAGE DIR>>
+<<assets - base url>><<PAGE URI>>
 @
 
 <<CANONICAL URL>>=
@@ -85,7 +94,7 @@ ${kbdir_ftl}/<<YEAR>>/<<STAMP>>_<<ITEM_ID>>
 
 <<*>>=
 <<sh preamble>>
-if git-file-is-pristine.sh README.txt; then
+if git-file-is-pristine.sh <<PRIMARY SOURCES>>; then
     rm -f .draft
 else
     date '+%Y-%m-%d_%Hh%Mm%S' > .draft

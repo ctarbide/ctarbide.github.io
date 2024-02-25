@@ -109,16 +109,18 @@ find pages/ -mindepth 3 -maxdepth 3 -name .draft -type f
 @
 
 <<generate pages listing>>=
-<<find pages - Makefile>> | LC_ALL=C sort -r | perl -le'
+<<find pages - Makefile>> | LC_ALL=C sort -r | perl -MURI::Escape -le'
     printf(qq{@<<pages listing>>=\n});
     printf(qq{<ul>\n});
     while (<STDIN>) {
         chomp;
-        s,/Makefile$,,;
+        next unless m{^(.*/)(.*?)/Makefile$};
+        $_ = $1 . $2;
         next if -f qq{${_}/.hidden};
         next unless m{^( pages/ [12]\d{3} / ) (.*)$}xi;
         my ($date, $item) = ($1, $2);
-        print(qq{<li><p><a href="${_}/">${item}</a></p></li>});
+        my $url = $date . uri_escape($item);
+        print(qq{<li><p><a href="${url}/">${item}</a></p></li>});
     }
     printf(qq{</ul>\n});
     printf(qq{@\n});'
@@ -141,8 +143,8 @@ chmod 0444 pages.nw
     printf(qq{@<<make pages>>=\n});
     while (<STDIN>) {
         chomp;
-        s,/Makefile$,,;
-        print(qq{\t\$(MAKE) -C \047${_}\047});
+        next unless m{^(.*)/Makefile$};
+        print(qq{\t\$(MAKE) -C \047${1}\047});
     }
     printf(qq{@\n});'
 ) | CHMOD='chmod 0444' nofake.sh --error -RMakefile -oMakefile index.nw -
