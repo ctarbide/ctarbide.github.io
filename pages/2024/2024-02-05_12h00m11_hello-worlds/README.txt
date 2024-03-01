@@ -1,4 +1,8 @@
 
+<<PRIMARY SOURCES>>=
+<<TOP>>/assets.nw README.txt htmlify-all-hellos.sh hello-*.sh
+@
+
 <<body in markdown>>=
 <h1><<TITLE>></h1>
 
@@ -72,9 +76,6 @@ else
     git reset --quiet -- index.html
 fi
 nofake --error -Rrender <<PRIMARY SOURCES>> | sh
-@
-<<PRIMARY SOURCES>>=
-<<TOP>>/assets.nw README.txt hello-*.sh htmlify-all-hellos.sh
 @
 
 <<TOP>>=
@@ -177,7 +178,6 @@ cat <<PRIMARY SOURCES>>
 @
 
 <<update (or not) .index.html from primary sources>>=
-./htmlify-all-hellos.sh
 nofake --error -Rgenerate <<PRIMARY SOURCES>> | sh | gzip > .cache
 (
     gzip -dc .cache
@@ -192,6 +192,7 @@ nofake --error -Rgenerate <<PRIMARY SOURCES>> | sh | gzip > .cache
 <<render>>=
 <<sh preamble>>
 <<set $t0>>
+./htmlify-all-hellos.sh
 <<update (or not) .index.html from primary sources>>
 <<update (or not) index.html from .index.html>>
 @

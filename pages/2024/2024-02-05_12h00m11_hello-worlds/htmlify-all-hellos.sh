@@ -15,12 +15,12 @@ the processing then goes to 'htmlify all hellos and thisprog'
 thisprog=${1} # the initial script
 mainprog=${0}
 primsrcs=`nofake --error -R'PRIMARY SOURCES' README.txt`
-set -- "${thisprog}" ${primsrcs} --ba-- "$@" ${primsrcs} --ea--
+set -- ${primsrcs} --ba-- ${thisprog} ${primsrcs} --ea--
 nofake-exec.sh --error -R'htmlify all hellos and thisprog' "$@" -- "${SH}" -eu
 @
 
 <<htmlify all hellos and thisprog>>=
-thisprog=${1} # the initial script
+thisprog=${1}; shift # the initial script
 <<asset - function escape>>
 for i in "${thisprog}" hello-*.sh; do
     i=${i#./}
