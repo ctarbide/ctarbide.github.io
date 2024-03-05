@@ -102,6 +102,7 @@ else
 fi
 nofake --error -Rrender @<<PRIMARY SOURCES>> | sh
 @@
+
 EOF
 
 if [ "x${on_top_level}" = x1 ]; then
