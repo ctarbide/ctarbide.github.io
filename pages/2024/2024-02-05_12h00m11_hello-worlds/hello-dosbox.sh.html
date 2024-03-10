@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<style>
+pre {
+    font-family: "Lucida Console", Courier, monospace;
+    font-size: 14pt;
+}
+code {
+    font-family: "Lucida Console", Courier, monospace;
+    font-size: 14pt;
+}
+body {
+    width: 90ch;
+    max-width: calc(100vw - 8ch);
+    margin: 3ch auto 6ch auto;
+    font-family: Georgia, "Bitstream Charter", serif;
+    font-size: 14pt;
+}
+</style>
+<h3><a href="index.html">index.html</a></h3>
+
+<h3><a href="README.txt">README.txt</a></h3>
+
+<h3>Code for <a href="hello-dosbox.sh"><code>hello-dosbox.sh</code></a>:</h3>
+
+<pre style="margin-left: 3ch;"><code>#!/bin/sh
+# https&colon;//ctarbide.github.io/pages/2024/2024-02-05_12h00m11_hello-worlds/
+# https&colon;//github.com/ctarbide/coolscripts/blob/master/bin/nofake-exec.nw
+set -eu; set -- "${0}" --ba-- "${0}" "$@" --ea--
+set -- "$@" --tmp-- .nw
+SH=${SH&colon;-sh}; export SH
+DOSBOX=${DOSBOX&colon;-dosbox}; export DOSBOX
+KBLAYOUT=${KBLAYOUT&colon;-us}; export KBLAYOUT
+exec nofake-exec.sh --error -Rprog "$@" -- "${SH}" -eu
+exit 1
+
+This is a live literate program.
+
+&lt;&lt;autoexec>>=
+mount c "&lt;&lt;CWD>>"
+c&colon;
+dir hello-~1.sh
+echo "hello world!"
+&#x40;
+
+&lt;&lt;prog>>=
+thisprog=${1}; shift
+setnw(){ printf -- '@&lt;&lt;%s>>=\n%s\n@\n' "${1}" "${2}" >>"${0}.nw"; }
+setnw KBLAYOUT "${KBLAYOUT}" 
+setnw CWD "`pwd`"
+exec nofake-exec.sh --error -Rconf "${thisprog}" "${0}.nw" -- "${DOSBOX}" -conf
+&#x40;
+
+&lt;&lt;conf>>=
+[dos]
+keyboardlayout=&lt;&lt;KBLAYOUT>>
+[autoexec]
+&lt;&lt;autoexec>>
+&#x40;
+</code></pre>
