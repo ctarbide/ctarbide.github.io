@@ -15,11 +15,24 @@ code {
     font-size: 14pt;
 }
 body {
+    color: #111;
     width: 90ch;
     max-width: calc(100vw - 8ch);
     margin: 3ch auto 6ch auto;
     font-family: Georgia, "Bitstream Charter", serif;
     font-size: 14pt;
+}
+@media (prefers-color-scheme: dark) {
+    body {
+        color: #fbfbfe;
+        background-color: #1c1b22;
+    }
+    a:visited {
+        color: #aac;
+    }
+    a {
+        color: #6af;
+    }
 }
 </style>
 <h1>ctarbi.de - compiling cmucl 2023-08 on a void-live-i686 vm</h1>
@@ -323,4 +336,4 @@ bin/make-dist.sh -V 2023-08 -I dist linux-4
 </ul>
 <p> This <a href="README.txt">page</a> was last modified on February 16, 2024 at 18:07:46 UTC.
 
-<!-- Generated in 0.059 seconds on February 16, 2024 at 18:07:58 UTC. -->
+<!-- Generated in 0.074 seconds on March 18, 2024 at 14:39:31 UTC. -->

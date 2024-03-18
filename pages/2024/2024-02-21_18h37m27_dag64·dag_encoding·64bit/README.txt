@@ -86,7 +86,7 @@ pages/<<YEAR>>/<<STAMP>>_<<ITEM_ID>>
 
 <<*>>=
 <<sh preamble>>
-if git-file-is-pristine.sh README.txt; then
+if git-file-is-pristine.sh <<PRIMARY SOURCES>>; then
     rm -f .draft
 else
     date '+%Y-%m-%d_%Hh%Mm%S' > .draft

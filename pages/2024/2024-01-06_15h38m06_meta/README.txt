@@ -235,11 +235,25 @@ pages/<<md.pl from pages>>
 @
 
 <<style - body>>=
+color: #111;
 width: 90ch;
 max-width: calc(100vw - 8ch);
 margin: 3ch auto 6ch auto;
 font-family: Georgia, "Bitstream Charter", serif;
 font-size: 14pt;
+@
+
+<<style - prefers dark color scheme>>=
+body {
+    color: #fbfbfe;
+    background-color: #1c1b22;
+}
+a:visited {
+    color: #aac;
+}
+a {
+    color: #6af;
+}
 @
 
 <<style - monospace font>>=
@@ -258,6 +272,9 @@ code {
 }
 body {
     <<style - body>>
+}
+@@media (prefers-color-scheme: dark) {
+    <<style - prefers dark color scheme>>
 }
 </style>
 @@

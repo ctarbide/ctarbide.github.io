@@ -10,11 +10,24 @@ code {
     font-size: 14pt;
 }
 body {
+    color: #111;
     width: 90ch;
     max-width: calc(100vw - 8ch);
     margin: 3ch auto 6ch auto;
     font-family: Georgia, "Bitstream Charter", serif;
     font-size: 14pt;
+}
+@media (prefers-color-scheme: dark) {
+    body {
+        color: #fbfbfe;
+        background-color: #1c1b22;
+    }
+    a:visited {
+        color: #aac;
+    }
+    a {
+        color: #6af;
+    }
 }
 </style>
 <h3><a href="index.html">index.html</a></h3>

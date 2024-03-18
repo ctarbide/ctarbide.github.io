@@ -33,7 +33,7 @@ done
 @
 
 <<htmlify "${i}">>=
-test -f index.html && printf -- '### [index.html](index.html)\n\n'
+printf -- '### [index.html](index.html)\n\n'
 test -f README.txt && printf -- '### [README.txt](README.txt)\n\n'
 test -f README.html && printf -- '### [README.html](README.html)\n\n'
 printf '**** Code for [`%s`](%s):\n\n' "${i}" "${i}"

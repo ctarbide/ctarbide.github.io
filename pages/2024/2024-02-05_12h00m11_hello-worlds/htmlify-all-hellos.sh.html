@@ -10,11 +10,24 @@ code {
     font-size: 14pt;
 }
 body {
+    color: #111;
     width: 90ch;
     max-width: calc(100vw - 8ch);
     margin: 3ch auto 6ch auto;
     font-family: Georgia, "Bitstream Charter", serif;
     font-size: 14pt;
+}
+@media (prefers-color-scheme: dark) {
+    body {
+        color: #fbfbfe;
+        background-color: #1c1b22;
+    }
+    a:visited {
+        color: #aac;
+    }
+    a {
+        color: #6af;
+    }
 }
 </style>
 <h3><a href="index.html">index.html</a></h3>
@@ -58,7 +71,7 @@ done
 &#x40;
 
 &lt;&lt;htmlify "${i}">>=
-test -f index.html &amp;&amp; printf -- '### [index.html](index.html)\n\n'
+printf -- '### [index.html](index.html)\n\n'
 test -f README.txt &amp;&amp; printf -- '### [README.txt](README.txt)\n\n'
 test -f README.html &amp;&amp; printf -- '### [README.html](README.html)\n\n'
 printf '**** Code for [`%s`](%s)&colon;\n\n' "${i}" "${i}"
