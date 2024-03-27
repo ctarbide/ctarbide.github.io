@@ -1,0 +1,68 @@
+
+Copyright (c) 2024 by C. Tarbide. You may do as you please with
+this code as long as you do not remove this copyright notice or
+hold me liable for its use.
+
+<<c standards>>=
+#ifndef _BSD_SOURCE
+#define _BSD_SOURCE
+#endif
+
+#ifndef _ISOC99_SOURCE
+#define _ISOC99_SOURCE
+#endif
+
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE 600
+#endif
+
+#ifndef _POSIX_C_SOURCE
+#define _POSIX_C_SOURCE 200112L
+#endif
+@
+
+<<includes>>=
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <inttypes.h>
+#include <string.h>
+#include <math.h>
+#include <ctype.h>
+#include <limits.h>
+#include <stdarg.h>
+/* #include <fcntl.h> */
+/* #include <unistd.h> */
+@
+
+<<macros>>=
+/* placeholder */
+@
+
+<<enums>>=
+/* placeholder */
+@
+
+<<unions>>=
+/* placeholder */
+@
+
+<<globals>>=
+/* placeholder */
+@
+
+<<globals initialization>>=
+/* placeholder */
+@
+
+<<definitions>>=
+/* placeholder */
+@
+
+<<structs>>=
+/* placeholder */
+@
+
+<<main variables>>=
+/* placeholder */
+@

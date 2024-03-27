@@ -1,0 +1,24 @@
+
+<<protos>>=
+void hello(void);
+@
+
+<<impl>>=
+void
+hello(void)
+{
+    <<WIP>>
+    <<TRACE HERE>>
+    <<trace usage example>>
+}
+@
+
+<<main impl>>=
+hello();
+@
+
+<<trace usage example>>=
+<<TRACE BEGIN>> "hello %s!"
+<<TRACE ARGS:>> "world"
+<<TRACE END>>
+@

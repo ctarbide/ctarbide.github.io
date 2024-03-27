@@ -1,0 +1,90 @@
+
+<<header>>=
+/* Copyright (c) 2024 by C. Tarbide. You may do as you please with
+ * this code as long as you do not remove this copyright notice or
+ * hold me liable for its use.
+ *
+ * generated from:
+<<generated from>>
+ */
+@
+
+<<generated from>>=
+- wip.nw: TODO: brief description
+@
+
+<<impl>>=
+int
+main(int argc, char **argv)
+{
+    <<main variables>>
+    <<globals initialization>>
+    <<main impl>>
+    return 0;
+}
+@
+
+<<wip.c>>=
+<<header>>
+<<c standards>>
+<<includes>>
+<<definitions>>
+<<macros>>
+<<enums>>
+<<structs>>
+<<unions>>
+<<protos>>
+<<globals>>
+<<impl>>
+@
+
+<<targets>>=
+wip.c
+wip
+@
+
+run ./build.sh everytime you change 'wip.c deps' below
+
+<<wip.c deps>>=
+config.nw wip.nw plumbing.nw hello.nw debug.nw reallocarray.nw
+@
+
+<<build 'wip.c'>>=
+nofake.sh --error -L -R'wip.c' -o'wip.c' <<indented 'wip.c' deps>>
+perl -lni -e'
+    next if m{^\#line \s+ \d+ \s+ " (?: <<no #line for>> ).nw" $}xi;
+    print;
+' wip.c
+@
+
+<<wip deps>>=
+<<wip.c deps>>
+@
+
+<<set build PEDANTIC>>=
+set -- "$@" -ansi -pedantic
+set -- "$@" -Wall -Wextra -Wdeclaration-after-statement
+set -- "$@" -Wstrict-prototypes -Wmissing-prototypes
+set -- "$@" -Wno-unused-parameter
+set -- "$@" -Werror -fmax-errors=3
+@
+
+<<build 'wip' STANDARD>>=
+gcc -Wall -O2 -owip wip.c
+@
+
+<<build 'wip' DEBUG>>=
+gcc -Wall -O0 -g -owip wip.c
+@
+
+<<build 'wip' PEDANTIC>>=
+set -- -O2
+<<set build PEDANTIC>>
+gcc "$@" -owip wip.c
+@
+
+<<build 'wip' PEDANTIC DEBUG>>=
+set -- -O0 -g
+<<set build PEDANTIC>>
+gcc "$@" -owip wip.c
+@

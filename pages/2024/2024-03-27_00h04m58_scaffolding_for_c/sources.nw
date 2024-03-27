@@ -1,0 +1,11 @@
+
+automatically generated from Makefile.nw
+
+<<set sources>>=
+set -- "$@" 'config.nw'
+set -- "$@" 'wip.nw'
+set -- "$@" 'plumbing.nw'
+set -- "$@" 'hello.nw'
+set -- "$@" 'debug.nw'
+set -- "$@" 'reallocarray.nw'
+@

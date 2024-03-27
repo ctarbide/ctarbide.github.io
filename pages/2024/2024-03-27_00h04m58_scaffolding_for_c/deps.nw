@@ -1,0 +1,30 @@
+
+automatically generated from Makefile.nw
+
+<<set 'wip.c' deps>>=
+set -- "$@" 'config.nw'
+set -- "$@" 'wip.nw'
+set -- "$@" 'plumbing.nw'
+set -- "$@" 'hello.nw'
+set -- "$@" 'debug.nw'
+set -- "$@" 'reallocarray.nw'
+@
+
+<<indented 'wip.c' deps>>=
+    config.nw wip.nw plumbing.nw \
+    hello.nw debug.nw reallocarray.nw
+@
+
+<<set 'wip' deps>>=
+set -- "$@" 'config.nw'
+set -- "$@" 'wip.nw'
+set -- "$@" 'plumbing.nw'
+set -- "$@" 'hello.nw'
+set -- "$@" 'debug.nw'
+set -- "$@" 'reallocarray.nw'
+@
+
+<<indented 'wip' deps>>=
+    config.nw wip.nw plumbing.nw \
+    hello.nw debug.nw reallocarray.nw
+@

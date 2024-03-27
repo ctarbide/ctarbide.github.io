@@ -1,0 +1,7 @@
+
+automatically generated from Makefile.nw
+
+<<set targets>>=
+set -- "$@" 'wip.c'
+set -- "$@" 'wip'
+@

@@ -1,0 +1,11 @@
+
+<<no #line for>>=
+debug | sanity-check
+@
+
+<<build 'wip'>>=
+#@<<build 'wip' STANDARD>>
+#@<<build 'wip' DEBUG>>
+#@<<build 'wip' PEDANTIC DEBUG>>
+<<build 'wip' PEDANTIC>>
+@
