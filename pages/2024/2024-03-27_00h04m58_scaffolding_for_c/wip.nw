@@ -65,6 +65,9 @@ perl -lni -e'
 set -- "$@" -ansi -pedantic
 set -- "$@" -Wall -Wextra -Wdeclaration-after-statement
 set -- "$@" -Wstrict-prototypes -Wmissing-prototypes
+set -- "$@" -Wredundant-decls
+set -- "$@" -Wshadow
+set -- "$@" -Wpointer-arith
 set -- "$@" -Wno-unused-parameter
 set -- "$@" -Werror -fmax-errors=3
 @
