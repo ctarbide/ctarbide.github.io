@@ -2,29 +2,37 @@
 automatically generated from Makefile.nw
 
 <<set 'wip.c' deps>>=
-set -- "$@" 'config.nw'
-set -- "$@" 'wip.nw'
-set -- "$@" 'plumbing.nw'
-set -- "$@" 'hello.nw'
-set -- "$@" 'debug.nw'
-set -- "$@" 'reallocarray.nw'
+set -- "$@" 'config.nw';
+set -- "$@" 'wip.nw';
+set -- "$@" 'plumbing.nw';
+set -- "$@" 'hello.nw';
+set -- "$@" 'debug.nw';
+set -- "$@" 'reallocarray.nw';
+set -- "$@" 'lconcat.nw';
+set -- "$@" 'strlcat.nw';
+set -- "$@" 'strlcpy.nw';
 @
 
 <<indented 'wip.c' deps>>=
     config.nw wip.nw plumbing.nw \
-    hello.nw debug.nw reallocarray.nw
+    hello.nw debug.nw reallocarray.nw \
+    lconcat.nw strlcat.nw strlcpy.nw
 @
 
 <<set 'wip' deps>>=
-set -- "$@" 'config.nw'
-set -- "$@" 'wip.nw'
-set -- "$@" 'plumbing.nw'
-set -- "$@" 'hello.nw'
-set -- "$@" 'debug.nw'
-set -- "$@" 'reallocarray.nw'
+set -- "$@" 'config.nw';
+set -- "$@" 'wip.nw';
+set -- "$@" 'plumbing.nw';
+set -- "$@" 'hello.nw';
+set -- "$@" 'debug.nw';
+set -- "$@" 'reallocarray.nw';
+set -- "$@" 'lconcat.nw';
+set -- "$@" 'strlcat.nw';
+set -- "$@" 'strlcpy.nw';
 @
 
 <<indented 'wip' deps>>=
     config.nw wip.nw plumbing.nw \
-    hello.nw debug.nw reallocarray.nw
+    hello.nw debug.nw reallocarray.nw \
+    lconcat.nw strlcat.nw strlcpy.nw
 @

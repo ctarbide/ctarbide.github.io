@@ -47,6 +47,7 @@ run ./build.sh everytime you change 'wip.c deps' below
 
 <<wip.c deps>>=
 config.nw wip.nw plumbing.nw hello.nw debug.nw reallocarray.nw
+lconcat.nw strlcat.nw strlcpy.nw
 @
 
 <<build 'wip.c'>>=

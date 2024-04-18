@@ -129,8 +129,12 @@ printf '@\n'
 
 <<gen: sources listing>>=
 printf '@<<sources listing>>=\n'
-for i in <<wip.c deps>> Makefile.nw build.sh; do
-    printf -- '- [%s](%s)\n\n' "${i}" "${i}"
+set --
+eval `nofake -R"set 'wip' deps" deps.nw`
+set -- "$@" Makefile.nw build.sh
+deps=`nofake -R'wip.c deps' wip.nw | normalize-args.sh`
+for dep; do
+    printf -- '- [%s](%s)\n\n' "${dep}" "${dep}"
 done
 printf '@\n'
 @

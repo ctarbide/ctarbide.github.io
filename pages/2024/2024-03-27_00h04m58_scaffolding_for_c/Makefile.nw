@@ -39,7 +39,7 @@ nofake --error -R'generate Makefile' <<primary sources>> \
 printf -- '\nautomatically generated from Makefile.nw\n\n'
 printf -- '@<<set sources>>=\n'
 nofake --error -R'other sources' <<primary sources>> |
-    normalize-args.sh | perl -lne'print(qq{set -- "\$\@" ${_}})'
+    normalize-args.sh | perl -lne'print(qq{set -- "\$\@" ${_};})'
 printf -- '@\n'
 @
 
@@ -53,7 +53,7 @@ nofake --error -Rtargets "$@"
 printf -- '\nautomatically generated from Makefile.nw\n\n'
 printf -- '@<<set targets>>=\n'
 nofake --error -R'collect targets' Makefile.nw sources.nw | "${SH}" -eu |
-    normalize-args.sh | perl -lne'print(qq{set -- "\$\@" ${_}})'
+    normalize-args.sh | perl -lne'print(qq{set -- "\$\@" ${_};})'
 printf -- '@\n'
 @
 
@@ -92,7 +92,7 @@ for target; do (
     set --
     <<set sources>>
     nofake --error -R"${target}"' deps' "$@" | normalize-args.sh |
-        perl -lne'print(qq{set -- "\$\@" ${_}})'> "${0}.deps"
+        perl -lne'print(qq{set -- "\$\@" ${_};})'> "${0}.deps"
     <<output set target deps>>
     <<output indented target deps>>
 ); done

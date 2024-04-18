@@ -10,6 +10,10 @@ hello(void)
     <<WIP>>
     <<TRACE HERE>>
     <<trace usage example>>
+    <<concat example>>
+    <<strlcpy example>>
+    <<lconcat example>>
+    <<strlcat example>>
 }
 @
 
@@ -22,3 +26,102 @@ hello();
 <<TRACE ARGS:>> "world"
 <<TRACE END>>
 @
+
+<<hello world!>>=
+"hello", " ", "world", "!"
+@
+
+<<concat example>>=
+{
+    char *str;
+    str = concat(<<hello world!>>, NULL);
+    printf("%d [%s] (%d bytes)\n", __LINE__, str, (int)strlen(str));
+    free(str);
+    str = NULL;
+}
+@
+
+<<strlcpy example>>=
+{
+    char *str;
+    char buf10[10] = {0};
+    char buf20[20] = {0};
+    str = concat(<<hello world!>>, NULL);
+    printf("needed buffer size: %d bytes\n", (int)(lconcat(NULL, 0, <<hello world!>>, NULL) + 1));
+    if (xstrlcpy(buf10, str, sizeof(buf10)) >= sizeof(buf10)) {
+        if (xstrlcpy(buf20, str, sizeof(buf20)) >= sizeof(buf20)) {
+            fprintf(stderr, "%d exhaustion\n", __LINE__);
+            exit(1);
+        }
+        printf("%d [%s] (%d bytes)\n", __LINE__, buf20, (int)strlen(buf20));
+    } else {
+        printf("%d [%s] (%d bytes)\n", __LINE__, buf10, (int)strlen(buf10));
+    }
+    free(str);
+    str = NULL;
+}
+@
+
+<<lconcat example>>=
+{
+    char buf10[10] = {0};
+    char buf20[20] = {0};
+    printf("needed buffer size: %d bytes\n", (int)(lconcat(NULL, 0, <<hello world!>>, NULL) + 1));
+    if (lconcat(buf10, sizeof(buf10), <<hello world!>>, NULL) >= sizeof(buf10)) {
+        if (lconcat(buf20, sizeof(buf20), <<hello world!>>, NULL) >= sizeof(buf20)) {
+            fprintf(stderr, "%d exhaustion\n", __LINE__);
+            exit(1);
+        }
+        printf("%d [%s] (%d bytes)\n", __LINE__, buf20, (int)strlen(buf20));
+    } else {
+        printf("%d [%s] (%d bytes)\n", __LINE__, buf10, (int)strlen(buf10));
+    }
+}
+
+<<strlcat example>>=
+{
+    char *pieces[] = {<<hello world!>>};
+    char buf10[10] = {0};
+    char buf20[20] = {0};
+    char *buf, *piece;
+    int i;
+    size_t nbytes_previous, nbytes = 0, bufsz;
+    buf = buf10;
+    bufsz = sizeof(buf10);
+    for (i=0; i<(int)(sizeof(pieces)/sizeof(*pieces)); i++) {
+        piece = pieces[i];
+        nbytes_previous = nbytes;
+        nbytes = xstrlcat(buf, piece, bufsz);
+        if (nbytes >= bufsz) {
+            char *tmp;
+            if (buf == buf20) {
+                /* nowhere to go */
+                fprintf(stderr, "%d exhaustion\n", __LINE__);
+                exit(1);
+            }
+            /* undo last failed operation */
+            buf[nbytes_previous] = 0;
+            /* increase buffer */
+            tmp = buf;
+            buf = buf20;
+            bufsz = sizeof(buf20);
+            /* retry */
+#if 0
+            if (xstrlcpy(buf, tmp, bufsz) >= bufsz) {
+                fprintf(stderr, "%d exhaustion\n", __LINE__);
+                exit(1);
+            }
+            if (xstrlcat(buf, piece, bufsz) >= bufsz) {
+                fprintf(stderr, "%d exhaustion\n", __LINE__);
+                exit(1);
+            }
+#else
+            if (lconcat(buf, bufsz, tmp, piece, NULL) >= bufsz) {
+                fprintf(stderr, "%d exhaustion\n", __LINE__);
+                exit(1);
+            }
+#endif
+        }
+    }
+    printf("%d [%s] (%d bytes)\n", __LINE__, buf, (int)strlen(buf));
+}

@@ -6,12 +6,14 @@ all: \
 
 wip.c: \
     config.nw wip.nw plumbing.nw \
-    hello.nw debug.nw reallocarray.nw
+    hello.nw debug.nw reallocarray.nw \
+    lconcat.nw strlcat.nw strlcpy.nw
 	nofake-exec.sh --error -R"build 'wip.c'" deps.nw builds.nw $^ --ba-- deps.nw builds.nw $^ --ea-- -- sh -eu
 
 wip: \
     config.nw wip.nw plumbing.nw \
-    hello.nw debug.nw reallocarray.nw
+    hello.nw debug.nw reallocarray.nw \
+    lconcat.nw strlcat.nw strlcpy.nw
 	nofake-exec.sh --error -R"build 'wip'" deps.nw builds.nw $^ --ba-- deps.nw builds.nw $^ --ea-- -- sh -eu
 
 clean:
