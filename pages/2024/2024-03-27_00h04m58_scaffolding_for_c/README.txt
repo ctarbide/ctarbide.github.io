@@ -139,7 +139,7 @@ EOF
 <<function cmd_push_to_argv>>
 <<function list_set_sources>>
 printf '@<<sources listing>>=\n'
-eval "set --; `list_set_sources`"
+eval "set -- 'build.sh'; `list_set_sources`"
 for dep; do
     printf -- '- [%s](%s)\n\n' "${dep}" "${dep}"
 done
