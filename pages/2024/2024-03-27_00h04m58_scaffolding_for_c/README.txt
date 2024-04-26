@@ -58,7 +58,7 @@ nofake --error -Rrender <<PRIMARY SOURCES>> | sh
 @
 
 <<PRIMARY SOURCES>>=
-<<TOP>>/assets.nw README.txt wip.nw
+<<TOP>>/assets.nw README.txt wip.nw Makefile-wip.nw
 @
 
 <<TOP>>=
@@ -127,12 +127,19 @@ printf '@<<base url>>=\n'
 printf '@\n'
 @
 
+<<function list_set_primary_sources>>=
+list_set_primary_sources(){
+    cat<<'EOF' | cmd_push_to_argv
+<<PRIMARY SOURCES>>
+EOF
+}
+@
+
 <<gen: sources listing>>=
+<<function cmd_push_to_argv>>
+<<function list_set_sources>>
 printf '@<<sources listing>>=\n'
-set --
-eval `nofake -R"set 'wip' deps" deps.nw`
-set -- "$@" Makefile.nw build.sh
-deps=`nofake -R'wip.c deps' wip.nw | normalize-args.sh`
+eval "set --; `list_set_sources`"
 for dep; do
     printf -- '- [%s](%s)\n\n' "${dep}" "${dep}"
 done

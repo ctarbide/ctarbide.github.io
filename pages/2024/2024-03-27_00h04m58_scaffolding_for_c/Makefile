@@ -1,4 +1,4 @@
-index.html: ../../../assets.nw README.txt
+index.html: ../../../assets.nw README.txt Makefile-wip.nw wip.nw
 	@nofake --error README.txt | sh
 
 .PHONY: reveal
