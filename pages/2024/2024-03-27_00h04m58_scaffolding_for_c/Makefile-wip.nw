@@ -41,13 +41,14 @@ nofake --error -R'generate Makefile' "$@" | ${SH} ><<Makefile prefix>>
 
 <<function cmd_push_to_argv>>=
 cmd_push_to_argv(){
-    normalize-args.sh | perl -lpe'$_=qq{set -- \042\$\@\042 ${_};}'
+    normalize-args.sh | perl -lpe'$_=qq{set -- \042\$\@\042 ${_};}' |
+        LC_ALL=C sort -u
 }
 @
 
 <<function list_set_sources>>=
 list_set_sources(){
-    cat<<'EOF' | LC_ALL=C sort -u | cmd_push_to_argv
+    cat<<'EOF' | cmd_push_to_argv
 <<sources>>
 EOF
 }

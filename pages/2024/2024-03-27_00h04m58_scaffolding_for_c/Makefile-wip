@@ -13,13 +13,13 @@ TARGETS = \
 all: $(TARGETS)
 
 wip.c: \
-    config.nw wip.nw plumbing.nw hello.nw debug.nw \
-    reallocarray.nw lconcat.nw strlcat.nw strlcpy.nw
+    config.nw debug.nw hello.nw lconcat.nw plumbing.nw \
+    reallocarray.nw strlcat.nw strlcpy.nw wip.nw
 	@nofake --error -R'build wip.c' $(SOURCES) | $(SH)
 
 wip: \
-    config.nw wip.nw plumbing.nw hello.nw debug.nw \
-    reallocarray.nw lconcat.nw strlcat.nw strlcpy.nw
+    config.nw debug.nw hello.nw lconcat.nw plumbing.nw \
+    reallocarray.nw strlcat.nw strlcpy.nw wip.nw
 	@nofake --error -R'build wip' $(SOURCES) | $(SH)
 
 clean:
