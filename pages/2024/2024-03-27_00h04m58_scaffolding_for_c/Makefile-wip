@@ -1,0 +1,27 @@
+
+# automatically generated from Makefile-wip.nw
+
+SH = sh -eu
+
+SOURCES = \
+    Makefile-wip.nw config.nw debug.nw hello.nw lconcat.nw \
+    plumbing.nw reallocarray.nw strlcat.nw strlcpy.nw wip.nw
+
+TARGETS = \
+    wip.c wip
+
+all: $(TARGETS)
+
+wip.c: \
+    config.nw wip.nw plumbing.nw hello.nw debug.nw \
+    reallocarray.nw lconcat.nw strlcat.nw strlcpy.nw
+	@nofake --error -R'build wip.c' $(SOURCES) | $(SH)
+
+wip: \
+    config.nw wip.nw plumbing.nw hello.nw debug.nw \
+    reallocarray.nw lconcat.nw strlcat.nw strlcpy.nw
+	@nofake --error -R'build wip' $(SOURCES) | $(SH)
+
+clean:
+	-rm -f $(TARGETS)
+

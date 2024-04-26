@@ -104,8 +104,10 @@ if (so_far > <<SO_FAR>>) {
 @
 
 <<EXHAUSTION>>=
-<<TRACE HERE, LINE - 1>>
-exhaustion();
+<<TRACE BEGIN>> "exhaustion"
+<<TRACE NO ARGS, LINE - 1>>
+<<TRACE END>>
+exit(1);
 @
 
 <<globals>>=
@@ -173,18 +175,4 @@ debug_get_pointer_name(void *ptr)
 
 <<definitions>>=
 #define DEBUG_POINTER_NAME(PTR) debug_get_pointer_name(PTR)
-@
-
-<<protos>>=
-void
-exhaustion(void);
-@
-
-<<impl>>=
-void
-exhaustion(void)
-{
-    fprintf(stderr, "Exhaustion.\n");
-    exit(1);
-}
 @

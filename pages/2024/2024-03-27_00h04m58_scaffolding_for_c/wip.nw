@@ -39,27 +39,33 @@ main(int argc, char **argv)
 @
 
 <<targets>>=
-wip.c
-wip
+set -- "$@" wip.c
+set -- "$@" wip
 @
 
 run ./build.sh everytime you change 'wip.c deps' below
 
 <<wip.c deps>>=
-config.nw wip.nw plumbing.nw hello.nw debug.nw reallocarray.nw
-lconcat.nw strlcat.nw strlcpy.nw
-@
-
-<<build 'wip.c'>>=
-nofake.sh --error -L -R'wip.c' -o'wip.c' <<indented 'wip.c' deps>>
-perl -lni -e'
-    next if m{^\#line \s+ \d+ \s+ " (?: <<no #line for>> ).nw" $}xi;
-    print;
-' wip.c
+config.nw wip.nw plumbing.nw hello.nw debug.nw
+reallocarray.nw lconcat.nw strlcat.nw strlcpy.nw
 @
 
 <<wip deps>>=
 <<wip.c deps>>
+@
+
+<<build wip.c>>=
+list_set_deps(){
+cat<<'EOF' | normalize-args.sh | perl -lpe'$_=qq{set -- \042\$\@\042 ${_};}'
+<<wip.c deps>>
+EOF
+}
+eval "set --; `list_set_deps`"
+nofake.sh --error -L -R'wip.c' -o'wip.c' "$@"
+perl -lni -e'
+    next if m{^\#line \s+ \d+ \s+ " (?: <<no #line for>> ).nw" $}xi;
+    print;
+' wip.c
 @
 
 <<set build PEDANTIC>>=
@@ -73,22 +79,29 @@ set -- "$@" -Wno-unused-parameter
 set -- "$@" -Werror -fmax-errors=3
 @
 
-<<build 'wip' STANDARD>>=
+<<build wip - STANDARD>>=
 gcc -Wall -O2 -owip wip.c
 @
 
-<<build 'wip' DEBUG>>=
+<<build wip - DEBUG>>=
 gcc -Wall -O0 -g -owip wip.c
 @
 
-<<build 'wip' PEDANTIC>>=
+<<build wip - PEDANTIC>>=
 set -- -O2
 <<set build PEDANTIC>>
 gcc "$@" -owip wip.c
 @
 
-<<build 'wip' PEDANTIC DEBUG>>=
+<<build wip - PEDANTIC DEBUG>>=
 set -- -O0 -g
 <<set build PEDANTIC>>
 gcc "$@" -owip wip.c
+@
+
+<<build wip>>=
+#@<<build wip - STANDARD>>
+#@<<build wip - DEBUG>>
+#@<<build wip - PEDANTIC DEBUG>>
+<<build wip - PEDANTIC>>
 @

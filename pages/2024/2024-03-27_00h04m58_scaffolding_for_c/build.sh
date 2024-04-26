@@ -1,5 +1,6 @@
 #!/bin/sh
+# automatically generated from Makefile-wip.nw
 set -eu
-SH=${SH:-sh}; export SH
-nofake Makefile.nw | "${SH}" > Makefile.wip
-make -f Makefile.wip
+SH=${SH:-sh -eu}; export SH
+nofake --error Makefile-wip.nw | ${SH}
+make -f Makefile-wip

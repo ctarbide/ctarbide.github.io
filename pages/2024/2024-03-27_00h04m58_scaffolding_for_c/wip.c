@@ -72,8 +72,6 @@ int
 debug_set_pointer_name(void *ptr, char *name);
 char *
 debug_get_pointer_name(void *ptr);
-void
-exhaustion(void);
 #line 30 "reallocarray.nw"
 void *
 xreallocarray(void *optr, size_t nmemb, size_t size);
@@ -293,12 +291,6 @@ debug_get_pointer_name(void *ptr)
     }
     snprintf(g_debug_data.buf, sizeof(g_debug_data.buf), "(unknown %p)", ptr);
     return g_debug_data.buf;
-}
-void
-exhaustion(void)
-{
-    fprintf(stderr, "Exhaustion.\n");
-    exit(1);
 }
 #line 35 "reallocarray.nw"
 void *

@@ -1,0 +1,125 @@
+
+Copyright (c) 2024 by C. Tarbide. You may do as you please with
+this code as long as you do not remove this copyright notice or
+hold me liable for its use.
+
+Limit the responsibilities of Makefile and delegate the heavy work back to
+sh/nofake as soon as possible.
+
+To generate/update Makefile, simply do:
+
+    nofake Makefile-wip.nw | sh
+
+<<Makefile prefix>>=
+Makefile-wip
+@
+
+<<sources>>=
+<<Makefile prefix>>.nw
+config.nw
+debug.nw
+hello.nw
+lconcat.nw
+plumbing.nw
+reallocarray.nw
+strlcat.nw
+strlcpy.nw
+wip.nw
+@
+
+<<*>>=
+#!/bin/sh
+set -eu
+SH=${SH:-sh -eu}; export SH
+<<function cmd_push_to_argv>>
+<<function list_set_sources>>
+set -- <<Makefile prefix>>.nw
+nofake --error -R'generate build.sh' "$@" | ${SH}
+eval "set --; `list_set_sources`"
+nofake --error -R'generate Makefile' "$@" | ${SH} ><<Makefile prefix>>
+@
+
+<<function cmd_push_to_argv>>=
+cmd_push_to_argv(){
+    normalize-args.sh | perl -lpe'$_=qq{set -- \042\$\@\042 ${_};}'
+}
+@
+
+<<function list_set_sources>>=
+list_set_sources(){
+    cat<<'EOF' | cmd_push_to_argv
+<<sources>>
+EOF
+}
+@
+
+<<function indent_args>>=
+indent_args(){
+    perl -le'
+        sub backslash(){ scalar(@ARGV) ? q{ \\} : q{} }
+        while (my @a = splice(@ARGV, 0, 5)) {
+            print(q{    }, join(q{ }, @a), backslash);
+        }' -- "$@"
+}
+@
+
+<<indent "$@">>=
+indent_args "$@"
+@
+
+<<output SH= and SOURCES=>>=
+eval "set --; ${set_sources}"
+printf -- 'SH = %s\n\nSOURCES = \\\n' "${SH}"
+<<indent "$@">>
+@
+
+<<output TARGETS=>>=
+set --
+<<targets>>
+printf -- '\nTARGETS = \\\n'
+<<indent "$@">>
+@
+
+<<output all:>>=
+printf -- '\nall: $(TARGETS)\n\n'
+for target; do
+    printf '%s: \\\n' "${target}"
+    (
+        eval "set --; ${set_sources}"
+        set_deps=`nofake --error -R"${target} deps" "$@" | cmd_push_to_argv`
+        eval "set --; ${set_deps}"
+        <<indent "$@">>
+        printf -- '\t@nofake --error -R'"'"'build '"${target}'"' $(SOURCES) | $(SH)\n\n'
+    )
+done
+@
+
+<<generate Makefile>>=
+#!/bin/sh
+set -eu
+SH=${SH:-sh -eu}; export SH
+<<function cmd_push_to_argv>>
+<<function list_set_sources>>
+<<function indent_args>>
+printf -- '\n# automatically generated from <<Makefile prefix>>.nw\n\n'
+set_sources=`list_set_sources`
+<<output SH= and SOURCES=>>
+<<output TARGETS=>>
+<<output all:>>
+printf -- 'clean:\n\t-rm -f $(TARGETS)\n\n'
+@
+
+<<generate build.sh>>=
+#!/bin/sh
+set -eu
+CHMOD='chmod 0555' nofake.sh --error -Rbuild.sh -obuild.sh <<Makefile prefix>>.nw
+@
+
+<<build.sh>>=
+#!/bin/sh
+# automatically generated from <<Makefile prefix>>.nw
+set -eu
+SH=${SH:-sh -eu}; export SH
+nofake --error <<Makefile prefix>>.nw | ${SH}
+make -f <<Makefile prefix>>
+@
