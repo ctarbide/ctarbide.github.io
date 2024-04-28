@@ -4,8 +4,7 @@
 SH = sh -eu
 
 SOURCES = \
-    Makefile-wip.nw config.nw debug.nw hello.nw lconcat.nw \
-    plumbing.nw reallocarray.nw strlcat.nw strlcpy.nw wip.nw
+    Makefile-wip.nw wip.nw
 
 TARGETS = \
     wip.c wip
@@ -15,12 +14,12 @@ all: $(TARGETS)
 wip.c: \
     config.nw debug.nw hello.nw lconcat.nw plumbing.nw \
     reallocarray.nw strlcat.nw strlcpy.nw wip.nw
-	@nofake --error -R'build wip.c' $(SOURCES) | $(SH)
+	nofake --error -R'build wip.c' $^ | $(SH)
 
 wip: \
     config.nw debug.nw hello.nw lconcat.nw plumbing.nw \
-    reallocarray.nw strlcat.nw strlcpy.nw wip.nw
-	@nofake --error -R'build wip' $(SOURCES) | $(SH)
+    reallocarray.nw strlcat.nw strlcpy.nw wip.c wip.nw
+	nofake --error -R'build wip' $^ | $(SH)
 
 clean:
 	-rm -f $(TARGETS)

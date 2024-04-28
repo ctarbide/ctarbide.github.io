@@ -127,19 +127,21 @@ printf '@<<base url>>=\n'
 printf '@\n'
 @
 
-<<function list_set_primary_sources>>=
-list_set_primary_sources(){
+<<function list_set_downloadable_sources>>=
+list_set_downloadable_sources(){
     cat<<'EOF' | cmd_push_to_argv
-<<PRIMARY SOURCES>>
+build.sh
+Makefile-wip.nw
+<<wip.c deps>>
 EOF
 }
 @
 
 <<gen: sources listing>>=
 <<function cmd_push_to_argv>>
-<<function list_set_sources>>
+<<function list_set_downloadable_sources>>
 printf '@<<sources listing>>=\n'
-eval "set -- 'build.sh'; `list_set_sources`"
+eval "set --; `list_set_downloadable_sources`"
 for dep; do
     printf -- '- [%s](%s)\n\n' "${dep}" "${dep}"
 done

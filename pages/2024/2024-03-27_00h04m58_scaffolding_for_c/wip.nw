@@ -51,7 +51,7 @@ reallocarray.nw lconcat.nw strlcat.nw strlcpy.nw
 @
 
 <<wip deps>>=
-<<wip.c deps>>
+<<wip.c deps>> wip.c
 @
 
 <<build wip.c>>=
