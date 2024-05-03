@@ -46,6 +46,7 @@ set -- "$@" wip
 run ./build.sh everytime you change 'wip.c deps' below
 
 <<wip.c deps>>=
+<<Makefile prefix>>.nw
 config.nw wip.nw plumbing.nw hello.nw debug.nw
 reallocarray.nw lconcat.nw strlcat.nw strlcpy.nw
 @
@@ -54,18 +55,32 @@ reallocarray.nw lconcat.nw strlcat.nw strlcpy.nw
 <<wip.c deps>> wip.c
 @
 
-<<build wip.c>>=
+<<function list_set_deps - wip.c>>=
 list_set_deps(){
-cat<<'EOF' | normalize-args.sh | perl -lpe'$_=qq{set -- \042\$\@\042 ${_};}'
+    cat<<'EOF' | cmd_push_to_argv
 <<wip.c deps>>
 EOF
 }
+@
+
+Filter out specific #line directives.
+
+<<function no_line_for>>=
+no_line_for(){
+   perl -lni -e'
+       next if m{^\#line \s+ \d+ \s+ " (?: <<no #line for>> ).nw " $}xi;
+       print;
+   ' -- "$@"
+}
+@
+
+<<build wip.c>>=
+<<function cmd_push_to_argv>>
+<<function list_set_deps - wip.c>>
+<<function no_line_for>>
 eval "set --; `list_set_deps`"
 nofake.sh --error -L -R'wip.c' -o'wip.c' "$@"
-perl -lni -e'
-    next if m{^\#line \s+ \d+ \s+ " (?: <<no #line for>> ).nw" $}xi;
-    print;
-' wip.c
+no_line_for wip.c
 @
 
 <<set build PEDANTIC>>=

@@ -14,20 +14,17 @@
 #ifndef _BSD_SOURCE
 #define _BSD_SOURCE
 #endif
-
 #ifndef _ISOC99_SOURCE
 #define _ISOC99_SOURCE
 #endif
-
 #ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 600
 #endif
-
 #ifndef _POSIX_C_SOURCE
 #define _POSIX_C_SOURCE 200112L
 #endif
 #line 30 "wip.nw"
-#line 25 "plumbing.nw"
+#line 22 "plumbing.nw"
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -40,47 +37,47 @@
 /* #include <fcntl.h> */
 /* #include <unistd.h> */
 #line 31 "wip.nw"
-#line 59 "plumbing.nw"
-/* placeholder */
 #define DEBUG_POINTER_NAME(PTR) debug_get_pointer_name(PTR)
+#line 141 "lconcat.nw"
+#ifndef SIZE_MAX
+#define SIZE_MAX ((size_t)-1)
+#endif
+#line 56 "plumbing.nw"
+/* placeholder */
 #line 22 "reallocarray.nw"
 /*
  * This is sqrt(SIZE_MAX+1), as s1*s2 <= SIZE_MAX
  * if both s1 < MUL_NO_OVERFLOW and s2 < MUL_NO_OVERFLOW
  */
 #define MUL_NO_OVERFLOW ((size_t)1 << (sizeof(size_t) * 4))
-#line 141 "lconcat.nw"
-#ifndef SIZE_MAX
-#define SIZE_MAX ((size_t)-1)
-#endif
 #line 32 "wip.nw"
-#line 39 "plumbing.nw"
+#line 36 "plumbing.nw"
 /* placeholder */
 #line 33 "wip.nw"
-#line 43 "plumbing.nw"
+#line 40 "plumbing.nw"
 /* placeholder */
 #line 34 "wip.nw"
-#line 63 "plumbing.nw"
+#line 60 "plumbing.nw"
 /* placeholder */
 #line 35 "wip.nw"
-#line 47 "plumbing.nw"
+#line 44 "plumbing.nw"
 /* placeholder */
 #line 36 "wip.nw"
-#line 3 "hello.nw"
-void hello(void);
 int
 debug_set_pointer_name(void *ptr, char *name);
 char *
 debug_get_pointer_name(void *ptr);
-#line 30 "reallocarray.nw"
-void *
-xreallocarray(void *optr, size_t nmemb, size_t size);
+#line 3 "hello.nw"
+void hello(void);
 #line 28 "lconcat.nw"
 char *
 concat(const char *s1, ...);
 #line 90 "lconcat.nw"
 size_t
 lconcat(char *dst, size_t dstsize, const char *s1, ...);
+#line 30 "reallocarray.nw"
+void *
+xreallocarray(void *optr, size_t nmemb, size_t size);
 #line 32 "strlcat.nw"
 size_t
 xstrlcat(char *dst, const char *src, size_t dsize);
@@ -88,9 +85,7 @@ xstrlcat(char *dst, const char *src, size_t dsize);
 size_t
 xstrlcpy(char *dst, const char *src, size_t dsize);
 #line 37 "wip.nw"
-#line 51 "plumbing.nw"
-/* placeholder */
-static int so_far = 0;
+int so_far = 0;
 static struct {
     struct {
         int size, tally;
@@ -99,22 +94,44 @@ static struct {
     } pointers;
     char buf[100];
 } g_debug_data = {0};
+#line 48 "plumbing.nw"
+/* placeholder */
 #line 38 "wip.nw"
-#line 17 "wip.nw"
 int
-main(int argc, char **argv)
+debug_set_pointer_name(void *ptr, char *name)
 {
-#line 67 "plumbing.nw"
-    /* placeholder */
-#line 21 "wip.nw"
-#line 55 "plumbing.nw"
-    /* placeholder */
-    (void)so_far;
-#line 22 "wip.nw"
-#line 21 "hello.nw"
-    hello();
-#line 23 "wip.nw"
-    return 0;
+    int i;
+    for (i = 0; i < g_debug_data.pointers.tally; ++i) {
+        if (strcmp(g_debug_data.pointers.names[i], name) == 0) {
+            g_debug_data.pointers.pointers[i] = ptr;
+            return i;
+        }
+    }
+    if (g_debug_data.pointers.size == 0) {
+        g_debug_data.pointers.size = 64;
+        g_debug_data.pointers.tally = 0;
+        g_debug_data.pointers.names = calloc(g_debug_data.pointers.size, sizeof(char*));
+        g_debug_data.pointers.pointers = calloc(g_debug_data.pointers.size, sizeof(void*));
+    } else if (g_debug_data.pointers.tally == g_debug_data.pointers.size) {
+        g_debug_data.pointers.size *= 2;
+        g_debug_data.pointers.names = xreallocarray(g_debug_data.pointers.names, g_debug_data.pointers.size, sizeof(char*));
+        g_debug_data.pointers.pointers = xreallocarray(g_debug_data.pointers.pointers, g_debug_data.pointers.size, sizeof(void*));
+    }
+    g_debug_data.pointers.names[g_debug_data.pointers.tally] = strdup(name);
+    g_debug_data.pointers.pointers[g_debug_data.pointers.tally] = ptr;
+    return g_debug_data.pointers.tally++;
+}
+char *
+debug_get_pointer_name(void *ptr)
+{
+    int i;
+    for (i = 0; i < g_debug_data.pointers.tally; ++i) {
+        if (g_debug_data.pointers.pointers[i] == ptr) {
+            return g_debug_data.pointers.names[i];
+        }
+    }
+    snprintf(g_debug_data.buf, sizeof(g_debug_data.buf), "(unknown %p)", ptr);
+    return g_debug_data.buf;
 }
 #line 7 "hello.nw"
 void
@@ -256,55 +273,6 @@ hello(void)
     }
 #line 17 "hello.nw"
 }
-int
-debug_set_pointer_name(void *ptr, char *name)
-{
-    int i;
-    for (i = 0; i < g_debug_data.pointers.tally; ++i) {
-        if (strcmp(g_debug_data.pointers.names[i], name) == 0) {
-            g_debug_data.pointers.pointers[i] = ptr;
-            return i;
-        }
-    }
-    if (g_debug_data.pointers.size == 0) {
-        g_debug_data.pointers.size = 64;
-        g_debug_data.pointers.tally = 0;
-        g_debug_data.pointers.names = calloc(g_debug_data.pointers.size, sizeof(char*));
-        g_debug_data.pointers.pointers = calloc(g_debug_data.pointers.size, sizeof(void*));
-    } else if (g_debug_data.pointers.tally == g_debug_data.pointers.size) {
-        g_debug_data.pointers.size *= 2;
-        g_debug_data.pointers.names = xreallocarray(g_debug_data.pointers.names, g_debug_data.pointers.size, sizeof(char*));
-        g_debug_data.pointers.pointers = xreallocarray(g_debug_data.pointers.pointers, g_debug_data.pointers.size, sizeof(void*));
-    }
-    g_debug_data.pointers.names[g_debug_data.pointers.tally] = strdup(name);
-    g_debug_data.pointers.pointers[g_debug_data.pointers.tally] = ptr;
-    return g_debug_data.pointers.tally++;
-}
-char *
-debug_get_pointer_name(void *ptr)
-{
-    int i;
-    for (i = 0; i < g_debug_data.pointers.tally; ++i) {
-        if (g_debug_data.pointers.pointers[i] == ptr) {
-            return g_debug_data.pointers.names[i];
-        }
-    }
-    snprintf(g_debug_data.buf, sizeof(g_debug_data.buf), "(unknown %p)", ptr);
-    return g_debug_data.buf;
-}
-#line 35 "reallocarray.nw"
-void *
-xreallocarray(void *optr, size_t nmemb, size_t size)
-{
-    if ((nmemb >= MUL_NO_OVERFLOW || size >= MUL_NO_OVERFLOW) &&
-        nmemb > 0 && SIZE_MAX / nmemb < size) {
-        fprintf(stderr, "Error, cannot re-allocate array, size too large.");
-        exit(1);
-        /* errno = ENOMEM; */
-        /* return NULL; */
-    }
-    return realloc(optr, size * nmemb);
-}
 #line 33 "lconcat.nw"
 char *
 concat(const char *s1, ...)
@@ -400,6 +368,19 @@ lconcat(char *dst, size_t dstsize, const char *s1, ...)
     }
     return m;
 }
+#line 35 "reallocarray.nw"
+void *
+xreallocarray(void *optr, size_t nmemb, size_t size)
+{
+    if ((nmemb >= MUL_NO_OVERFLOW || size >= MUL_NO_OVERFLOW) &&
+        nmemb > 0 && SIZE_MAX / nmemb < size) {
+        fprintf(stderr, "Error, cannot re-allocate array, size too large.");
+        exit(1);
+        /* errno = ENOMEM; */
+        /* return NULL; */
+    }
+    return realloc(optr, size * nmemb);
+}
 #line 37 "strlcat.nw"
 size_t
 xstrlcat(char *dst, const char *src, size_t dsize)
@@ -458,4 +439,21 @@ xstrlcpy(char *dst, const char *src, size_t dsize)
 
     diff = (size_t)(src - osrc);    /* src only advances, unsigned safe */
     return diff - 1;                /* count does not include NUL */
+}
+#line 17 "wip.nw"
+int
+main(int argc, char **argv)
+{
+#line 64 "plumbing.nw"
+    /* placeholder */
+#line 21 "wip.nw"
+    (void)so_far;
+    (void)g_debug_data;
+#line 52 "plumbing.nw"
+    /* placeholder */
+#line 22 "wip.nw"
+#line 21 "hello.nw"
+    hello();
+#line 23 "wip.nw"
+    return 0;
 }
