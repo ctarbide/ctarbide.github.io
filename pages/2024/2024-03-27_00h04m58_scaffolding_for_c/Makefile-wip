@@ -3,9 +3,6 @@
 
 SH = sh -eu
 
-SOURCES = \
-    Makefile-wip.nw wip.nw
-
 TARGETS = \
     wip.c wip
 
@@ -24,4 +21,3 @@ wip: \
 
 clean:
 	-rm -f $(TARGETS)
-
