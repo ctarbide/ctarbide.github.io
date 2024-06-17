@@ -187,11 +187,14 @@ cat <<PRIMARY SOURCES>>
 <<gen: listing of anbn3>>
 @
 
+<<link to ${i}>>=
+printf -- '- [`%s`](%s)\n\n' "${i}" "${i}"
+@
+
 <<gen: listing of anbn0>>=
 printf '@<<listing of anbn0>>=\n'
 for i in anbn0/*; do
-    name=${i}
-    printf -- '- [%s](%s)\n\n' "${name}" "${i}"
+    <<link to ${i}>>
 done
 printf '\n@\n'
 @
@@ -199,8 +202,7 @@ printf '\n@\n'
 <<gen: listing of anbn1>>=
 printf '@<<listing of anbn1>>=\n'
 for i in anbn1/*; do
-    name=${i}
-    printf -- '- [%s](%s)\n\n' "${name}" "${i}"
+    <<link to ${i}>>
 done
 printf '\n@\n'
 @
@@ -208,8 +210,7 @@ printf '\n@\n'
 <<gen: listing of anbn2>>=
 printf '@<<listing of anbn2>>=\n'
 for i in anbn2/*; do
-    name=${i}
-    printf -- '- [%s](%s)\n\n' "${name}" "${i}"
+    <<link to ${i}>>
 done
 printf '\n@\n'
 @
@@ -217,8 +218,7 @@ printf '\n@\n'
 <<gen: listing of anbn3>>=
 printf '@<<listing of anbn3>>=\n'
 for i in anbn3/*; do
-    name=${i}
-    printf -- '- [%s](%s)\n\n' "${name}" "${i}"
+    <<link to ${i}>>
 done
 printf '\n@\n'
 @
