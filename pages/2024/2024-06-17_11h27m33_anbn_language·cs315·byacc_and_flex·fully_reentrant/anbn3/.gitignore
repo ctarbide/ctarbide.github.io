@@ -1,0 +1,5 @@
+*.stamp
+/.gdbinit
+/rtt-aux.nw
+/anbn.c
+/anbn

@@ -1,0 +1,64 @@
+
+<<anbn.c>>=
+#ifndef _BSD_SOURCE
+#define _BSD_SOURCE
+#endif
+#ifndef _ISOC99_SOURCE
+#define _ISOC99_SOURCE
+#endif
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE           600
+#endif
+#ifndef _POSIX_C_SOURCE
+#define _POSIX_C_SOURCE         200112L
+#endif
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <stddef.h>
+#include <inttypes.h>
+#include <string.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <assert.h>
+#include <locale.h>
+#include <ctype.h>
+#include <limits.h>
+#include <signal.h>
+#include <setjmp.h>
+#include <errno.h>
+
+<<definitions>>
+
+<<typedef anbn_program>>
+
+<<typedef yyscan_t>>
+<<typedef yy_size_t>>
+<<typedef yy_state_type>>
+
+<<typedef YY_BUFFER_STATE>>
+
+<<typedef flex_int8_t>>
+<<typedef flex_uint8_t>>
+<<typedef flex_int16_t>>
+<<typedef flex_uint16_t>>
+<<typedef flex_int32_t>>
+<<typedef flex_uint32_t>>
+
+<<typedef YY_CHAR>>
+<<typedef YYINT>>
+<<typedef YYSTYPE>>
+
+<<typedef YYSTACKDATA>>
+
+<<struct yy_buffer_state>>
+<<struct yyguts_t>>
+
+<<globals>>
+
+<<protos>>
+<<protos - static>>
+
+<<impl>>
+@

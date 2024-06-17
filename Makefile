@@ -31,3 +31,4 @@ pages: unlink-draft-pages
 	$(MAKE) -C 'pages/2024/2024-02-21_18h37m27_dag64·dag_encoding·64bit'
 	$(MAKE) -C 'pages/2024/2024-03-05_10h29m27_qemu-kvm·winxpsp3·paravirtualization·virtio-win·spice'
 	$(MAKE) -C 'pages/2024/2024-03-27_00h04m58_scaffolding_for_c'
+	$(MAKE) -C 'pages/2024/2024-06-17_11h27m33_anbn_language·cs315·byacc_and_flex·fully_reentrant'
