@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<title>ctarbi.de - anbn language · reentrant byacc and flex</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=0.6">
+<link rel="canonical" href="https://ctarbide.github.io/pages/2024/2024-06-17_11h27m33_anbn_language%C2%B7cs315%C2%B7byacc_and_flex%C2%B7fully_reentrant/index.html">
+<link rel="icon" href="../../../favicon.ico" type="image/x-icon">
+<style>
+pre {
+    font-family: "Lucida Console", Courier, monospace;
+    font-size: 14pt;
+}
+code {
+    font-family: "Lucida Console", Courier, monospace;
+    font-size: 14pt;
+}
+body {
+    color: #111;
+    width: 90ch;
+    max-width: calc(100vw - 8ch);
+    margin: 3ch auto 6ch auto;
+    font-family: Georgia, "Bitstream Charter", serif;
+    font-size: 14pt;
+}
+@media (prefers-color-scheme: dark) {
+    body {
+        color: #fbfbfe;
+        background-color: #1c1b22;
+    }
+    a:visited {
+        color: #aac;
+    }
+    a {
+        color: #6af;
+    }
+}
+</style>
+<h1>ctarbi.de - anbn language · reentrant byacc and flex</h1>
+
+<h2>References</h2>
+
+<ul>
+<li><p><a href="http://www.cs.bilkent.edu.tr/~guvenir/courses/CS315/lex-yacc/index.html">http://www.cs.bilkent.edu.tr/~guvenir/courses/CS315/lex-yacc/index.html</a></p>
+
+<ul>
+<li><p><em>Lex &amp; Yacc</em> (<a href="lex-yacc.pdf">local copy</a>)</p></li>
+<li><p>by H. Altay G&uuml;venir</p></li>
+</ul></li>
+<li><p><a href="https://westes.github.io/flex/manual/index.html">https://westes.github.io/flex/manual/index.html</a></p></li>
+<li><p><a href="https://invisible-island.net/byacc/manpage/yacc.html">https://invisible-island.net/byacc/manpage/yacc.html</a></p></li>
+</ul>
+
+<h2>Examples</h2>
+
+<p>All examples below implements the same grammar for the language
+L={a<sup>n</sup>b<sup>n</sup>|n &gt;= 0}.</p>
+
+<h3>Standard implementation</h3>
+
+<p>Standard, non-reentrant implementation:</p>
+
+<ul>
+<li><p><a href="anbn0/Makefile">anbn0/Makefile</a></p></li>
+<li><p><a href="anbn0/README.txt">anbn0/README.txt</a></p></li>
+<li><p><a href="anbn0/anbn.l">anbn0/anbn.l</a></p></li>
+<li><p><a href="anbn0/anbn.y">anbn0/anbn.y</a></p></li>
+<li><p><a href="anbn0/test.sh">anbn0/test.sh</a></p></li>
+</ul>
+
+<h3>Reentrant scanner</h3>
+
+<p>Reentrant scanner (lexical scanner) using
+<a href="https://github.com/westes/flex"><code>flex</code></a>:</p>
+
+<ul>
+<li><p><a href="anbn1/Makefile">anbn1/Makefile</a></p></li>
+<li><p><a href="anbn1/README.txt">anbn1/README.txt</a></p></li>
+<li><p><a href="anbn1/anbn.l">anbn1/anbn.l</a></p></li>
+<li><p><a href="anbn1/anbn.y">anbn1/anbn.y</a></p></li>
+<li><p><a href="anbn1/test.sh">anbn1/test.sh</a></p></li>
+</ul>
+
+<h3>Reentrant scanner and parser</h3>
+
+<p>Reentrant scanner and (pure) parser using <code>flex</code> and
+<a href="https://invisible-island.net/byacc/"><code>byacc</code></a>:</p>
+
+<ul>
+<li><p><a href="anbn2/Makefile">anbn2/Makefile</a></p></li>
+<li><p><a href="anbn2/anbn.h">anbn2/anbn.h</a></p></li>
+<li><p><a href="anbn2/anbn.l">anbn2/anbn.l</a></p></li>
+<li><p><a href="anbn2/anbn.y">anbn2/anbn.y</a></p></li>
+<li><p><a href="anbn2/parser.c">anbn2/parser.c</a></p></li>
+<li><p><a href="anbn2/scanner.c">anbn2/scanner.c</a></p></li>
+<li><p><a href="anbn2/test.sh">anbn2/test.sh</a></p></li>
+</ul>
+
+<h3>Reentrant scanner and parser augumented with <code>noweb</code></h3>
+
+<p><a href="https://github.com/ctarbide/icon-rtt"><code>icon-rtt</code></a> do a minimum analysis of
+the c language sources and translates it to a <code>noweb</code> output that removes
+most of the rigidity of c source code:</p>
+
+<ul>
+<li><p><a href="anbn3/Makefile">anbn3/Makefile</a></p></li>
+<li><p><a href="anbn3/README.txt">anbn3/README.txt</a></p></li>
+<li><p><a href="anbn3/anbn.l">anbn3/anbn.l</a></p></li>
+<li><p><a href="anbn3/anbn.nw">anbn3/anbn.nw</a></p></li>
+<li><p><a href="anbn3/anbn.y">anbn3/anbn.y</a></p></li>
+<li><p><a href="anbn3/rtt-aux.r">anbn3/rtt-aux.r</a></p></li>
+<li><p><a href="anbn3/test.sh">anbn3/test.sh</a></p></li>
+</ul>
+
+<h2>Notes</h2>
+
+<ul>
+<li><p>All code above is provided <a href="https://github.com/ctarbide/ctarbide.github.io">here</a>.</p></li>
+<li><p>Tested with:</p>
+
+<ul>
+<li><p>flex 2.6.4</p></li>
+<li><p>byacc 2.0 20240109</p></li>
+</ul></li>
+</ul>
+
+<p>More details in the link below.</p>
+<p> This <a href="README.txt">page</a> was last modified on June 17, 2024 at 13:47:13 UTC.
+
+<!-- Generated in 0.066 seconds on June 17, 2024 at 13:47:17 UTC. -->
