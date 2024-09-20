@@ -15,7 +15,7 @@
 In `test-list.nw` you will find some common algorithms for dealing with singly
 linked lists.
 
-To evaluate and playing around with it, firts install
+To evaluate and playing around with it, first install
 [coolscripts](https://github.com/ctarbide/coolscripts), then download
 `test-list.nw` below and then run `nofake test-list.nw`.
 
