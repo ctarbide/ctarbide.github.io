@@ -1,0 +1,1151 @@
+
+<<debug>>=
+#!/bin/sh
+nofake test-list.nw | DO_NOT_COMPILE=1 sh >a.c
+gcc -g -O0 a.c -lgc
+<<update .gdbinit>>
+tmux split-window -h -l 75% gdb --quiet ./a.out
+@
+
+<<update .gdbinit>>=
+CHMOD='chmod 0400' nofake.sh --error -R.gdbinit -o.gdbinit test-list.nw
+<<.gdbinit>>=
+layout src
+b main
+#b add_or_get_thing
+#b test_remove_last_thing
+#b test_print
+r
+@
+
+<<includes - before>>=
+/* #define NDEBUG */
+#include <gc/leak_detector.h>
+@
+
+<<rtt>>=
+#include <stddef.h>
+#include <inttypes.h>
+/*@<<rtt passthru>>*/
+#noexpand __FILE__
+#noexpand __LINE__
+#output "rtt.nw"
+@
+
+<<set sources>>=
+set -- "$@" test-list.nw
+@
+
+using bdwgc is just nice, it can also double as a leak detector
+
+<<set LIBS>>=
+LIBS=-lgc
+export LIBS
+@
+
+<<*>>=
+#!/bin/sh
+set -eu
+trap 'rm -f rtt.nw' 0 1 2 3 15
+# trap 'test -f rtt.nw && mv -f rtt.nw rtt-ok.nw' 0 1 2 3 15
+set --
+<<set sources>>
+if ! nofake-exec.sh --error -Rrtt --suffix .r "$@" -- rtt -x; then
+    if [ -f rtt.nw ]; then show-line-numbers.sh rtt.nw
+    else nofake --error -Rrtt "$@" | show-line-numbers.sh
+    fi
+    exit 1
+fi
+<<cal c-expr.sh with sources>>
+@
+
+<<cal c-expr.sh with sources>>=
+for arg do srcs="${srcs:+${srcs} }${arg}"; done
+SOURCE_IN_STDIN=1
+export SOURCE_IN_STDIN
+ADDITIONAL_SOURCES="${srcs} rtt.nw"
+export ADDITIONAL_SOURCES
+<<set LIBS>>
+cat<<'EOF' | c-expr.sh #| head -n20
+test();
+CHECK_LEAKS();
+EOF
+@
+
+some types
+
+<<rtt>>=
+typedef int key_t;
+typedef int value_t;
+typedef struct thing {
+    struct thing *next;
+    key_t key;
+    value_t value;
+} thing_t;
+@
+
+<<types>>=
+<<typedef key_t>>
+<<typedef value_t>>
+<<typedef thing_t>>
+<<typedef cmp_key_t>>
+<<typedef cleanup_thing_t>>
+<<typedef predicate_t>>
+@
+
+<<rtt>>=
+thing_t *
+new_thing()
+{
+    return calloc(1, sizeof(thing_t));
+}
+@
+
+<<definitions>>=
+#define very_first_thing__is_fast(x) (x)
+@
+
+<<rtt>>=
+typedef int (*cmp_key_t)(key_t *a, key_t *b);
+
+/* return non-zero if a is less than b
+ */
+typedef int (*predicate_t)(key_t *a, key_t *b);
+
+thing_t *
+is_there_infinite_things__is_slow(thing_t *root)
+{
+    thing_t *hare;
+    if (root == NULL)
+        return NULL;
+    hare = root->next;
+    for (; root != hare; root = root->next) {
+        if (hare && (hare = hare->next))
+            hare = hare->next;
+    }
+    if (root && root == hare)
+        return hare;
+    return NULL;
+}
+
+thing_t **
+null_thing_holder__is_slow(thing_t **root)
+{
+    for (; *root; root = &(*root)->next);
+    return root;
+}
+
+thing_t **
+last_thing__is_slow(thing_t **root)
+{
+    if (*root)
+        for (; (*root)->next; root = &(*root)->next);
+    return root;
+}
+
+thing_t **
+first_thing(thing_t **root, key_t *key, cmp_key_t cmpfnc)
+{
+    for (; *root; root = &(*root)->next)
+        if (cmpfnc(key, &(*root)->key) == 0)
+            break;
+    return root;
+}
+
+thing_t **
+last_thing(thing_t **root, key_t *key, cmp_key_t cmpfnc)
+{
+    thing_t **prev;
+    prev = root = first_thing(root, key, cmpfnc);
+    while (*root && cmpfnc(key, &(*root)->key) == 0) {
+        prev = root;
+        root = &(*root)->next;
+    }
+    return prev;
+}
+
+thing_t *
+add_or_get_thing(thing_t **root, key_t *key, cmp_key_t cmpfnc)
+{
+    thing_t *n;
+    root = first_thing(root, key, cmpfnc);
+    if ((n = *root) == NULL) {
+        n = new_thing();
+        n->key = *key; /* copy key */
+        n->next = *root;
+        *root = n;
+    }
+    return n;
+}
+
+int
+how_many_things__is_slow(thing_t *root)
+{
+    int cnt;
+    for (cnt = 0; root; cnt++, root = root->next);
+    return cnt;
+}
+
+thing_t *
+remove_thing(thing_t **root, key_t *key, cmp_key_t cmpfnc)
+{
+    thing_t *n;
+    root = first_thing(root, key, cmpfnc);
+    if ((n = *root)) {
+        *root = n->next;
+        n->next = NULL;
+    }
+    return n;
+}
+
+thing_t *
+pop_thing(thing_t **root)
+{
+    thing_t *n;
+    if ((n = *very_first_thing__is_fast(root))) {
+        *root = n->next;
+        n->next = NULL;
+    }
+    return n;
+}
+
+thing_t *
+remove_last_thing__is_slow(thing_t **root)
+{
+    thing_t *n;
+    n = *(root = last_thing__is_slow(root));
+    *root = NULL;
+    return n;
+}
+@
+
+reverse, recursively and iteratively
+
+<<rtt>>=
+thing_t *
+reverse_things_recursive2(thing_t *parent, thing_t *child)
+{
+    thing_t *grandchild;
+    if ((grandchild = child->next)) {
+        child->next = parent;
+        return reverse_things_recursive2(child, grandchild);
+    }
+    child->next = parent;
+    return child;
+}
+
+thing_t *
+reverse_things_recursive(thing_t *parent)
+{
+    thing_t *child;
+    if (parent && (child = parent->next)) {
+        parent->next = NULL; /* this parent will become the last node */
+        return reverse_things_recursive2(parent, child);
+        }
+    return parent;
+}
+@
+
+<<rtt>>=
+thing_t *
+reverse_things_iterative(thing_t *parent)
+{
+    thing_t *child, *grandchild;
+    if (parent && (child = parent->next)) {
+        parent->next = NULL; /* this parent will become the last node */
+        while ((grandchild = child->next)) {
+            child->next = parent;
+            parent = child;
+            child = grandchild;
+        }
+        child->next = parent;
+        return child;
+    }
+    return parent;
+}
+@
+
+<<rtt>>=
+thing_t *
+swap(thing_t *a, thing_t *b)
+{
+    thing_t *tmp;
+    tmp = b->next;
+    b->next = a;
+    a->next = tmp;
+    return b;
+}
+@
+
+bubble sort:
+
+    - stable and adaptive: yes
+
+    - streamable: no
+
+    - parallelizable: yes
+
+    - uses nth: no
+
+glossary
+
+    - adaptive sort is has its best case performance when the list is already
+      sorted
+
+    - 'uses nth' means it requires only forward iteration of the list, this
+      is mostly relevant to linked lists and not to vectors/arrays
+
+<<rtt SKIP>>=
+int bubble_sort(thing_t **root, cmp_key_t cmpfnc)
+{
+    int total_swaps = 0;
+    if (*root && (*root)->next) {
+        thing_t **parent, **child;
+        int nswaps;
+        do {
+            nswaps = 0;
+            parent = root;
+            child = &(*parent)->next;
+            do {
+                int cmp;
+                cmp = cmpfnc(&(*parent)->key, &(*child)->key);
+                if (cmp > 0) {
+                    *parent = swap(*parent, *child);
+                    child = &(*parent)->next;
+                    nswaps++;
+                }
+                parent = child;
+            } while (*(child = &(*child)->next));
+            total_swaps += nswaps;
+        } while (nswaps);
+    }
+    return total_swaps;
+}
+@
+
+slight optimization: don't compare the already sorted tail end
+
+<<rtt>>=
+int bubble_sort(thing_t **root, cmp_key_t cmpfnc)
+{
+    int nswaps, total_swaps = 0;
+    thing_t **parent, **child, *last = NULL;
+    if (*root == NULL)
+        return 0;
+    do {
+        nswaps = 0;
+        parent = root;
+        while (*(child = &(*parent)->next) != last) {
+            int cmp;
+            cmp = cmpfnc(&(*parent)->key, &(*child)->key);
+            if (cmp > 0) {
+                *parent = swap(*parent, *child);
+                nswaps++;
+                parent = &(*parent)->next;
+                child = &(*parent)->next;
+            } else
+                child = &(*(parent = child))->next;
+        }
+        last = *parent;
+        total_swaps += nswaps;
+    } while (nswaps);
+    return total_swaps;
+}
+@
+
+<<rtt>>=
+thing_t *ntn_thing__is_slow(thing_t *root, int idx)
+{
+    while (idx && root) {
+        root = root->next;
+        idx--;
+    }
+    return root;
+}
+
+thing_t **ntn_thing_holder__is_slow(thing_t **root, int idx)
+{
+    while (idx && *root) {
+        root = &(*root)->next;
+        idx--;
+    }
+    return root;
+}
+@
+
+delete/cleanup functions
+
+<<rtt>>=
+typedef void (*cleanup_thing_t)(thing_t *x);
+
+void delete_thing(thing_t *x, cleanup_thing_t clnfnc)
+{
+    assert(x && x->next == NULL);
+    clnfnc(x);
+    free(x);
+}
+
+void delete_list_of_things(thing_t **root, cleanup_thing_t clnfnc)
+{
+    thing_t *r, *n, *next;
+    /* first pass, tag 'next' pointer for cyclic detection
+     */
+    r = *root;
+    for (n = r; n; n = next) {
+        next = n->next;
+        if (next && (uintptr_t)next->next & 1) {
+            /* cycle detect, break cycle
+             */
+            n->next = NULL;
+            break;
+        }
+        n->next = (void*)((uintptr_t)next | 1);
+    }
+    /* second pass, delete
+     */
+    for (n = r; n; n = next) {
+        next = (void*)((uintptr_t)n->next & (uintptr_t)~1);
+        n->next = NULL;
+        delete_thing(n, clnfnc);
+    }
+    *root = NULL;
+}
+@
+
+<<rtt>>=
+thing_t *
+sorted_attach(thing_t *root, thing_t *n, predicate_t predfnc)
+{
+    thing_t *cur;
+    key_t *key;
+    key = &n->key;
+    if ((cur = root) == NULL) {
+        n->next = NULL;
+        return n;
+    }
+    if (predfnc(key, &cur->key)) {
+        n->next = cur;
+        return n;
+    } else {
+        thing_t *prev;
+        do cur = (prev = cur)->next;
+            while (cur && !predfnc(key, &cur->key));
+        n->next = prev->next;
+        prev->next = n;
+    }
+    return root;
+}
+
+thing_t *
+sorted_insert(thing_t *root, key_t *key, predicate_t predfnc)
+{
+    thing_t *n = new_thing();
+    n->key = *key; /* copy key */
+    return sorted_attach(root, n, predfnc);
+}
+
+thing_t *insertion_sort(thing_t *root)
+{
+    thing_t *cur, *next, *res;
+    res = NULL;
+    for (cur = root; cur; cur = next) {
+        next = cur->next;
+        res = sorted_attach(res, cur, lesser_than);
+    }
+    return res;
+}
+@
+
+test functions
+
+<<rtt>>=
+int cmp_key(key_t *a, key_t *b)
+{
+    return *a - *b;
+}
+
+void test_add_or_get(thing_t **root, int key, int value)
+{
+    thing_t *t;
+    key_t k[1];
+    *k = key;
+    t = add_or_get_thing(root, k, cmp_key);
+    if (t->value == 0)
+        t->value = value; /* initial value */
+    else
+        t->value += value; /* update value */
+    assert(*k == key);
+    printf("got %d, value %d\n", t->key, t->value);
+}
+
+void test_length(thing_t *root)
+{
+    printf("length? %d\n", how_many_things__is_slow(root));
+}
+
+void test_remove(thing_t **root, int key)
+{
+    thing_t *t;
+    key_t k[1];
+    *k = key;
+    if ((t = remove_thing(root, k, cmp_key))) {
+        printf("removed %d\n", t->key);
+    } else {
+        printf("failed to remove %d\n", key);
+    }
+}
+@
+
+test most basic functionality: add, get, length and remove
+
+<<rtt>>=
+void test1()
+{
+    thing_t *root;
+    root = NULL;
+    test_add_or_get(&root, 1, 123);
+    test_add_or_get(&root, 2, 234);
+    test_add_or_get(&root, 3, 345);
+    test_length(root);
+    test_add_or_get(&root, 1, 111);
+    test_add_or_get(&root, 2, 222);
+    test_add_or_get(&root, 3, 333);
+    test_length(root);
+    test_remove(&root, 999);
+    test_length(root);
+    test_remove(&root, 2);
+    test_remove(&root, 2);
+    test_length(root);
+    test_remove(&root, 1);
+    test_remove(&root, 1);
+    test_length(root);
+    test_remove(&root, 3);
+    test_remove(&root, 3);
+    test_length(root);
+    test_remove(&root, 3);
+    test_remove(&root, 2);
+    test_remove(&root, 1);
+    test_remove(&root, 0);
+    test_length(root);
+}
+@
+
+<<rtt>>=
+void test_append(thing_t **root, int key)
+{
+    thing_t *n;
+    root = null_thing_holder__is_slow(root);
+    *root = n = new_thing();
+    n->key = key; /* copy key */
+}
+
+void test_print(thing_t *root)
+{
+    int i;
+    thing_t *hare;
+    if (root == NULL) {
+        printf("there are no things\n");
+        return;
+    }
+    hare = root->next;
+    for (i = 0; root != hare; root = root->next, i++) {
+        printf("thing in position %i is %d\n", i, root->key);
+        if (hare && (hare = hare->next))
+            hare = hare->next;
+    }
+    if (root && root == hare) {
+        puts("cycle detected, aborting");
+        exit(1);
+        return;
+    }
+    printf("there are %d things\n", i);
+}
+
+void test_push(thing_t **root, int key)
+{
+    thing_t *n;
+    root = very_first_thing__is_fast(root);
+    n = new_thing();
+    n->key = key; /* copy key */
+    n->next = *root;
+    *root = n;
+}
+
+void test_pop(thing_t **root)
+{
+    thing_t *n;
+    if ((n = pop_thing(root)))
+        printf("just popped %d\n", n->key);
+}
+
+void test_remove_last_thing(thing_t **root)
+{
+    thing_t *n;
+    if ((n = remove_last_thing__is_slow(root)))
+        printf("just removed last %d\n", n->key);
+}
+@
+
+test more basics stuff, append, iterating, push, pop
+
+<<rtt>>=
+void test2()
+{
+    thing_t *root;
+    root = NULL;
+    test_append(&root, 123);
+    test_append(&root, 234);
+    test_append(&root, 345);
+    test_print(root);
+    test_push(&root, 100);
+    test_push(&root, 90);
+    test_push(&root, 50);
+    test_push(&root, 10);
+    test_print(root);
+    test_pop(&root);
+    test_pop(&root);
+    test_pop(&root);
+    test_print(root);
+    test_remove_last_thing(&root);
+    test_print(root);
+}
+@
+
+<<rtt>>=
+void test_reverse_rec(thing_t **root)
+{
+    *root = reverse_things_recursive(*root);
+}
+
+void test_reverse_iter(thing_t **root)
+{
+    *root = reverse_things_iterative(*root);
+}
+
+void test3()
+{
+    thing_t *root;
+    root = NULL;
+    test_print(root);
+    test_append(&root, 123);
+    test_append(&root, 234);
+    test_append(&root, 345);
+    test_print(root);
+    test_reverse_rec(&root);
+    assert(is_there_infinite_things__is_slow(root) == NULL);
+    test_print(root);
+    test_reverse_iter(&root);
+    assert(is_there_infinite_things__is_slow(root) == NULL);
+    test_print(root);
+}
+
+void test4()
+{
+    thing_t *root;
+    root = NULL;
+    test_print(root);
+    test_append(&root, 123);
+    /* root->next = root; */
+    assert(is_there_infinite_things__is_slow(root) == NULL);
+    test_print(root);
+    test_append(&root, 234);
+    /* root->next->next = root; */
+    assert(is_there_infinite_things__is_slow(root) == NULL);
+    test_print(root);
+    test_append(&root, 345);
+    /* root->next->next->next = root; */
+    assert(is_there_infinite_things__is_slow(root) == NULL);
+    test_print(root);
+}
+@
+
+<<rtt>>=
+void test5()
+{
+    thing_t *root;
+    root = NULL;
+    test_append(&root, 123);
+    test_append(&root, 234);
+    test_append(&root, 345);
+    root = swap(root, root); /* identity */
+    test_print(root);
+    root = swap(root, root->next);
+    test_print(root);
+    root->next = swap(root->next, root->next->next);
+    test_print(root);
+}
+@
+
+<<rtt>>=
+void test_bubble_sort(thing_t **root)
+{
+    int nswaps;
+    assert(is_there_infinite_things__is_slow(*root) == NULL);
+    nswaps = bubble_sort(root, cmp_key);
+    printf("performed %d swaps\n", nswaps);
+}
+
+void test6()
+{
+    thing_t *root;
+    root = NULL;
+    test_append(&root, 123);
+    test_append(&root, 234);
+    test_append(&root, 345);
+    test_print(root);
+    assert(is_there_infinite_things__is_slow(root) == NULL);
+    test_bubble_sort(&root);
+    test_print(root);
+    test_reverse_iter(&root);
+    test_print(root);
+    assert(is_there_infinite_things__is_slow(root) == NULL);
+    test_bubble_sort(&root);
+    test_print(root);
+}
+@
+
+test nth
+
+<<rtt>>=
+void test7()
+{
+    thing_t *root;
+    int i, len;
+
+    root = NULL;
+    test_append(&root, 123);
+    test_append(&root, 234);
+    test_append(&root, 345);
+    test_print(root);
+
+    len = how_many_things__is_slow(root);
+    for (i=0; i<len; i++) {
+        thing_t *n = ntn_thing__is_slow(root, i);
+        printf("nth thing %i is %d\n", i, n->key);
+    }
+    assert(ntn_thing__is_slow(root, i) == NULL);
+
+    for (i=0; i<len; i++) {
+        thing_t **p = ntn_thing_holder__is_slow(&root, i);
+        printf("nth thing holder %i is %p and holds %d\n", i,
+            (void*)p, (*p)->key);
+    }
+    assert(*(ntn_thing_holder__is_slow(&root, i)) == NULL);
+}
+@
+
+test append many
+
+<<rtt>>=
+thing_t **test_append_at__is_fast(thing_t **null_holder, int key)
+{
+    thing_t *n;
+    *null_holder = n = new_thing();
+    n->key = key; /* copy key */
+    return &n->next; /* next null holder */
+}
+
+void test8()
+{
+    thing_t *root, **null_holder;
+
+    root = NULL;
+
+#if 1
+    test_append(&root, 123);
+    test_append(&root, 234);
+    test_append(&root, 345);
+    test_print(root);
+#endif
+
+    null_holder = null_thing_holder__is_slow(&root);
+
+    null_holder = test_append_at__is_fast(null_holder, 456);
+    null_holder = test_append_at__is_fast(null_holder, 567);
+    null_holder = test_append_at__is_fast(null_holder, 678);
+
+    test_print(root);
+}
+@
+
+test insert nth
+
+<<rtt>>=
+void test9()
+{
+    thing_t *root, *n, **p, *tmp;
+
+    root = NULL;
+
+    test_append(&root, 123); /* 0 */
+    test_append(&root, 234); /* 1 */
+    /* how to put a thing here? */
+    test_append(&root, 456); /* 2 */
+    test_append(&root, 567); /* 3 */
+    test_print(root);
+
+    p = ntn_thing_holder__is_slow(&root, 1);
+
+    tmp = (*p)->next;
+    (*p)->next = n = new_thing();
+    n->key = 345;
+    n->next = tmp;
+
+    test_print(root);
+}
+@
+
+first/last things, adjacent multiple equal things
+
+<<rtt>>=
+int cmp_tenths(key_t *a, key_t *b)
+{
+    return (*a - *b) / 10;
+}
+
+void test10()
+{
+    thing_t *root, *n, **n1, **n2, *tmp;
+    key_t k1;
+
+    root = NULL;
+    test_append(&root, 239);
+    test_append(&root, 238);
+    test_append(&root, 231);
+    test_append(&root, 230);
+    test_append(&root, 120);
+    test_append(&root, 340);
+    test_append(&root, 235); /* not adjacent */
+    test_print(root);
+
+    k1 = 120;
+    n1 = first_thing(&root, &k1, cmp_tenths);
+    n2 = last_thing(&root, &k1, cmp_tenths);
+    assert(n1 == n2 && (*n1)->key == k1);
+
+    /* insert 125 right after 120
+     */
+    tmp = (*n1)->next;
+    (*n1)->next = n = new_thing();
+    n->key = 125;
+    n->next = tmp;
+    test_print(root);
+
+    k1 = 230;
+    n1 = first_thing(&root, &k1, cmp_tenths);
+    n2 = last_thing(&root, &k1, cmp_tenths);
+    assert(n1 != n2 && (*n1)->key == 239 && (*n2)->key == 230);
+}
+@
+
+test replace and delete
+
+<<rtt>>=
+void cleanup(thing_t *x)
+{
+    printf("******************* obliterating %p (key %d)\n", (void*)x, x->key);
+    x->key = -1;
+}
+
+void test11()
+{
+    thing_t *root, **p, *gone, *tmp, *n;
+    key_t k1;
+
+    root = NULL;
+    test_append(&root, 123);
+    test_append(&root, 222);
+    test_append(&root, 345);
+    test_print(root);
+
+    k1 = 222;
+    p = first_thing(&root, &k1, cmp_key);
+    assert((*p)->key == k1);
+
+    tmp = (gone = *p)->next;
+    gone->next = NULL;
+    *p = n = new_thing();
+    n->key = 234;
+    n->next = tmp;
+    test_print(root);
+
+    delete_thing(gone, cleanup);
+}
+@
+
+test delete list of things
+
+<<rtt>>=
+void test12()
+{
+    thing_t *root;
+
+    root = NULL;
+    test_append(&root, 123);
+    test_append(&root, 234);
+    test_append(&root, 345);
+    test_print(root);
+    delete_list_of_things(&root, cleanup);
+    test_print(root);
+
+    /* now with cycle */
+    do {
+        thing_t *t;
+
+        assert(root == NULL);
+
+        test_append(&root, 1234);
+        test_append(&root, 2345);
+        test_append(&root, 3456);
+        test_print(root);
+
+        /* add cycle
+         */
+        t = *last_thing__is_slow(&root);
+        t->next = root;
+
+        /* indeed, a cycle
+         */
+        assert(is_there_infinite_things__is_slow(root));
+
+        delete_list_of_things(&root, cleanup);
+        test_print(root);
+    } while (0);
+}
+@
+
+sorted insert
+
+<<rtt>>=
+int greater_than(key_t *a, key_t *b)
+{
+    return *a > *b;
+}
+
+int lesser_than(key_t *a, key_t *b)
+{
+    return *a < *b;
+}
+
+void test13()
+{
+    test13a();
+    test13b();
+}
+
+void test13a()
+{
+    key_t k1;
+    thing_t *root;
+    root = NULL;
+    test_print(root);
+    k1 = 321;
+    root = sorted_insert(root, &k1, lesser_than);
+    k1 = 234;
+    root = sorted_insert(root, &k1, lesser_than);
+    k1 = 123;
+    root = sorted_insert(root, &k1, lesser_than);
+    test_print(root);
+}
+
+void test13b()
+{
+    key_t k1;
+    thing_t *root;
+    root = NULL;
+    test_print(root);
+    k1 = 321;
+    root = sorted_insert(root, &k1, greater_than);
+    k1 = 234;
+    root = sorted_insert(root, &k1, greater_than);
+    k1 = 123;
+    root = sorted_insert(root, &k1, greater_than);
+    test_print(root);
+}
+@
+
+sorted insert with predicate variations (prepend and append behaviour)
+
+<<rtt>>=
+int lesser_than_tenths(key_t *a, key_t *b)
+{
+    return (*a/10) < (*b/10);
+}
+
+int lesser_than_or_equal_tenths(key_t *a, key_t *b)
+{
+    return (*a/10) <= (*b/10);
+}
+
+void test14a()
+{
+    key_t k1;
+    thing_t *root;
+    root = NULL;
+    test_print(root);
+    k1 = 320;
+    root = sorted_insert(root, &k1, lesser_than_tenths);
+    k1 = 230;
+    root = sorted_insert(root, &k1, lesser_than_tenths);
+    k1 = 120;
+    root = sorted_insert(root, &k1, lesser_than_tenths);
+    test_print(root);
+
+    k1 = 238;
+    root = sorted_insert(root, &k1, lesser_than_tenths);
+    k1 = 234;
+    root = sorted_insert(root, &k1, lesser_than_tenths);
+
+    test_print(root);
+}
+
+void test14b()
+{
+    key_t k1;
+    thing_t *root;
+    root = NULL;
+    test_print(root);
+    k1 = 320;
+    root = sorted_insert(root, &k1, lesser_than_or_equal_tenths);
+    k1 = 230;
+    root = sorted_insert(root, &k1, lesser_than_or_equal_tenths);
+    k1 = 120;
+    root = sorted_insert(root, &k1, lesser_than_or_equal_tenths);
+    test_print(root);
+
+    k1 = 238;
+    root = sorted_insert(root, &k1, lesser_than_or_equal_tenths);
+    k1 = 234;
+    root = sorted_insert(root, &k1, lesser_than_or_equal_tenths);
+
+    test_print(root);
+}
+
+void test14()
+{
+    test14a();
+    test14b();
+}
+@
+
+insertion sort
+
+<<rtt>>=
+void test15()
+{
+    int i, rand[] = {10097, 32533, 76520, 13586, 34673,
+        54876, 80959, 9117, 39292, 74945, -1};
+    thing_t *root;
+    root = NULL;
+    for (i=0; rand[i] >= 0; i++) {
+        test_append(&root, rand[i]);
+    }
+    test_print(root);
+    root = insertion_sort(root);
+    test_print(root);
+}
+@
+
+merge sort
+
+<<rtt>>=
+thing_t *
+split_in_half(thing_t *root)
+{
+    thing_t *cur, *hare, *right;
+    if ((cur = root) == NULL)
+        return NULL;
+    hare = cur->next;
+    while (hare && cur != hare) {
+        if ((hare = hare->next)) {
+            cur = cur->next;
+            hare = hare->next;
+            continue;
+        }
+        break;
+    }
+    if (cur && cur == hare) {
+        puts("cycle detected, aborting");
+        exit(1);
+    }
+    right = cur->next;
+    cur->next = NULL;
+    return right;
+}
+
+thing_t *
+merge_things(thing_t *a, thing_t *b, predicate_t predfnc)
+{
+    if (a == NULL)
+        return b;
+    if (b == NULL)
+        return a;
+    if (predfnc(&a->key, &b->key)) {
+        a->next = merge_things(a->next, b, predfnc);
+        return a;
+    }
+    b->next = merge_things(b->next, a, predfnc);
+    return b;
+}
+
+thing_t *
+merge_sort(thing_t *root, predicate_t predfnc)
+{
+    thing_t *right;
+    if (root == NULL || root->next == NULL)
+        return root;
+    right = split_in_half(root); /* root is the left */
+    root = merge_sort(root, predfnc);
+    right = merge_sort(right, predfnc);
+    return merge_things(root, right, predfnc);
+}
+
+void test16()
+{
+    int i, rand[] = {10097, 32533, 76520, 13586, 34673,
+        54876, 80959, 9117, 39292, 74945, -1};
+    thing_t *root;
+    root = NULL;
+    for (i=0; rand[i] >= 0; i++)
+        test_append(&root, rand[i]);
+    test_print(root);
+
+#if 0
+    /* now with cycle */
+    do {
+        /* add cycle
+         */
+        thing_t *t = *last_thing__is_slow(&root);
+        t->next = root;
+    } while (0);
+#endif
+
+    root = merge_sort(root, lesser_than);
+    test_print(root);
+}
+@
+
+from what I recall, the only missing part is shuffling, that is trivially done
+with vectors and Fisher-Yates shuffle algorithm
+
+<<rtt>>=
+void test()
+{
+    test1();
+    test2();
+    test3();
+    test4();
+    test5();
+    test6();
+    test7();
+    test8();
+    test9();
+    test10();
+    test11();
+    test12();
+    test13();
+    test14();
+    test15();
+    test16();
+}
+@
