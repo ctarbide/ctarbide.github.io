@@ -72,7 +72,7 @@ nofake --error -Rrender <<PRIMARY SOURCES>> | sh
 @
 
 <<PRIMARY SOURCES>>=
-<<TOP>>/assets.nw README.txt
+<<TOP>>/assets.nw README.txt test-list.nw
 @
 
 <<TOP>>=

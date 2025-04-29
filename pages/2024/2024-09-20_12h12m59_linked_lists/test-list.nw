@@ -38,9 +38,10 @@ set -- "$@" test-list.nw
 
 using bdwgc is just nice, it can also double as a leak detector
 
-<<set LIBS>>=
-LIBS=-lgc
-export LIBS
+<<function c_expr>>=
+c_expr(){
+    SOURCE_IN_STDIN=1 INCLUDE_HOME_LOCAL=1 LIBS=-lgc c-expr.sh
+}
 @
 
 <<*>>=
@@ -48,6 +49,7 @@ export LIBS
 set -eu
 trap 'rm -f rtt.nw' 0 1 2 3 15
 # trap 'test -f rtt.nw && mv -f rtt.nw rtt-ok.nw' 0 1 2 3 15
+<<function c_expr>>
 set --
 <<set sources>>
 if ! nofake-exec.sh --error -Rrtt --suffix .r "$@" -- rtt -x; then
@@ -56,17 +58,8 @@ if ! nofake-exec.sh --error -Rrtt --suffix .r "$@" -- rtt -x; then
     fi
     exit 1
 fi
-<<cal c-expr.sh with sources>>
-@
-
-<<cal c-expr.sh with sources>>=
 for arg do srcs="${srcs:+${srcs} }${arg}"; done
-SOURCE_IN_STDIN=1
-export SOURCE_IN_STDIN
-ADDITIONAL_SOURCES="${srcs} rtt.nw"
-export ADDITIONAL_SOURCES
-<<set LIBS>>
-cat<<'EOF' | c-expr.sh #| head -n20
+cat<<'EOF' | ADDITIONAL_SOURCES="${srcs} rtt.nw" c_expr #| head -n20
 test();
 CHECK_LEAKS();
 EOF
