@@ -8,8 +8,12 @@ Copyright (c) 2003-2023 Fabrice Bellard and the QEMU Project developers
 spicy 0.42
 @
 
+<<spice-guest-tools>>=
+spice-guest-tools-0.141.exe
+@
+
 <<file>>=
-/libvirt-storage/winxp_sp3_x86_vs6sp6.qcow2
+/libvirt-storage/winxp_sp3_x86.qcow2
 @
 
 <<other iproute2 interesting commands>>=
@@ -47,6 +51,14 @@ fi
 
 Most of these qemu settings came from 'ps axf' while using virt-manager.
 
+Using 'rtl8139' driver should work out-of-the-box to let you install virtio
+drivers.
+
+<<tap network - rtl8139>>=
+set -- "$@" -netdev '{"type":"tap","ifname":"tap99","id":"tapnet99","script":"no","downscript":"no"}'
+set -- "$@" -device '{"driver":"rtl8139","netdev":"tapnet99","id":"net0","mac":"52:54:00:69:c7:22"}'
+@
+
 <<tap network - virtio-net-pci>>=
 set -- "$@" -netdev '{"type":"tap","ifname":"tap99","id":"tapnet99","script":"no","downscript":"no"}'
 set -- "$@" -device '{"driver":"virtio-net-pci","netdev":"tapnet99","id":"net0","mac":"52:54:00:69:c7:22"}'
@@ -81,20 +93,37 @@ winxpsp3x86
 nofake-exec.sh --error -Rrun.sh -orun.sh README.txt -- sh -eu
 @
 
+<<create incremental image from backing image>>=
+backing=<<file>>
+out=${backing%.qcow2}--temp.qcow2
+
+if [ ! -f "${out}" ]; then
+    chmod a-w "${backing}"
+    qemu-img create -f qcow2 -o backing_file="${backing}" -F qcow2 "${out}"
+fi
+@
+
 <<run.sh>>=
 <<sh preamble>>
+
+virtio_drivers_installed=no
 
 set --
 
 <<machine settings>>
-<<tap network - virtio-net-pci>>
-<<spice server and devices>>
-<<spice audio>>
+
+if [ x"${virtio_drivers_installed}" = xyes ]; then
+    <<tap network - virtio-net-pci>>
+    <<spice server and devices>>
+    <<spice audio>>
+    set -- "$@" -vga qxl
+else
+    <<tap network - rtl8139>>
+fi
 
 set -- "$@" -name <<guest name>>
 set -- "$@" -monitor stdio
 set -- "$@" -boot order=dc
-set -- "$@" -vga qxl
 
 exec qemu-system-x86_64 "$@" <<file>>
 @
@@ -108,11 +137,11 @@ spicy -h 127.0.0.1 -p 5900 --title '<<guest name>>'
 <<references>>=
 - https://www.spice-space.org/spice-user-manual.html
 
+- https://www.spice-space.org/download/windows/spice-guest-tools/spice-guest-tools-0.141/<<spice-guest-tools>>
+
 - https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/virtio-win-0.1.248-1/virtio-win-0.1.248.iso
 
     - latest drivers
-
-- https://www.spice-space.org/download/windows/spice-guest-tools/spice-guest-tools-0.141/spice-guest-tools-0.141.exe
 
 @
 
@@ -131,6 +160,9 @@ spicy -h 127.0.0.1 -p 5900 --title '<<guest name>>'
 
 **************** Tun/Tap Setup
 
+The steps below help create an exclusive network between the host and the
+guest, isolated from the internet.
+
 **** Setup
 
     <<tap setup - run as root>>
@@ -143,13 +175,35 @@ spicy -h 127.0.0.1 -p 5900 --title '<<guest name>>'
 
     <<other iproute2 interesting commands>>
 
+**************** Install Guest OS drivers
+
+Install `<<spice-guest-tools>>` in guest os, link in references.
+
 **************** Run Script
+
+First run with `virtio_drivers_installed=no` to be able to download from
+the host and then install `<<spice-guest-tools>>`.
+
+After successfully installing guest tools, then restart the guest with
+`virtio_drivers_installed=yes`.
 
     <<run.sh>>
 
-**** Tip
+**************** Tips
+
+**** launch from README.txt
 
     <<launch from README.txt>>
+
+**** use a backing file
+
+    <<create incremental image from backing image>>
+
+N.B.: update `qemu-system-x86_64` call to use the `--temp.qcow2` suffix
+
+**** get back in time (away from 2038)
+
+    set -- "$@" -rtc base=2022-01-01,clock=vm
 
 **************** Spicy Viewer
 

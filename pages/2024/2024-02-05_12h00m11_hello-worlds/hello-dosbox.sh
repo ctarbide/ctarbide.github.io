@@ -21,7 +21,7 @@ echo "hello world!"
 <<prog>>=
 thisprog=${1}; shift
 setnw(){ printf -- '@<<%s>>=\n%s\n@\n' "${1}" "${2}" >>"${0}.nw"; }
-setnw KBLAYOUT "${KBLAYOUT}" 
+setnw KBLAYOUT "${KBLAYOUT}"
 setnw CWD "`pwd`"
 exec nofake-exec.sh --error -Rconf "${thisprog}" "${0}.nw" -- "${DOSBOX}" -conf
 @
