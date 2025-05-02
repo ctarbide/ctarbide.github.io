@@ -52,6 +52,9 @@ Copyright (c) 2003-2023 Fabrice Bellard and the QEMU Project developers
 
 <h2>Tun/Tap Setup</h2>
 
+<p>The steps below help create an exclusive network between the host and the
+guest, isolated from the internet.</p>
+
 <h3>Setup</h3>
 
 <pre><code>#!/bin/sh
@@ -87,10 +90,22 @@ ip -brief addr
 ip route
 </code></pre>
 
+<h2>Install Guest OS drivers</h2>
+
+<p>Install <code>spice-guest-tools-0.141.exe</code> in guest os, link in references.</p>
+
 <h2>Run Script</h2>
+
+<p>First run with <code>virtio_drivers_installed=no</code> to be able to download from
+the host and then install <code>spice-guest-tools-0.141.exe</code>.</p>
+
+<p>After successfully installing guest tools, then restart the guest with
+<code>virtio_drivers_installed=yes</code>.</p>
 
 <pre><code>#!/bin/sh
 set -eu
+
+virtio_drivers_installed=no
 
 set --
 
@@ -101,25 +116,51 @@ set -- "$@" -m 'size=2097152k'
 set -- "$@" -object '{"qom-type":"memory-backend-ram","id":"pc.ram","size":2147483648}'
 set -- "$@" -overcommit 'mem-lock=off'
 set -- "$@" -smp '2,sockets=2,cores=1,threads=1'
-set -- "$@" -netdev '{"type":"tap","ifname":"tap99","id":"tapnet99","script":"no","downscript":"no"}'
-set -- "$@" -device '{"driver":"virtio-net-pci","netdev":"tapnet99","id":"net0","mac":"52:54:00:69:c7:22"}'
-set -- "$@" -spice port=5900,addr=127.0.0.1,disable-ticketing=on
-set -- "$@" -device virtio-serial -chardev spicevmc,id=vdagent,debug=0,name=vdagent
-set -- "$@" -device virtserialport,chardev=vdagent,name=com.redhat.spice.0
-set -- "$@" -audiodev '{"id":"audio1","driver":"spice"}'
-set -- "$@" -device '{"driver":"AC97","id":"sound0","audiodev":"audio1"}'
+
+if [ x"${virtio_drivers_installed}" = xyes ]; then
+    set -- "$@" -netdev '{"type":"tap","ifname":"tap99","id":"tapnet99","script":"no","downscript":"no"}'
+    set -- "$@" -device '{"driver":"virtio-net-pci","netdev":"tapnet99","id":"net0","mac":"52:54:00:69:c7:22"}'
+    set -- "$@" -spice port=5900,addr=127.0.0.1,disable-ticketing=on
+    set -- "$@" -device virtio-serial -chardev spicevmc,id=vdagent,debug=0,name=vdagent
+    set -- "$@" -device virtserialport,chardev=vdagent,name=com.redhat.spice.0
+    set -- "$@" -audiodev '{"id":"audio1","driver":"spice"}'
+    set -- "$@" -device '{"driver":"AC97","id":"sound0","audiodev":"audio1"}'
+    set -- "$@" -vga qxl
+else
+    set -- "$@" -netdev '{"type":"tap","ifname":"tap99","id":"tapnet99","script":"no","downscript":"no"}'
+    set -- "$@" -device '{"driver":"rtl8139","netdev":"tapnet99","id":"net0","mac":"52:54:00:69:c7:22"}'
+fi
 
 set -- "$@" -name winxpsp3x86
 set -- "$@" -monitor stdio
 set -- "$@" -boot order=dc
-set -- "$@" -vga qxl
 
-exec qemu-system-x86_64 "$@" /libvirt-storage/winxp_sp3_x86_vs6sp6.qcow2
+exec qemu-system-x86_64 "$@" /libvirt-storage/winxp_sp3_x86.qcow2
 </code></pre>
 
-<h3>Tip</h3>
+<h2>Tips</h2>
+
+<h3>launch from README.txt</h3>
 
 <pre><code>nofake-exec.sh --error -Rrun.sh -orun.sh README.txt -- sh -eu
+</code></pre>
+
+<h3>use a backing file</h3>
+
+<pre><code>backing=/libvirt-storage/winxp_sp3_x86.qcow2
+out=${backing%.qcow2}--temp.qcow2
+
+if [ ! -f "${out}" ]; then
+    chmod a-w "${backing}"
+    qemu-img create -f qcow2 -o backing_file="${backing}" -F qcow2 "${out}"
+fi
+</code></pre>
+
+<p>N.B.: update <code>qemu-system-x86_64</code> call to use the <code>--temp.qcow2</code> suffix</p>
+
+<h3>get back in time (away from 2038)</h3>
+
+<pre><code>set -- "$@" -rtc base=2022-01-01,clock=vm
 </code></pre>
 
 <h2>Spicy Viewer</h2>
@@ -141,15 +182,15 @@ exec qemu-system-x86_64 "$@" /libvirt-storage/winxp_sp3_x86_vs6sp6.qcow2
 
 <ul>
 <li><p><a href="https://www.spice-space.org/spice-user-manual.html">https://www.spice-space.org/spice-user-manual.html</a></p></li>
+<li><p><a href="https://www.spice-space.org/download/windows/spice-guest-tools/spice-guest-tools-0.141/spice-guest-tools-0.141.exe">https://www.spice-space.org/download/windows/spice-guest-tools/spice-guest-tools-0.141/spice-guest-tools-0.141.exe</a></p></li>
 <li><p><a href="https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/virtio-win-0.1.248-1/virtio-win-0.1.248.iso">https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/virtio-win-0.1.248-1/virtio-win-0.1.248.iso</a></p>
 
 <ul>
 <li>latest drivers</li>
 </ul></li>
-<li><p><a href="https://www.spice-space.org/download/windows/spice-guest-tools/spice-guest-tools-0.141/spice-guest-tools-0.141.exe">https://www.spice-space.org/download/windows/spice-guest-tools/spice-guest-tools-0.141/spice-guest-tools-0.141.exe</a></p></li>
 </ul>
 
 <p>More details in the link below.</p>
-<p> This <a href="README.txt">page</a> was last modified on March 18, 2024 at 14:56:59 UTC.
+<p> This <a href="README.txt">page</a> was last modified on May  2, 2025 at 21:56:31 UTC.
 
-<!-- Generated in 0.066 seconds on March 18, 2024 at 14:57:06 UTC. -->
+<!-- Generated in 0.086 seconds on May  2, 2025 at 21:56:39 UTC. -->
