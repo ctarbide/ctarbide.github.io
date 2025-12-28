@@ -22,6 +22,8 @@
 
 - [hello sh perl](hello-sh-perl.sh.html)
 
+- [hello pari/gp](hello-parigp.sh.html)
+
 **************** hello pdf?
 
 [Sure](hello-pdf.sh.html), here is the [output](hello-pdf.pdf).

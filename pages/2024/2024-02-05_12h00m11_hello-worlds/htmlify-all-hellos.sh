@@ -26,7 +26,7 @@ for i in "${thisprog}" hello-*.sh; do
     i=${i#./}
     if [ ! -e "${i}.html" -o "${i}" -nt "${i}.html" ]; then
         nofake --error -R'html preamble' "$@" >"${i}.html"
-        ( <<htmlify "${i}">> ) | <<md-autoheader-autolink.pl>> |
+        ( <<htmlify "${i}">> ) |
             <<assets - md.pl for pages>> >>"${i}.html"
     fi
 done
@@ -36,7 +36,7 @@ done
 printf -- '### [index.html](index.html)\n\n'
 test -f README.txt && printf -- '### [README.txt](README.txt)\n\n'
 test -f README.html && printf -- '### [README.html](README.html)\n\n'
-printf '**** Code for [`%s`](%s):\n\n' "${i}" "${i}"
+printf '### Code for [`%s`](%s):\n\n' "${i}" "${i}"
 printf '<pre style="margin-left: 3ch;"><code>'
 escape "${i}"
 printf '</code></pre>\n'

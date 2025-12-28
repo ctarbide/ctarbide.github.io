@@ -42,7 +42,7 @@ done
 
 STAMP=${stamp}
 ITEM_ID=${item_id}
-ITEM_URI=`perl -MURI::Escape -sle'print uri_escape($n)' -- -n="${ITEM_ID}"`
+ITEM_URI=`perl -MCGI::Util=escape -sle'print escape($n)' -- -n="${ITEM_ID}"`
 DOC_ID=${stamp}_${item_id}
 DOCRELDIR=${year}/${DOC_ID}
 DOCABSDIR=${kbdir}/${DOCRELDIR}

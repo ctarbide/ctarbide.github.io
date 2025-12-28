@@ -109,7 +109,7 @@ find pages/ -mindepth 3 -maxdepth 3 -name .draft -type f
 @
 
 <<generate pages listing>>=
-<<find pages - Makefile>> | LC_ALL=C sort -r | perl -MURI::Escape -le'
+<<find pages - Makefile>> | LC_ALL=C sort -r | perl -MCGI::Util=escape -le'
     printf(qq{@<<pages listing>>=\n});
     printf(qq{<ul>\n});
     while (<STDIN>) {
@@ -119,7 +119,7 @@ find pages/ -mindepth 3 -maxdepth 3 -name .draft -type f
         next if -f qq{${_}/.hidden};
         next unless m{^( pages/ [12]\d{3} / ) (.*)$}xi;
         my ($date, $item) = ($1, $2);
-        my $url = $date . uri_escape($item);
+        my $url = $date . escape($item);
         print(qq{<li><p><a href="${url}/">${item}</a></p></li>});
     }
     printf(qq{</ul>\n});
