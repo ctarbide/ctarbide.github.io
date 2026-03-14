@@ -39,14 +39,14 @@ body {
 <pre style="margin-left: 3ch;"><code>#!/bin/sh
 # https&colon;//ctarbide.github.io/pages/2024/2024-02-05_12h00m11_hello-worlds/
 # https&colon;//github.com/ctarbide/coolscripts/blob/master/bin/nofake-exec.nw
-set -eu; set -- "${0}" --ba-- "$@" --ea--
+set -eu; set -- "${0}" --ba-- "${0}" "$@" --ea--
 set -- "$@" --tmp-- .o --tmp-- .out
-SH=${SH&colon;-sh}; export SH
-exec nofake-exec.sh --error -Rprog "$@" -- "${SH}" -eu -c '
-    as -march=i386 -32 "${0}" -o "${0}.o"
-    ld -m elf_i386 "${0}.o" -o "${0}.out"
-    exec "${0}.out" "$@"
-'
+SH=${SH&colon;-sh -eu}; export SH
+exec nofake-exec.sh --error -Rprog "$@" -- ${SH} -c '
+    as -march=i386 -32 "${1}" -o "${1}.o"
+    ld -m elf_i386 "${1}.o" -o "${1}.out"
+    exec "${1}.out" "$@"
+' --
 exit 1
 
 This is a live literate program.

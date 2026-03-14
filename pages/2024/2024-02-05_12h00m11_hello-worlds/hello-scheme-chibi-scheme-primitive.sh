@@ -1,12 +1,12 @@
 #!/bin/sh
 # https://ctarbide.github.io/pages/2024/2024-02-05_12h00m11_hello-worlds/
 # https://github.com/ctarbide/coolscripts/blob/master/bin/nofake-exec.nw
-set -eu; set -- "${0}" --ba-- "$@" --ea--
-SH=${SH:-sh}; export SH
-exec nofake-exec.sh --error -Rprog "$@" -- "${SH}" -eu -c '
+set -eu; set -- "${0}" --ba-- "${0}" "$@" --ea--
+SH=${SH:-sh -eu}; export SH
+exec nofake-exec.sh --error -Rprog "$@" -- ${SH} -c '
     exec chibi-scheme -x "chibi primitive" \
-        -e "(%load \"${0}\" (current-environment))" -- "$@"
-'
+        -e "(%load \"${1}\" (current-environment))" -- "$@"
+' --
 exit 1
 
 This is a live literate program.

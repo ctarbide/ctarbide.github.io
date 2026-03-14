@@ -3,8 +3,8 @@
 # https://github.com/ctarbide/coolscripts/blob/master/bin/nofake-exec.nw
 set -eu; set -- "${0}" --ba-- "${0}" "$@" --ea--
 set -- "$@" --tmp-- .nw
-SH=${SH:-sh}; export SH
-exec nofake-exec.sh --error -Rprog0 "$@" -- "${SH}" -eu
+SH=${SH:-sh -eu}; export SH
+exec nofake-exec.sh --error -Rprog0 "$@" -- ${SH}
 exit 1
 
 This is a live literate program.
@@ -24,7 +24,7 @@ thisprog=${1}; shift
 ) >"${0}.nw"
 
 exec nofake-exec.sh --error -Rprog "${thisprog}" "${0}.nw" \
-    --ba-- "$@" --ea-- -- "${SH}" -eu
+    --ba-- "$@" --ea-- -- ${SH}
 @
 
 <<try this>>=

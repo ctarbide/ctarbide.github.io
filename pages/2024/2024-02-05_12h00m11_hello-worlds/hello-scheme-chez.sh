@@ -3,7 +3,7 @@
 # https://github.com/ctarbide/coolscripts/blob/master/bin/nofake-exec.nw
 set -eu; set -- "${0}" --ba-- "$@" --ea--
 CHEZ=${CHEZ:-chez-scheme}; export CHEZ
-exec nofake-exec.sh --error -Rprog "$@" -- "${CHEZ}" --script
+exec nofake-exec.sh --error -Rprog "$@" -- ${CHEZ} --script
 exit 1
 
 This is a live literate program.

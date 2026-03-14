@@ -2,19 +2,17 @@
 # https://ctarbide.github.io/pages/2024/2024-02-05_12h00m11_hello-worlds/
 # https://github.com/ctarbide/coolscripts/blob/master/bin/nofake-exec.nw
 set -eu; set -- "${0}" --ba-- "${0}" "$@" --ea--
-set -- "$@" --tmp-- .out
+set -- "$@" --tmp-- .cmi --tmp-- .cmx --tmp-- .o --tmp-- .native --suffix .ml
 SH=${SH:-sh -eu}; export SH
 exec nofake-exec.sh --error -Rprog "$@" -- ${SH} -c '
-    csc -o "${1}.out" "${1}"
-    exec "${1}.out" "$@"
+    # ocamlopt -c -dcmm "${1}"
+    ocamlopt -o "${1%.ml}.native" "${1}"
+    exec "${1%.ml}.native"
 ' --
 exit 1
 
 This is a live literate program.
 
-<<tested with versions>>=
-- Version 5.3.0 (rev e31bbee5)
-@
-
 <<prog>>=
-(display "hello world!\n")
+print_endline "hello world!"
+@

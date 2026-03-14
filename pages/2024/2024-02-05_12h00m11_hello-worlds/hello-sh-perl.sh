@@ -2,10 +2,10 @@
 # https://ctarbide.github.io/pages/2024/2024-02-05_12h00m11_hello-worlds/
 # https://github.com/ctarbide/coolscripts/blob/master/bin/nofake-exec.nw
 set -eu; set -- "${0}" --ba-- "${0}" "$@" --ea--
-SH=${SH:-sh}; export SH
-PERL=${PERL:-perl}; export PERL
+SH=${SH:-sh -eu}; export SH
+PERL=${PERL:-perl -w}; export PERL
 printf -- '[%s]\n' "${0}"
-exec nofake-exec.sh --error -Rmain "$@" -- "${SH}" -eu
+exec nofake-exec.sh --error -Rmain "$@" -- ${SH}
 exit 1
 
 This is a live literate program.
@@ -23,8 +23,8 @@ thisprog=${1} # the initial script
 mainprog=${0}
 set -- "${thisprog}" --ba-- "${mainprog}" "$@" --ea--
 printf -- '[%s] -> [%s]\n' "${thisprog}" "${mainprog}"
-[ -t 0 ] || nofake-exec.sh -R'stdin is non-tty' "${thisprog}" -- "${PERL}" -wl
-nofake --error -Rdata "${thisprog}" | nofake-exec.sh --error -Rperl "$@" -- "${PERL}" -w
+[ -t 0 ] || nofake-exec.sh -R'stdin is non-tty' "${thisprog}" -- ${PERL} -l
+nofake --error -Rdata "${thisprog}" | nofake-exec.sh --error -Rperl "$@" -- ${PERL}
 @
 
 <<perl>>=

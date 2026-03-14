@@ -3,10 +3,10 @@
 # https://github.com/ctarbide/coolscripts/blob/master/bin/nofake-exec.nw
 set -eu; set -- "${0}" --ba-- "${0}" "$@" --ea--
 set -- "$@" --tmp-- .nw
-SH=${SH:-sh}; export SH
+SH=${SH:-sh -eu}; export SH
 DOSBOX=${DOSBOX:-dosbox}; export DOSBOX
 KBLAYOUT=${KBLAYOUT:-us}; export KBLAYOUT
-exec nofake-exec.sh --error -Rprog "$@" -- "${SH}" -eu
+exec nofake-exec.sh --error -Rprog "$@" -- ${SH}
 exit 1
 
 This is a live literate program.
@@ -23,7 +23,7 @@ thisprog=${1}; shift
 setnw(){ printf -- '@<<%s>>=\n%s\n@\n' "${1}" "${2}" >>"${0}.nw"; }
 setnw KBLAYOUT "${KBLAYOUT}"
 setnw CWD "`pwd`"
-exec nofake-exec.sh --error -Rconf "${thisprog}" "${0}.nw" -- "${DOSBOX}" -conf
+exec nofake-exec.sh --error -Rconf "${thisprog}" "${0}.nw" -- ${DOSBOX} -conf
 @
 
 <<conf>>=

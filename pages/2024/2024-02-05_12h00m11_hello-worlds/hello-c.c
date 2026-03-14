@@ -1,3 +1,4 @@
+#line 27 "hello-c.sh"
 #line 97 "hello-c.sh"
 #ifndef _BSD_SOURCE
 #define _BSD_SOURCE
@@ -11,6 +12,7 @@
 #ifndef _POSIX_C_SOURCE
 #define _POSIX_C_SOURCE		200112L
 #endif
+#line 28 "hello-c.sh"
 #line 112 "hello-c.sh"
 #include <stdlib.h>
 #include <stdio.h>
@@ -19,6 +21,7 @@
 #include <string.h>
 #include <fcntl.h>
 #include <unistd.h>
+#line 29 "hello-c.sh"
 #line 33 "hello-c.sh"
 int
 main(int argc, char **argv)

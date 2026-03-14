@@ -3,8 +3,8 @@
 # https://github.com/ctarbide/coolscripts/blob/master/bin/nofake-exec.nw
 set -eu; set -- "${0}" --ba-- "${0}" "$@" --ea--
 set -- "$@" --tmp-- .nw
-SH=${SH:-sh}; export SH
-exec nofake-exec.sh --error -Rprog "$@" -- "${SH}" -eu
+SH=${SH:-sh -eu}; export SH
+exec nofake-exec.sh --error -Rprog "$@" -- ${SH}
 exit 1
 
 \documentclass{article}

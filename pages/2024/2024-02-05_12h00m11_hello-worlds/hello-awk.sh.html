@@ -39,13 +39,15 @@ body {
 <pre style="margin-left: 3ch;"><code>#!/bin/sh
 # https&colon;//ctarbide.github.io/pages/2024/2024-02-05_12h00m11_hello-worlds/
 # https&colon;//github.com/ctarbide/coolscripts/blob/master/bin/nofake-exec.nw
-set -eu; set -- "${0}" --ba-- "$@" --ea--
-SH=${SH&colon;-sh}; export SH
+set -eu; set -- "${0}" --ba-- "${0}" "$@" --ea--
+SH=${SH&colon;-sh -eu}; export SH
 AWK=${AWK&colon;-awk}; export AWK
-exec nofake-exec.sh --error -Rprog "$@" -- "${SH}" -eu -c '
+exec nofake-exec.sh --error -Rprog "$@" -- ${SH} -c '
+    awkprog=${1}; shift
+    thisprog=${1}; shift
     [ -t 0 ] &amp;&amp; exec &lt;/dev/null
-    exec "${AWK}" -f "${0}" "$@"
-'
+    exec ${AWK} -f "${awkprog}" "$@"
+' --
 exit 1
 
 This is a live literate program.

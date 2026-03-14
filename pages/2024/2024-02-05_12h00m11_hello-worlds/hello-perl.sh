@@ -2,8 +2,8 @@
 # https://ctarbide.github.io/pages/2024/2024-02-05_12h00m11_hello-worlds/
 # https://github.com/ctarbide/coolscripts/blob/master/bin/nofake-exec.nw
 set -eu; set -- "${0}" --ba-- "${0}" "$@" --ea--
-PERL=${PERL:-perl}; export PERL
-exec nofake-exec.sh --error -Rprog "$@" -- "${PERL}" -wl
+PERL=${PERL:-perl -w}; export PERL
+exec nofake-exec.sh --error -Rprog "$@" -- ${PERL} -l
 exit 1
 
 This is a live literate program.

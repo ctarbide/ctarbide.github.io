@@ -39,13 +39,13 @@ body {
 <pre style="margin-left: 3ch;"><code>#!/bin/sh
 # https&colon;//ctarbide.github.io/pages/2024/2024-02-05_12h00m11_hello-worlds/
 # https&colon;//github.com/ctarbide/coolscripts/blob/master/bin/nofake-exec.nw
-set -eu; set -- "${0}" --ba-- "$@" --ea--
-SH=${SH&colon;-sh}; export SH
-exec nofake-exec.sh --error -Rprog "$@" -- "${SH}" -eu -c '
-    exec 3&lt;"${0}"
+set -eu; set -- "${0}" --ba-- "${0}" "$@" --ea--
+SH=${SH&colon;-sh -eu}; export SH
+exec nofake-exec.sh --error -Rprog "$@" -- ${SH} -c '
+    exec 3&lt;"${1}"
     [ -t 0 ] || perl -lne"}{print(qq{Input discarded, \${.} lines.})"
     exec scheme48 -a batch 0&lt;&amp;3
-'
+' --
 exit 1
 
 This is a live literate program.

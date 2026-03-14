@@ -41,8 +41,8 @@ body {
 # https&colon;//github.com/ctarbide/coolscripts/blob/master/bin/nofake-exec.nw
 set -eu; set -- "${0}" --ba-- "${0}" "$@" --ea--
 set -- "$@" --tmp-- .nw
-SH=${SH&colon;-sh}; export SH
-exec nofake-exec.sh --error -Rprog "$@" -- "${SH}" -eu
+SH=${SH&colon;-sh -eu}; export SH
+exec nofake-exec.sh --error -Rprog "$@" -- ${SH}
 exit 1
 
 \documentclass{article}
