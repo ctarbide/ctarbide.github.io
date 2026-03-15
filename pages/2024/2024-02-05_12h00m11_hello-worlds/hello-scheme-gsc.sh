@@ -9,7 +9,7 @@ GSI=${GSI:-gsi}
 export SH GSC GSI
 exec nofake-exec.sh --error -Rprog "$@" -- ${SH} -c '
     ${GSC} -o "${1}.o1" "${1}"
-    exec ${GSI} "${1}.o1"
+    exec ${GSI} "${1}.o1" "$@"
 ' --
 exit 1
 
@@ -32,4 +32,6 @@ GSC=gsc ./hello-scheme-gsc.sh
 @
 
 <<prog>>=
+@;gsi-script
 (display "hello world!\n")
+(pretty-print (command-line))

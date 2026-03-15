@@ -8,7 +8,7 @@ GSC=${GSC:-gambit-gsc}
 export SH GSC
 exec nofake-exec.sh --error -Rprog "$@" -- ${SH} -c '
     ${GSC} -exe -o "${1}.out" "${1}"
-    exec "${1}.out"
+    exec "${1}.out" "$@"
 ' --
 exit 1
 
@@ -31,4 +31,6 @@ GSC=gsc ./hello-scheme-gsc-alt.sh
 @
 
 <<prog>>=
+@;gsi-script
 (display "hello world!\n")
+(pretty-print (command-line))
