@@ -12,5 +12,7 @@ This is a live literate program.
 @
 
 <<prog>>=
-(format #t "args: ~s~%" (command-line))
+(format #t "full args: ~s~%" (command-line))
+(format #t "thisprog: ~s~%" (car command-line-arguments))
+(format #t "args: ~s~%" (cdr command-line-arguments))
 (display "hello world!\n")

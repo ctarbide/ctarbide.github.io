@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<style>
+pre {
+    font-family: "Lucida Console", Courier, monospace;
+    font-size: 14pt;
+}
+code {
+    font-family: "Lucida Console", Courier, monospace;
+    font-size: 14pt;
+}
+body {
+    color: #111;
+    width: 90ch;
+    max-width: calc(100vw - 8ch);
+    margin: 3ch auto 6ch auto;
+    font-family: Georgia, "Bitstream Charter", serif;
+    font-size: 14pt;
+}
+@media (prefers-color-scheme: dark) {
+    body {
+        color: #fbfbfe;
+        background-color: #1c1b22;
+    }
+    a:visited {
+        color: #aac;
+    }
+    a {
+        color: #6af;
+    }
+}
+</style>
+<h3><a href="index.html">index.html</a></h3>
+
+<h3><a href="README.txt">README.txt</a></h3>
+
+<h3>Code for <a href="hello-nashorn.sh"><code>hello-nashorn.sh</code></a>:</h3>
+
+<pre style="margin-left: 3ch;"><code>#!/bin/sh
+# https&colon;//ctarbide.github.io/pages/2024/2024-02-05_12h00m11_hello-worlds/
+# https&colon;//github.com/ctarbide/coolscripts/blob/master/bin/nofake-exec.nw
+set -eu; set -- "${0}" --ba-- "${0}" "$@" --ea--
+set -- "$@" --suffix .js
+SH=${SH&colon;-sh -eu}; export SH
+exec nofake-exec.sh --error -Rprog "$@" -- ${SH} -c '
+    prog=${1}; shift
+    thisprog=${1}; shift
+    #exec ~/showargs-nl nashorn.sh "${prog}" "$@"
+    exec nashorn.sh "${prog}" -- "$@"
+' --
+exit 1
+
+This is a live literate program.
+
+&lt;&lt;tested with versions>>=
+- 17.0.15, Java OpenJDK 64-Bit Server VM
+- nashorn 15.6
+&#x40;
+
+&lt;&lt;see also>>=
+- https&colon;//github.com/ctarbide/java-scripting
+
+    - provides a `nashorn.sh`
+
+&#x40;
+
+&lt;&lt;prog>>=
+const System = Java.type("java.lang.System");
+const JavaString = Java.type("java.lang.String");
+
+const println = s => System.out.println(s);
+
+if (!Array.from) Array.from = x => [].slice.call(x);
+
+println("hello world!");
+const args = Array.from(arguments);
+println(`args&colon; ${JavaString.join(", ", args.map(x => `"${x}"`))}`);
+
+var LogManager = Java.type('org.apache.logging.log4j.LogManager');
+var LogManager_getLogger = Java.type('org.apache.logging.log4j.LogManager')['getLogger(String)'];
+
+var LOG = LogManager_getLogger("hello-nashorn.sh");
+
+LOG.trace("testing&colon; {}", 'trace message');
+LOG.debug("testing&colon; {}", 'debug message');
+LOG.info("testing&colon; {}", 'info message');
+LOG.warn("testing&colon; {}", 'warn message');
+
+LOG.info("current file name&colon; {}", __FILE__);
+</code></pre>
