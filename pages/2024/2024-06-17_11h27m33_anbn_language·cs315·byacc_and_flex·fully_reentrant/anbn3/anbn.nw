@@ -30,35 +30,10 @@
 #include <errno.h>
 
 <<definitions>>
-
-<<typedef anbn_program>>
-
-<<typedef yyscan_t>>
-<<typedef yy_size_t>>
-<<typedef yy_state_type>>
-
-<<typedef YY_BUFFER_STATE>>
-
-<<typedef flex_int8_t>>
-<<typedef flex_uint8_t>>
-<<typedef flex_int16_t>>
-<<typedef flex_uint16_t>>
-<<typedef flex_int32_t>>
-<<typedef flex_uint32_t>>
-
-<<typedef YY_CHAR>>
-<<typedef YYINT>>
-<<typedef YYSTYPE>>
-
-<<typedef YYSTACKDATA>>
-
-<<struct yy_buffer_state>>
-<<struct yyguts_t>>
-
+<<typedefs>>
+<<structs and unions>>
 <<globals>>
-
 <<protos>>
 <<protos - static>>
-
 <<impl>>
 @

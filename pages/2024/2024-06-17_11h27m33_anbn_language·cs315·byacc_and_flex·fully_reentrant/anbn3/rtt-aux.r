@@ -52,6 +52,7 @@ typedef IGNORE _Bool;
 #include <stddef.h>
 #include <stdarg.h>
 #include <inttypes.h>
+#include <stdio.h>
 
 typedef IGNORE YYSTYPE;
 
